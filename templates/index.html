@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Adobe Firefly Replica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --panel-bg: #ffffff;
+            --text-color: #333333;
+            --text-secondary: #666666;
+            --accent-color: #0066cc;
+            --border-color: #e0e0e0;
+            --hover-color: #f0f0f0;
+        }
+
+        .dark-mode {
+            --bg-color: #1a1a1a;
+            --panel-bg: #2a2a2a;
+            --text-color: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent-color: #4d9fff;
+            --border-color: #3a3a3a;
+            --hover-color: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .header {
+            background-color: var(--panel-bg);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            width: 30px;
+            height: 30px;
+            background-color: var(--accent-color);
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header-actions button {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            margin-left: 15px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        .header-actions button:hover {
+            color: var(--accent-color);
+        }
+
+        .content {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 320px;
+            background-color: var(--panel-bg);
+            padding: 25px;
+            overflow-y: auto;
+            border-right: 1px solid var(--border-color);
+            transition: background-color 0.3s;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        select, .custom-select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:hover, .custom-select:hover {
+            background-color: var(--hover-color);
+        }
+
+        .content-type-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .content-type-buttons button {
+            flex: 1;
+            padding: 12px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .content-type-buttons button:hover {
+            background-color: var(--hover-color);
+        }
+
+        .content-type-buttons button.active {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        .toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 28px;
+            background-color: var(--bg-color);
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background-color: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active {
+            background-color: var(--accent-color);
+        }
+
+        .toggle-switch.active::after {
+            left: 24px;
+        }
+
+        .upload-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .upload-buttons button {
+            flex: 1;
+            padding: 12px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-buttons button:hover {
+            background-color: var(--hover-color);
+        }
+
+        .reference-images {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .reference-images .image {
+            width: 80px;
+            height: 80px;
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            flex-grow: 1;
+            margin-bottom: 120px;
+        }
+
+        .image-box {
+            aspect-ratio: 1;
+            background-color: var(--panel-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--text-secondary);
+        }
+
+        .image-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-box button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            padding: 8px 12px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .image-box:hover button {
+            opacity: 1;
+        }
+
+        .prompt-container {
+            position: fixed;
+            bottom: 0;
+            left: 320px;
+            right: 0;
+            background-color: var(--panel-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 20px;
+            z-index: 1000;
+            transition: background-color 0.3s;
+        }
+
+        #prompt {
+            width: calc(100% - 140px);
+            padding: 12px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 14px;
+            margin-right: 15px;
+            transition: all 0.3s;
+        }
+
+        #prompt:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+        }
+
+        #generateButton {
+            padding: 12px 25px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #generateButton:hover {
+            background-color: #0052a3;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .prompt-container {
+                left: 0;
+            }
+        }
+
+        #darkModeToggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 18px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        #darkModeToggle:hover {
+            color: var(--accent-color);
+        }
+        @keyframes skeletonLoading {
+    0% {
+        background-color: hsl(200, 20%, 80%);
+    }
+    100% {
+        background-color: hsl(200, 20%, 95%);
+    }
+}
+
+.skeleton-loading {
+    animation: skeletonLoading 1s linear infinite alternate;
+}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo"></div>
+        <div class="header-title">Text to Image</div>
+        <div class="header-actions">
+            <button>💬</button>
+            <button>⬆️</button>
+            <button>⋯</button>
+            <button id="darkModeToggle">🌓</button>
+        </div>
+    </div>
+    <div class="content">
+        <div class="sidebar">
+            <div class="section">
+                <div class="section-title">General settings</div>
+                <select id="model">
+                    <option value="flux-dev">Firefly Image 3</option>
+                </select>
+                <select id="image_size">
+                    <option value="512">Square (1:1)</option>
+                    <option value="768">Large Square (1:1)</option>
+                </select>
+            </div>
+            <div class="section">
+                <div class="section-title">Content type</div>
+                <div class="content-type-buttons">
+                    <button class="active" data-style="art style">Art</button>
+                    <button data-style="photo realistic">Photo</button>
+                </div>
+                <div class="toggle">
+                    <span>Auto</span>
+                    <div class="toggle-switch"></div>
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-title">Composition</div>
+                <div class="custom-select">Reference</div>
+                <div class="upload-buttons">
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    <button onclick="document.getElementById('fileInput').click()">Upload Image</button>
+                    <button>Browse gallery</button>
+                </div>
+                <div class="reference-images">
+                    <div class="image" id="uploadedImage"></div>
+                    <div class="image"></div>
+                    <div class="image"></div>
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="image-grid" id="resultGrid">
+                <div class="image-box"></div>
+                <div class="image-box"></div>
+                <div class="image-box"></div>
+                <div class="image-box"></div>
+            </div>
+            <div class="prompt-container">
+                <input type="text" id="prompt" placeholder="Enter your prompt here">
+                <button id="generateButton">Generate</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        let selectedStyle = 'art style';
+        let selectedColor = 'vibrant colors';
+    
+        document.querySelectorAll('.content-type-buttons button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelector('.content-type-buttons button.active').classList.remove('active');
+                this.classList.add('active');
+                selectedStyle = this.dataset.style;
+            });
+        });
+    
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('uploadedImage').style.backgroundImage = `url(${e.target.result})`;
+                    document.getElementById('uploadedImage').style.backgroundSize = 'cover';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    
+        document.getElementById('generateButton').addEventListener('click', function() {
+    const formData = new FormData();
+    const fileInput = document.getElementById('fileInput');
+    const prompt = document.getElementById('prompt').value;
+
+    if (!prompt) {
+        alert('Please enter a prompt.');
+        return;
+    }
+
+    formData.append('image_size', document.getElementById('image_size').value);
+    formData.append('style', selectedStyle);
+    formData.append('color', selectedColor);
+    formData.append('prompt', prompt);
+
+    // Add file to formData if one is uploaded
+    if (fileInput.files.length > 0) {
+        formData.append('file', fileInput.files[0]);
+    }
+
+    // Show skeleton loading in image boxes
+    const resultGrid = document.getElementById('resultGrid');
+    resultGrid.innerHTML = '';
+    for (let i = 0; i < 4; i++) {
+        const imageBox = document.createElement('div');
+        imageBox.className = 'image-box skeleton-loading';
+        resultGrid.appendChild(imageBox);
+    }
+
+    // Actual API call
+    axios.post('/transform', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    .then(response => {
+        const imageUrls = response.data.image_urls;
+        const generatedCount = response.data.generated_count;
+        
+        document.querySelectorAll('.image-box').forEach((box, index) => {
+            box.classList.remove('skeleton-loading');
+            if (index < imageUrls.length && imageUrls[index]) {
+                box.style.backgroundImage = `url('${imageUrls[index]}')`;
+                box.style.backgroundSize = 'cover';
+                
+                const downloadButton = document.createElement('button');
+                downloadButton.textContent = 'Download';
+                downloadButton.onclick = () => window.location.href = `/download?url=${encodeURIComponent(imageUrls[index])}`;
+                
+                box.appendChild(downloadButton);
+            }
+        });
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while generating the images.');
+        resultGrid.innerHTML = '<div class="error">Error generating images. Please try again.</div>';
+    });
+});
+    </script>
+</body>
+</html>
