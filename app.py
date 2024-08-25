@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash, g
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import os
 import replicate
@@ -17,8 +17,8 @@ load_dotenv()
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
-app.config['SECRET_KEY'] = 'your_secret_key_here'  # Change this to a random secret key
-app.config['DATABASE_URL'] = "postgresql://ada_user:49IUgdx0lzU0TITw7lVcMr2y1FRsbLNR@dpg-cr5cbol2ng1s73ecq15g-a.oregon-postgres.render.com/ada"
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')  # Load from .env
+app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')  # Load from .env
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
@@ -58,6 +58,12 @@ def init_db():
             password VARCHAR(255) NOT NULL
         )
     """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS images (
+            id SERIAL PRIMARY KEY,
+            url VARCHAR(255) NOT NULL
+        )
+    """)
     conn.commit()
     cur.close()
     conn.close()
@@ -70,6 +76,10 @@ def init_db():
 # Instead, call init_db() when the app starts
 with app.app_context():
     init_db()
+
+@app.before_request
+def before_request():
+    g.db = get_db_connection()
 
 @app.route('/')
 @login_required
@@ -179,6 +189,14 @@ def transform_image():
 
             time.sleep(1)  # Add a short delay between API calls
 
+            # Save each generated image URL to the database
+            for url in image_urls:
+                if url:
+                    cur = g.db.cursor()
+                    cur.execute("INSERT INTO images (url) VALUES (%s)", (url,))
+                    g.db.commit()
+                    cur.close()
+
         # Pad the image_urls list to always have 4 items
         image_urls = image_urls + [None] * (4 - len(image_urls))
 
@@ -205,6 +223,14 @@ def download_image():
         return send_file(image_data, mimetype='image/png', as_attachment=True, download_name='generated_image.png')
     except Exception as e:
         return jsonify({"error": f"Failed to download image: {str(e)}"}), 500
+
+@app.route('/previous_images', methods=['GET'])
+def previous_images():
+    cur = g.db.cursor()
+    cur.execute("SELECT url FROM images")
+    images = cur.fetchall()
+    cur.close()
+    return jsonify({"images": [img[0] for img in images]})
 
 if __name__ == '__main__':
     app.run(debug=True, port=4000)

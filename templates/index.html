@@ -504,6 +504,22 @@
     background-color: #0056b3;
     transform: translateY(-2px);
 }
+
+/* Add this section to display previously generated images */
+#previous-images {
+    margin-top: 20px;
+}
+
+#images-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+#images-container img {
+    width: 200px;
+    margin: 10px;
+}
     </style>
 </head>
 <body>
@@ -572,6 +588,11 @@
             <div class="prompt-container">
                 <input type="text" id="prompt" placeholder="Enter your prompt here">
                 <button id="generateButton">Generate</button>
+            </div>
+            <!-- Add this section to display previously generated images -->
+            <div id="previous-images">
+                <h2>Previously Generated Images</h2>
+                <div id="images-container"></div>
             </div>
         </div>
     </div>
@@ -688,6 +709,21 @@
                 localStorage.setItem('darkMode', null);
             }
         });
+
+        // Fetch previously generated images on page load
+        fetch('/previous_images')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('images-container');
+                data.images.forEach(url => {
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.alt = 'Generated Image';
+                    img.style.width = '200px'; // Adjust size as needed
+                    img.style.margin = '10px';
+                    container.appendChild(img);
+                });
+            });
     </script>
 </body>
 </html>
