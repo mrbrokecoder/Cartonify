@@ -617,31 +617,7 @@
             opacity: 0.6;
             cursor: not-allowed;
         }
-
-        .premium-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            margin-left: 10px;
-            background: linear-gradient(45deg, #FFD700, #FF4500);
-            color: white;
-            text-decoration: none;
-            border-radius: 15px;
-            font-weight: bold;
-            font-size: 0.9em;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .premium-badge:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .credits-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-         /* Add this to your existing styles */
+            /* Add this to your existing styles */
     .premium-badge {
         display: inline-block;
         padding: 5px 10px;
@@ -669,7 +645,10 @@
     </style>
 </head>
 <body>
-
+    <div class="popup-overlay" id="imagePopup">
+        <div class="popup-content">
+        </div>
+    </div>
         <!-- Add this block for flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -912,7 +891,7 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
 
             // Disable the generate button and show loading state
             generateButton.disabled = true;
-            generateButton.textContent = 'Generating...';
+            generateButton.textContent = 'Generate';
 
             // Show skeleton loading in image boxes
             const resultGrid = document.getElementById('resultGrid');
@@ -992,20 +971,5 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
             }
         });
     </script>
-    <script>
-        function checkScreenSize() {
-            if (window.innerWidth <= 768) {
-                window.location.href = '/mobile';
-            }
-        }
-    
-        // Check screen size on page load
-        checkScreenSize();
-    
-        // Check screen size on window resize
-        window.addEventListener('resize', checkScreenSize);
-    </script>
-    </body>
-    </html>
 </body>
 </html>
