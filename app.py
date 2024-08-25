@@ -23,21 +23,31 @@ import random
 
 load_dotenv()
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # This loads the variables from .env
+
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
-app.config['SECRET_KEY'] = 'your_secret_key_here'  # Change this to a random secret key
-app.config['DATABASE_URL'] = "postgresql://ada_user:49IUgdx0lzU0TITw7lVcMr2y1FRsbLNR@dpg-cr5cbol2ng1s73ecq15g-a.oregon-postgres.render.com/ada"
-app.config['STRIPE_PUBLIC_KEY'] = 'pk_test_MpawxI5H45tHVB0uudWg2ktW00KRGGnelH'
-app.config['STRIPE_SECRET_KEY'] = 'sk_test_8A4TXOVZzkMgc8PVGfs0cQZ200kNa9kp2M'
+app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER')
+app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_CONTENT_LENGTH'))  # 16MB max upload size
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
+app.config['STRIPE_PUBLIC_KEY'] = os.getenv('STRIPE_PUBLISHABLE_KEY')
+app.config['STRIPE_SECRET_KEY'] = os.getenv('STRIPE_SECRET_KEY')
 stripe.api_key = app.config['STRIPE_SECRET_KEY']
 app.config['SESSION_TYPE'] = 'filesystem'
 
 # Add these configurations
-app.config['SMTP_SERVER'] = 'mail.spofykart.tech'
-app.config['SMTP_PORT'] = 465
-app.config['SMTP_USERNAME'] = 'adarsh@spofykart.tech'
-app.config['SMTP_PASSWORD'] = 'Adarsh@800850'
+app.config['SMTP_SERVER'] = os.getenv('SMTP_SERVER')
+app.config['SMTP_PORT'] = int(os.getenv('SMTP_PORT'))
+app.config['SMTP_USERNAME'] = os.getenv('SMTP_USERNAME')
+app.config['SMTP_PASSWORD'] = os.getenv('SMTP_PASSWORD')
+app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
+stripe.api_key = app.config['STRIPE_SECRET_KEY']
+app.config['SESSION_TYPE'] = 'filesystem'
+
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 

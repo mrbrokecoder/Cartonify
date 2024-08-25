@@ -1,7 +1,9 @@
 Flask
 Flask-Login
-psycopg2-binary
-replicate
 python-dotenv
 Werkzeug
+psycopg2-binary
+replicate
 requests
+stripe
+APScheduler
