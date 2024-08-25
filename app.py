@@ -161,14 +161,6 @@ def init_db():
         ADD COLUMN IF NOT EXISTS monthly_quota INTEGER DEFAULT 0;
     """)
     
-    # Add default settings columns
-    cur.execute("""
-        ALTER TABLE users 
-        ADD COLUMN IF NOT EXISTS default_size INTEGER DEFAULT 512,
-        ADD COLUMN IF NOT EXISTS default_style VARCHAR(255) DEFAULT 'art style',
-        ADD COLUMN IF NOT EXISTS default_color VARCHAR(255) DEFAULT 'vibrant';
-    """)
-    
     conn.commit()
     cur.close()
     conn.close()
@@ -195,7 +187,33 @@ def custom_datetime(value):
             except ValueError:
                 return value
     return value
+
+@app.route('/')
+@login_required
+def index():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM images WHERE user_id = %s ORDER BY created_at DESC", (current_user.id,))
+    images = cur.fetchall()
     
+    # Get user's premium status and remaining credits
+    cur.execute("SELECT is_premium, prompt_count, monthly_quota FROM users WHERE id = %s", (current_user.id,))
+    user_data = cur.fetchone()
+    is_premium, prompt_count, monthly_quota = user_data
+    
+    cur.close()
+    conn.close()
+    
+    # Calculate remaining credits
+    if is_premium:
+        remaining_credits = monthly_quota
+    else:
+        remaining_credits = 5 - prompt_count
+    
+    return render_template('index.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
+
+# ... (existing imports and configurations) ...
+
 @app.route('/mobile')
 @login_required
 def mobile_home():
@@ -213,7 +231,7 @@ def mobile_home():
     cur.close()
     conn.close()
     
-    return render_template('mobile_home.html', remaining_credits=remaining_credits)
+    return render_template('mobile.html', remaining_credits=remaining_credits)
 
 @app.route('/mobile/gallery')
 @login_required
@@ -283,6 +301,7 @@ def mobile_profile():
     
     return render_template('mobile_profile.html', remaining_credits=remaining_credits)
 
+# ... (rest of your Flask application) ...
 @app.route('/check_login')
 def check_login():
     return jsonify({"logged_in": current_user.is_authenticated})
