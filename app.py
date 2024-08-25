@@ -161,6 +161,14 @@ def init_db():
         ADD COLUMN IF NOT EXISTS monthly_quota INTEGER DEFAULT 0;
     """)
     
+    # Add default settings columns
+    cur.execute("""
+        ALTER TABLE users 
+        ADD COLUMN IF NOT EXISTS default_size INTEGER DEFAULT 512,
+        ADD COLUMN IF NOT EXISTS default_style VARCHAR(255) DEFAULT 'art style',
+        ADD COLUMN IF NOT EXISTS default_color VARCHAR(255) DEFAULT 'vibrant';
+    """)
+    
     conn.commit()
     cur.close()
     conn.close()
@@ -187,30 +195,93 @@ def custom_datetime(value):
             except ValueError:
                 return value
     return value
-
-@app.route('/')
+    
+@app.route('/mobile')
 @login_required
-def index():
+def mobile_home():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM images WHERE user_id = %s ORDER BY created_at DESC", (current_user.id,))
-    images = cur.fetchall()
-    
-    # Get user's premium status and remaining credits
     cur.execute("SELECT is_premium, prompt_count, monthly_quota FROM users WHERE id = %s", (current_user.id,))
     user_data = cur.fetchone()
     is_premium, prompt_count, monthly_quota = user_data
     
-    cur.close()
-    conn.close()
-    
-    # Calculate remaining credits
     if is_premium:
         remaining_credits = monthly_quota
     else:
         remaining_credits = 5 - prompt_count
     
-    return render_template('index.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
+    cur.close()
+    conn.close()
+    
+    return render_template('mobile_home.html', remaining_credits=remaining_credits)
+
+@app.route('/mobile/gallery')
+@login_required
+def mobile_gallery():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM images WHERE user_id = %s ORDER BY created_at DESC", (current_user.id,))
+    images = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('mobile_gallery.html', images=images)
+
+@app.route('/mobile/settings', methods=['GET', 'POST'])
+@login_required
+def mobile_settings():
+    if request.method == 'POST':
+        # Save the user's settings
+        default_size = request.form.get('default_size')
+        default_style = request.form.get('default_style')
+        default_color = request.form.get('default_color')
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE users 
+            SET default_size = %s, default_style = %s, default_color = %s 
+            WHERE id = %s
+        """, (default_size, default_style, default_color, current_user.id))
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        flash('Settings saved successfully', 'success')
+        return redirect(url_for('mobile_settings'))
+    
+    # Get the user's current settings
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT default_size, default_style, default_color FROM users WHERE id = %s", (current_user.id,))
+    user_settings = cur.fetchone()
+    cur.close()
+    conn.close()
+    
+    default_size, default_style, default_color = user_settings or (512, 'art style', 'vibrant')
+    
+    return render_template('mobile_settings.html', 
+                           default_size=default_size, 
+                           default_style=default_style, 
+                           default_color=default_color)
+
+@app.route('/mobile/profile')
+@login_required
+def mobile_profile():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT is_premium, prompt_count, monthly_quota FROM users WHERE id = %s", (current_user.id,))
+    user_data = cur.fetchone()
+    is_premium, prompt_count, monthly_quota = user_data
+    
+    if is_premium:
+        remaining_credits = monthly_quota
+    else:
+        remaining_credits = 5 - prompt_count
+    
+    cur.close()
+    conn.close()
+    
+    return render_template('mobile_profile.html', remaining_credits=remaining_credits)
 
 @app.route('/check_login')
 def check_login():

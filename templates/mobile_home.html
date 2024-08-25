@@ -1,0 +1,41 @@
+{% extends "mobile.html" %}
+{% block content %}
+<div class="section">
+    <div class="section-title">Generate Image</div>
+    <input type="text" id="prompt" placeholder="Enter your prompt here">
+    <select id="image_size">
+        <option value="256">Small Square (256x256)</option>
+        <option value="512">Medium Square (512x512)</option>
+        <option value="768">Large Square (768x768)</option>
+    </select>
+    <select id="style">
+        <option value="art style">Art</option>
+        <option value="photo realistic">Photo</option>
+        <option value="cartoon">Cartoon</option>
+    </select>
+    <select id="color">
+        <option value="vibrant">Vibrant</option>
+        <option value="pastel">Pastel</option>
+        <option value="monochrome">Monochrome</option>
+        <option value="earthy">Earthy</option>
+    </select>
+    <button id="generateButton">Generate</button>
+</div>
+
+<div class="section">
+    <div class="section-title">Generated Images</div>
+    <div class="image-grid" id="resultGrid">
+        <!-- Generated images will be inserted here -->
+    </div>
+</div>
+
+<div class="credits-info">
+    {% if current_user.is_premium %}
+        <span>Premium: {{ remaining_credits }} / 1600 credits</span>
+    {% else %}
+        <span>Free: {{ remaining_credits }} / 5 credits</span>
+        <br>
+        <a href="{{ url_for('premium') }}" class="premium-badge">Buy Premium</a>
+    {% endif %}
+</div>
+{% endblock %}

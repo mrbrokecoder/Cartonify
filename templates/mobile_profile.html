@@ -1,0 +1,15 @@
+{% extends "mobile.html" %}
+{% block content %}
+<div class="section">
+    <div class="section-title">Your Profile</div>
+    <p>Email: {{ current_user.email }}</p>
+    <p>Account Type: {% if current_user.is_premium %}Premium{% else %}Free{% endif %}</p>
+    <p>Remaining Credits: {{ remaining_credits }}</p>
+    {% if not current_user.is_premium %}
+    <a href="{{ url_for('premium') }}" class="premium-badge">Upgrade to Premium</a>
+    {% endif %}
+</div>
+<div class="section">
+    <a href="{{ url_for('logout') }}" class="button">Logout</a>
+</div>
+{% endblock %}
