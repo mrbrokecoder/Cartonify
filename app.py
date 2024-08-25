@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash, g
+from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash, session
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import os
 import replicate
@@ -11,14 +11,33 @@ import time
 import psycopg2
 from psycopg2 import sql
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime, timedelta
+import secrets  # Add this import at the top of the file
+import stripe
+from apscheduler.schedulers.background import BackgroundScheduler
+import atexit
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import random
 
 load_dotenv()
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')  # Load from .env
-app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')  # Load from .env
+app.config['SECRET_KEY'] = 'your_secret_key_here'  # Change this to a random secret key
+app.config['DATABASE_URL'] = "postgresql://ada_user:49IUgdx0lzU0TITw7lVcMr2y1FRsbLNR@dpg-cr5cbol2ng1s73ecq15g-a.oregon-postgres.render.com/ada"
+app.config['STRIPE_PUBLIC_KEY'] = 'pk_test_MpawxI5H45tHVB0uudWg2ktW00KRGGnelH'
+app.config['STRIPE_SECRET_KEY'] = 'sk_test_8A4TXOVZzkMgc8PVGfs0cQZ200kNa9kp2M'
+stripe.api_key = app.config['STRIPE_SECRET_KEY']
+app.config['SESSION_TYPE'] = 'filesystem'
+
+# Add these configurations
+app.config['SMTP_SERVER'] = 'mail.spofykart.tech'
+app.config['SMTP_PORT'] = 465
+app.config['SMTP_USERNAME'] = 'adarsh@spofykart.tech'
+app.config['SMTP_PASSWORD'] = 'Adarsh@800850'
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
@@ -27,21 +46,25 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 class User(UserMixin):
-    def __init__(self, id, email, password):
+    def __init__(self, id, email, password, is_premium=False, prompt_count=0, subscription_start=None, monthly_quota=0):
         self.id = id
         self.email = email
         self.password = password
+        self.is_premium = is_premium
+        self.prompt_count = prompt_count
+        self.subscription_start = subscription_start
+        self.monthly_quota = monthly_quota
 
 @login_manager.user_loader
 def load_user(user_id):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    cur.execute("SELECT id, email, password, COALESCE(is_premium, FALSE) as is_premium, COALESCE(prompt_count, 0) as prompt_count, subscription_start, monthly_quota FROM users WHERE id = %s", (user_id,))
     user = cur.fetchone()
     cur.close()
     conn.close()
     if user:
-        return User(user[0], user[1], user[2])
+        return User(user[0], user[1], user[2], user[3], user[4], user[5], user[6])
     return None
 
 def get_db_connection():
@@ -51,6 +74,8 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
+    
+    # Create users table if it doesn't exist
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,
@@ -58,57 +83,203 @@ def init_db():
             password VARCHAR(255) NOT NULL
         )
     """)
+    
+    # Add is_premium column if it doesn't exist
+    cur.execute("""
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                           WHERE table_name='users' AND column_name='is_premium') THEN
+                ALTER TABLE users ADD COLUMN is_premium BOOLEAN DEFAULT FALSE;
+            END IF;
+        END $$;
+    """)
+    
+    # Add prompt_count column if it doesn't exist
+    cur.execute("""
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                           WHERE table_name='users' AND column_name='prompt_count') THEN
+                ALTER TABLE users ADD COLUMN prompt_count INTEGER DEFAULT 0;
+            END IF;
+        END $$;
+    """)
+    
+    # Create images table with all necessary columns
     cur.execute("""
         CREATE TABLE IF NOT EXISTS images (
             id SERIAL PRIMARY KEY,
-            url VARCHAR(255) NOT NULL
+            user_id INTEGER REFERENCES users(id),
+            url VARCHAR(255) NOT NULL,
+            prompt TEXT,
+            style VARCHAR(255),
+            color VARCHAR(255),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    
+    # Add columns if they don't exist
+    columns_to_add = [
+        ('user_id', 'INTEGER REFERENCES users(id)'),
+        ('prompt', 'TEXT'),
+        ('style', 'VARCHAR(255)'),
+        ('color', 'VARCHAR(255)'),
+        ('created_at', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
+    ]
+    
+    for column_name, column_type in columns_to_add:
+        cur.execute(f"""
+            DO $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                               WHERE table_name='images' AND column_name='{column_name}') THEN
+                    ALTER TABLE images ADD COLUMN {column_name} {column_type};
+                END IF;
+            END $$;
+        """)
+    
+    # Add api_key column to users table
+    cur.execute("""
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS api_key VARCHAR(64) UNIQUE;
+    """)
+    
+    # Add subscription_start and monthly_quota columns
+    cur.execute("""
+        ALTER TABLE users 
+        ADD COLUMN IF NOT EXISTS subscription_start TIMESTAMP,
+        ADD COLUMN IF NOT EXISTS monthly_quota INTEGER DEFAULT 0;
+    """)
+    
     conn.commit()
     cur.close()
     conn.close()
 
-# Remove this decorator
-# @app.before_first_request
-# def create_tables():
-#     init_db()
 
-# Instead, call init_db() when the app starts
 with app.app_context():
     init_db()
 
-@app.before_request
-def before_request():
-    g.db = get_db_connection()
+def safe_get(data, index, default=None):
+    if isinstance(data, dict):
+        return data.get(index, default)
+    elif isinstance(data, (list, tuple)):
+        return data[index] if index < len(data) else default
+    return default
+
+@app.template_filter('custom_datetime')
+def custom_datetime(value):
+    if isinstance(value, str):
+        try:
+            return datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f')
+        except ValueError:
+            try:
+                return datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                return value
+    return value
 
 @app.route('/')
 @login_required
 def index():
-    return render_template('index.html')
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM images WHERE user_id = %s ORDER BY created_at DESC", (current_user.id,))
+    images = cur.fetchall()
+    
+    # Get user's premium status and remaining credits
+    cur.execute("SELECT is_premium, prompt_count, monthly_quota FROM users WHERE id = %s", (current_user.id,))
+    user_data = cur.fetchone()
+    is_premium, prompt_count, monthly_quota = user_data
+    
+    cur.close()
+    conn.close()
+    
+    # Calculate remaining credits
+    if is_premium:
+        remaining_credits = monthly_quota
+    else:
+        remaining_credits = 5 - prompt_count
+    
+    return render_template('index.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
 
 @app.route('/check_login')
 def check_login():
     return jsonify({"logged_in": current_user.is_authenticated})
 
+def send_otp_email(email, otp):
+    msg = MIMEMultipart()
+    msg['From'] = app.config['SMTP_USERNAME']
+    msg['To'] = email
+    msg['Subject'] = 'Your OTP for signup'
+    
+    body = f'Your OTP for signup is: {otp}'
+    msg.attach(MIMEText(body, 'plain'))
+    
+    with smtplib.SMTP_SSL(app.config['SMTP_SERVER'], app.config['SMTP_PORT']) as server:
+        server.login(app.config['SMTP_USERNAME'], app.config['SMTP_PASSWORD'])
+        server.send_message(msg)
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE email = %s", (email,))
-        if cur.fetchone():
-            flash('Email already exists')
-            return redirect(url_for('signup'))
-        hashed_password = generate_password_hash(password)
-        cur.execute("INSERT INTO users (email, password) VALUES (%s, %s)", (email, hashed_password))
-        conn.commit()
-        cur.close()
-        conn.close()
-        flash('Account created successfully')
-        return redirect(url_for('login'))
-    return render_template('signup.html')
+        if 'otp' in request.form:
+            # OTP verification step
+            email = session.get('signup_email')
+            otp = request.form['otp']
+            
+            if otp != session.get('signup_otp'):
+                flash('Invalid OTP')
+                return render_template('signup.html', email=email, show_otp=True)
+            
+            # OTP is valid, create the user
+            password = session.get('signup_password')
+            hashed_password = generate_password_hash(password)
+            
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("INSERT INTO users (email, password) VALUES (%s, %s)", (email, hashed_password))
+            conn.commit()
+            cur.close()
+            conn.close()
+            
+            # Clear session data
+            session.pop('signup_otp', None)
+            session.pop('signup_email', None)
+            session.pop('signup_password', None)
+            
+            flash('Account created successfully')
+            return redirect(url_for('login'))
+        else:
+            # Initial signup step
+            email = request.form['email']
+            password = request.form['password']
+            
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM users WHERE email = %s", (email,))
+            if cur.fetchone():
+                flash('Email already exists')
+                cur.close()
+                conn.close()
+                return redirect(url_for('signup'))
+            cur.close()
+            conn.close()
+            
+            # Generate OTP
+            otp = str(random.randint(100000, 999999))
+            
+            # Store OTP and user details in session
+            session['signup_otp'] = otp
+            session['signup_email'] = email
+            session['signup_password'] = password
+            
+            # Send OTP via email
+            send_otp_email(email, otp)
+            
+            flash('OTP sent to your email. Please enter it to complete signup.')
+            return render_template('signup.html', email=email, show_otp=True)
+    
+    return render_template('signup.html', show_otp=False)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -122,7 +293,7 @@ def login():
         cur.close()
         conn.close()
         if user and check_password_hash(user[2], password):
-            user_obj = User(user[0], user[1], user[2])
+            user_obj = User(user[0], user[1], user[2], user[3], user[4], user[5], user[6])
             login_user(user_obj)
             return redirect(url_for('index'))
         flash('Invalid email or password')
@@ -135,8 +306,44 @@ def logout():
     flash('You have been logged out successfully.', 'info')
     return redirect(url_for('login'))
 
+def check_user_quota(user):
+    if not user.is_premium:
+        return user.prompt_count < 5
+    else:
+        # Check if the subscription has expired
+        if user.subscription_start and datetime.now() - user.subscription_start > timedelta(days=30):
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("""
+                UPDATE users 
+                SET is_premium = FALSE, 
+                    subscription_start = NULL, 
+                    monthly_quota = 0 
+                WHERE id = %s
+            """, (user.id,))
+            conn.commit()
+            cur.close()
+            conn.close()
+            return False
+        return user.monthly_quota > 0
+
 @app.route('/transform', methods=['POST'])
+@login_required
 def transform_image():
+    if not check_user_quota(current_user):
+        return jsonify({
+            'quota_exceeded': True,
+            'is_premium': current_user.is_premium
+        }), 403
+    
+    prompt = request.form.get('prompt')
+    if not prompt:
+        return jsonify({'error': 'No prompt provided'}), 400
+
+    # Check for NSFW content (implement your own NSFW detection logic)
+    if is_nsfw(prompt):
+        return jsonify({'nsfw_content': True}), 400
+
     image_size = int(request.form.get('image_size', 512))
     style = request.form.get('style', 'art style')
     color = request.form.get('color', 'vibrant colors')
@@ -148,10 +355,10 @@ def transform_image():
         "return_width": image_size,
         "return_height": image_size,
         "prompt": f"{prompt}, {style}, {color}",
-        "num_samples": 1,  # Generate 1 image per API call
+        "num_samples": 1,
         "num_inference_steps": 20,
         "guidance_scale": 9,
-        "nsfw": True  # Ensure the API knows you want NSFW content
+        "nsfw": True
     }
 
     if 'file' in request.files:
@@ -172,12 +379,12 @@ def transform_image():
 
     try:
         image_urls = []
-        for _ in range(4):  # Make 4 API calls to get 4 images
+        for _ in range(2):
             output = replicate.run(
                 "black-forest-labs/flux-schnell",
                 input=input_data
             )
-            app.logger.info(f"API Output: {output}")  # Log the API output
+            app.logger.info(f"API Output: {output}")
 
             if isinstance(output, str):
                 image_urls.append(output)
@@ -187,30 +394,55 @@ def transform_image():
             if len(image_urls) == 4:
                 break
 
-            time.sleep(1)  # Add a short delay between API calls
+            time.sleep(1)
 
-            # Save each generated image URL to the database
-            for url in image_urls:
-                if url:
-                    cur = g.db.cursor()
-                    cur.execute("INSERT INTO images (url) VALUES (%s)", (url,))
-                    g.db.commit()
-                    cur.close()
+        image_urls = image_urls + [None] * (2 - len(image_urls))
 
-        # Pad the image_urls list to always have 4 items
-        image_urls = image_urls + [None] * (4 - len(image_urls))
+        # Save image information to the database
+        conn = get_db_connection()
+        cur = conn.cursor()
+        for url in image_urls:
+            if url:
+                cur.execute("""
+                    INSERT INTO images (user_id, url, prompt, style, color, created_at)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (current_user.id, url, prompt, style, color, datetime.now()))
+
+        # Update quota after successful generation
+        if current_user.is_premium:
+            cur.execute("UPDATE users SET monthly_quota = monthly_quota - 1 WHERE id = %s", (current_user.id,))
+        else:
+            cur.execute("UPDATE users SET prompt_count = prompt_count + 1 WHERE id = %s", (current_user.id,))
+
+        conn.commit()
+        cur.close()
+        conn.close()
 
         return jsonify({
             "image_urls": image_urls,
-            "generated_count": len([url for url in image_urls if url is not None])
+            "generated_count": len([url for url in image_urls if url is not None]),
+            "quota_exceeded": False,
+            "is_premium": current_user.is_premium
         })
     except Exception as e:
-        app.logger.error(f"API Error: {str(e)}")  # Log any errors
+        cur.close()
+        conn.close()
+        app.logger.error(f"API Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
     return jsonify({"error": "Image generation failed"}), 500
 
+# Implement these functions based on your specific requirements
+def is_nsfw(prompt):
+    # Implement NSFW detection logic
+    pass
+
+def update_user_quota(user):
+    # Update user's quota in the database
+    pass
+
 @app.route('/download', methods=['GET'])
+@login_required
 def download_image():
     image_url = request.args.get('url')
     if not image_url:
@@ -224,13 +456,218 @@ def download_image():
     except Exception as e:
         return jsonify({"error": f"Failed to download image: {str(e)}"}), 500
 
-@app.route('/previous_images', methods=['GET'])
-def previous_images():
-    cur = g.db.cursor()
-    cur.execute("SELECT url FROM images")
+@app.route('/debug')
+@login_required
+def debug():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM images WHERE user_id = %s ORDER BY created_at DESC", (current_user.id,))
     images = cur.fetchall()
     cur.close()
-    return jsonify({"images": [img[0] for img in images]})
+    conn.close()
+    
+    debug_info = {
+        "image_count": len(images),
+        "first_image_type": str(type(images[0])) if images else None,
+        "first_image_length": len(images[0]) if images else None,
+        "first_image_data": str(images[0]) if images else None,
+    }
+    
+    return jsonify(debug_info)
+
+@app.route('/api_management')
+@login_required
+def api_management():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT api_key FROM users WHERE id = %s", (current_user.id,))
+    api_key = cur.fetchone()[0]
+    cur.close()
+    conn.close()
+    return render_template('api_management.html', api_key=api_key)
+
+@app.route('/generate_api_key', methods=['POST'])
+@login_required
+def generate_api_key():
+    api_key = secrets.token_urlsafe(48)  # Generate a 64-character URL-safe API key
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET api_key = %s WHERE id = %s", (api_key, current_user.id))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({"api_key": api_key})
+
+@app.route('/api/transform', methods=['POST'])
+def api_transform_image():
+    api_key = request.headers.get('X-API-Key')
+    if not api_key:
+        return jsonify({"error": "API key is required"}), 401
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id FROM users WHERE api_key = %s", (api_key,))
+    user = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if not user:
+        return jsonify({"error": "Invalid API key"}), 401
+
+    # Use the existing transform_image logic, but with the API user's ID
+    user_id = user[0]
+    image_size = int(request.form.get('image_size', 512))
+    style = request.form.get('style', 'art style')
+    color = request.form.get('color', 'vibrant colors')
+    prompt = request.form.get('prompt', '')
+
+    input_data = {
+        "detect_resolution": image_size,
+        "image_resolution": image_size,
+        "return_width": image_size,
+        "return_height": image_size,
+        "prompt": f"{prompt}, {style}, {color}",
+        "num_samples": 1,
+        "num_inference_steps": 20,
+        "guidance_scale": 9,
+        "nsfw": True
+    }
+
+    if 'file' in request.files:
+        file = request.files['file']
+        if file and file.filename != '':
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+
+            with open(filepath, "rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+            input_data["image"] = f"data:image/png;base64,{encoded_string}"
+
+            try:
+                os.remove(filepath)
+            except Exception as e:
+                app.logger.error(f"Error removing file: {str(e)}")
+
+    try:
+        image_urls = []
+        for _ in range(2):
+            output = replicate.run(
+                "black-forest-labs/flux-schnell",
+                input=input_data
+            )
+            app.logger.info(f"API Output: {output}")
+
+            if isinstance(output, str):
+                image_urls.append(output)
+            elif isinstance(output, list) and len(output) > 0:
+                image_urls.append(output[0])
+
+            if len(image_urls) == 4:
+                break
+
+            time.sleep(1)
+
+        image_urls = image_urls + [None] * (2 - len(image_urls))
+
+        # Save image information to the database
+        conn = get_db_connection()
+        cur = conn.cursor()
+        for url in image_urls:
+            if url:
+                cur.execute("""
+                    INSERT INTO images (user_id, url, prompt, style, color, created_at)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (user_id, url, prompt, style, color, datetime.now()))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return jsonify({
+            "image_urls": image_urls,
+            "generated_count": len([url for url in image_urls if url is not None])
+        })
+    except Exception as e:
+        app.logger.error(f"API Error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify({"error": "Image generation failed"}), 500
+
+@app.route('/premium')
+@login_required
+def premium():
+    return render_template('premium.html', key=app.config['STRIPE_PUBLIC_KEY'])
+
+@app.route('/create-checkout-session', methods=['POST'])
+@login_required
+def create_checkout_session():
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    'price_data': {
+                        'currency': 'usd',
+                        'unit_amount': 500,
+                        'product_data': {
+                            'name': 'Premium Subscription',
+                            'description': 'Generate unlimited images',
+                        },
+                    },
+                    'quantity': 1,
+                },
+            ],
+            mode='payment',
+            success_url=url_for('premium_success', _external=True),
+            cancel_url=url_for('premium', _external=True),
+            client_reference_id=str(current_user.id),
+        )
+        return jsonify({'id': checkout_session.id})
+    except Exception as e:
+        return jsonify(error=str(e)), 403
+
+@app.route('/premium-success')
+@login_required
+def premium_success():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    subscription_start = datetime.now()
+    cur.execute("""
+        UPDATE users 
+        SET is_premium = TRUE, 
+            subscription_start = %s, 
+            monthly_quota = 1600 
+        WHERE id = %s
+    """, (subscription_start, current_user.id))
+    conn.commit()
+    cur.close()
+    conn.close()
+    flash('You are now a premium user! Your subscription will last for 30 days.', 'success')
+    return redirect(url_for('index'))
+
+# Add a background task to reset monthly quota
+def reset_monthly_quota():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        UPDATE users 
+        SET monthly_quota = 1600 
+        WHERE is_premium = TRUE AND subscription_start IS NOT NULL 
+        AND subscription_start + INTERVAL '30 days' > NOW()
+    """)
+    conn.commit()
+    cur.close()
+    conn.close()
+
+# Initialize the scheduler
+scheduler = BackgroundScheduler()
+scheduler.add_job(reset_monthly_quota, 'cron', day=1, hour=0, minute=0)
+scheduler.start()
+
+# Make sure to shut down the scheduler when the app is closing
+atexit.register(lambda: scheduler.shutdown())
 
 if __name__ == '__main__':
+    with app.app_context():
+        init_db()
     app.run(debug=True, port=4000)

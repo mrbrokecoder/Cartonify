@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Subscription</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .btn {
+            display: inline-block;
+            background: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upgrade to Premium</h1>
+        <p>Unlock the full potential of our image generation service!</p>
+        <ul>
+            <li>Generate unlimited images</li>
+            <li>No 5 prompt limit</li>
+            <li>Priority processing</li>
+        </ul>
+        <p>All this for just $5!</p>
+        <button id="checkout-button" class="btn">Upgrade Now</button>
+    </div>
+
+    <script>
+        var stripe = Stripe('{{ stripe_public_key }}');
+        var checkoutButton = document.getElementById('checkout-button');
+
+        checkoutButton.addEventListener('click', function() {
+            console.log('Button clicked');
+            checkoutButton.disabled = true;
+            
+            fetch('/create-checkout-session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product: 'premium_subscription'
+                })
+            })
+            .then(function(response) {
+                console.log('Response received', response);
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text) });
+                }
+                return response.json();
+            })
+            .then(function(session) {
+                console.log('Session ID received', session.id);
+                return stripe.redirectToCheckout({ sessionId: session.id });
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                alert('An error occurred: ' + error.message);
+            })
+            .finally(function() {
+                checkoutButton.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>

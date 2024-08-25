@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Key Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #2680eb;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            background-color: #2680eb;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #1a6dca;
+        }
+        #api-key-display {
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>API Key Management</h1>
+
+    <div id="api-key-display" class="section">
+        {% if api_key %}
+            <p>Your current API key: <code>{{ api_key }}</code></p>
+        {% else %}
+            <p>You don't have an API key yet.</p>
+        {% endif %}
+    </div>
+
+    <button id="generate-api-key">Generate New API Key</button>
+
+    <div class="section">
+        <h2>API Documentation</h2>
+        <h3>Endpoint</h3>
+        <p>POST <code>/api/transform</code></p>
+
+        <h3>Headers</h3>
+        <pre><code>X-API-Key: your_api_key_here
+Content-Type: multipart/form-data</code></pre>
+
+        <h3>Parameters</h3>
+        <ul>
+            <li><code>image_size</code> (string): Size of the output image (e.g., "512x512")</li>
+            <li><code>style</code> (string): Style of the image transformation</li>
+            <li><code>color</code> (string): Color scheme for the transformation</li>
+            <li><code>prompt</code> (string): Text prompt for image generation</li>
+            <li><code>file</code> (file): Input image file</li>
+        </ul>
+
+        <h3>Response</h3>
+        <p>JSON object containing:</p>
+        <ul>
+            <li><code>image_urls</code> (array): URLs of the generated images</li>
+            <li><code>generated_count</code> (integer): Number of successfully generated images</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Tutorial: Using the API</h2>
+        <ol>
+            <li>Generate an API key using the button above.</li>
+            <li>Use a tool like cURL or a programming language of your choice to make a POST request to the API endpoint.</li>
+            <li>Include your API key in the <code>X-API-Key</code> header.</li>
+            <li>Set the content type to <code>multipart/form-data</code>.</li>
+            <li>Include the required parameters (image_size, style, color, prompt, and file) in the request body.</li>
+            <li>Send the request and process the JSON response.</li>
+        </ol>
+
+        <h3>Example using cURL:</h3>
+        <pre><code>curl -X POST \
+  -H "X-API-Key: your_api_key_here" \
+  -F "image_size=512x512" \
+  -F "style=anime" \
+  -F "color=vibrant" \
+  -F "prompt=A beautiful landscape" \
+  -F "file=@/path/to/your/image.jpg" \
+  https://your-domain.com/api/transform</code></pre>
+
+        <h3>Example using Python with requests library:</h3>
+        <pre><code>import requests
+
+url = "https://your-domain.com/api/transform"
+headers = {
+    "X-API-Key": "your_api_key_here"
+}
+data = {
+    "image_size": "512x512",
+    "style": "anime",
+    "color": "vibrant",
+    "prompt": "A beautiful landscape"
+}
+files = {
+    "file": open("/path/to/your/image.jpg", "rb")
+}
+
+response = requests.post(url, headers=headers, data=data, files=files)
+result = response.json()
+print(result)</code></pre>
+    </div>
+
+    <script>
+    document.getElementById('generate-api-key').addEventListener('click', function() {
+        if (confirm('Generating a new API key will invalidate your existing key. Are you sure?')) {
+            fetch('/generate_api_key', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('api-key-display').innerHTML = `<p>Your new API key: <code>${data.api_key}</code></p>`;
+                });
+        }
+    });
+    </script>
+</body>
+</html>

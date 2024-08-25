@@ -48,13 +48,16 @@
 
         .header {
             background-color: var(--panel-bg);
-            padding: 15px 25px;
+            padding: 8px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .dark-mode .header {
@@ -63,32 +66,45 @@
         }
 
         .logo {
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(45deg, #fa0f00, #ff4d4d);
-            border-radius: 8px;
-            transition: background-color 0.3s;
-            box-shadow: 0 0 20px rgba(0, 102, 204, 0.5);
-            animation: pulse 2s infinite;
+            border-radius: 10px;
+            transition: transform 0.3s;
+            box-shadow: 0 0 20px rgba(250, 15, 0, 0.5);
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
         }
 
         .header-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
+            background: linear-gradient(45deg, var(--accent-color), #00a0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-left: 15px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
         }
 
         .header-actions button {
             background: none;
             border: none;
             color: var(--text-color);
-            margin-left: 15px;
+            margin-left: 20px;
             cursor: pointer;
             font-size: 18px;
-            transition: color 0.3s;
+            transition: color 0.3s, transform 0.3s;
         }
 
         .header-actions button:hover {
             color: var(--accent-color);
+            transform: translateY(-2px);
         }
 
         .content {
@@ -261,7 +277,7 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 25px;
             flex-grow: 1;
-            margin-bottom: 120px;
+            margin-bottom: 50px;
         }
 
         .image-box {
@@ -504,52 +520,183 @@
     background-color: #0056b3;
     transform: translateY(-2px);
 }
+.previous-images {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--panel-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
-/* Add this section to display previously generated images */
-#previous-images {
-    margin-top: 20px;
-}
+        .previous-images h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
 
-#images-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
+        .previous-images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
 
-#images-container img {
-    width: 200px;
-    margin: 10px;
-}
+        .previous-image-box {
+            aspect-ratio: 1;
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .previous-image-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .previous-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .previous-image-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .previous-image-box:hover .previous-image-info {
+            opacity: 1;
+        }
+        .color-scheme-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .color-scheme-buttons button {
+            flex: 1 0 calc(50% - 5px);
+            padding: 10px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s, box-shadow 0.3s;
+        }
+
+        .color-scheme-buttons button:hover,
+        .color-scheme-buttons button.active {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .credits-info {
+            margin-left: 20px;
+            font-size: 14px;
+            color: var(--text-color);
+            background-color: var(--panel-bg);
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #generateButton:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+            /* Add this to your existing styles */
+    .premium-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        margin-left: 10px;
+        background: linear-gradient(45deg, #FFD700, #FF4500);
+        color: white;
+        text-decoration: none;
+        border-radius: 15px;
+        font-weight: bold;
+        font-size: 0.9em;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .premium-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Adjust the credits-info to align items properly */
+    .credits-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
     </style>
 </head>
 <body>
+    <div class="popup-overlay" id="imagePopup">
+        <div class="popup-content">
+        </div>
+    </div>
+        <!-- Add this block for flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
     <div class="header">
         <div class="logo"></div>
         <div class="header-title">Text to Image</div>
         <div class="header-actions">
-            <button aria-label="Chat"><i class="fas fa-comment"></i></button>
-            <button aria-label="Upload"><i class="fas fa-upload"></i></button>
-            <button aria-label="Menu"><i class="fas fa-ellipsis-v"></i></button>
+            <div class="credits-info">
+                {% if current_user.is_premium %}
+                    <span>Premium: {{ remaining_credits }} / 1600 credits</span>
+                {% else %}
+                    <span>Free: {{ remaining_credits }} / 5 credits</span>
+                    <a href="{{ url_for('premium') }}" class="premium-badge">Buy Premium</a>
+                {% endif %}
+            </div>
+
             <div class="dark-mode-toggle">
                 <input type="checkbox" id="darkModeToggle" class="dark-mode-input">
                 <label for="darkModeToggle" class="dark-mode-label"></label>
             </div>
             {% if current_user.is_authenticated %}
-            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
-        {% endif %}
+                <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+            {% endif %}
         </div>
     </div>
     <div class="content">
         <div class="sidebar">
             <div class="section">
                 <div class="section-title">General settings</div>
-                <select id="model">
-                    <option value="flux-dev">Firefly Image 3</option>
-                </select>
+
                 <select id="image_size">
-                    <option value="512">Square (1:1)</option>
-                    <option value="768">Large Square (1:1)</option>
+                    <option value="256">Small Square (256x256)</option>
+                    <option value="512">Medium Square (512x512)</option>
+                    <option value="768">Large Square (768x768)</option>
+                    <option value="1024">Extra Large Square (1024x1024)</option>
+                    <option value="512x768">Portrait (512x768)</option>
+                    <option value="768x512">Landscape (768x512)</option>
+                </select>
+                <select id="image_quality">
+                    <option value="standard">Standard Quality</option>
+                    <option value="high">High Quality</option>
+                    <option value="best">Best Quality</option>
                 </select>
             </div>
             <div class="section">
@@ -557,7 +704,20 @@
                 <div class="content-type-buttons">
                     <button class="active" data-style="art style">Art</button>
                     <button data-style="photo realistic">Photo</button>
+                    <button data-style="cartoon">Cartoon</button>
                 </div>
+                <br>
+                <div class="section">
+                    <div class="section-title">Color Scheme</div>
+                    <div class="color-scheme-buttons">
+                        <button class="active" data-color="vibrant">Vibrant</button>
+                        <button data-color="pastel">Pastel</button>
+                        <button data-color="monochrome">Monochrome</button>
+                        <button data-color="earthy">Earthy</button>
+                    </div>
+                    
+                </div>
+                <a href="{{ url_for('api_management') }}">API Management</a>
                 <div class="toggle">
                     <span>Auto</span>
                     <div class="toggle-switch"></div>
@@ -577,22 +737,37 @@
                     <div class="image"></div>
                 </div>
             </div>
+            
         </div>
         <div class="main-content">
             <div class="image-grid" id="resultGrid">
                 <div class="image-box"></div>
                 <div class="image-box"></div>
-                <div class="image-box"></div>
-                <div class="image-box"></div>
             </div>
+             <!-- Add the new section for previously generated images -->
+        <div class="previous-images">
+            <h2>Your Previously Generated Images</h2>
+            <div class="previous-images-grid">
+                {% if images %}
+                {% for image in images %}
+                    <div class="previous-image-box">
+                        <img src="{{ image.url }}" alt="{{ image.prompt }}">
+                        <div class="previous-image-info">
+                            <p>Prompt: {{ image.prompt }}</p>
+                            <p>Style: {{ image.style }}</p>
+                            <p>Color: {{ image.color }}</p>
+                            <p>Created at: {{ image.created_at | custom_datetime }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No images found.</p>
+            {% endif %}
+            </div>
+        </div>
             <div class="prompt-container">
                 <input type="text" id="prompt" placeholder="Enter your prompt here">
                 <button id="generateButton">Generate</button>
-            </div>
-            <!-- Add this section to display previously generated images -->
-            <div id="previous-images">
-                <h2>Previously Generated Images</h2>
-                <div id="images-container"></div>
             </div>
         </div>
     </div>
@@ -624,27 +799,77 @@
     
         // Enhance the image generation with a staggered fade-in effect
         function displayGeneratedImages(imageUrls) {
-            const resultGrid = document.getElementById('resultGrid');
-            resultGrid.innerHTML = '';
-            
-            imageUrls.forEach((url, index) => {
-                const imageBox = document.createElement('div');
-                imageBox.className = 'image-box fade-in';
-                imageBox.style.animationDelay = `${index * 0.1}s`;
-                imageBox.style.backgroundImage = `url('${url}')`;
-                imageBox.style.backgroundSize = 'cover';
+    const resultGrid = document.getElementById('resultGrid');
+    resultGrid.innerHTML = '';
+    
+    imageUrls.forEach((url, index) => {
+        const imageBox = document.createElement('div');
+        imageBox.className = 'image-box fade-in';
+        imageBox.style.animationDelay = `${index * 0.1}s`;
+        imageBox.style.backgroundImage = `url('${url}')`;
+        imageBox.style.backgroundSize = 'cover';
 
-                const downloadButton = document.createElement('button');
-                downloadButton.textContent = 'Download';
-                downloadButton.onclick = () => window.location.href = `/download?url=${encodeURIComponent(url)}`;
-                
-                imageBox.appendChild(downloadButton);
-                resultGrid.appendChild(imageBox);
-            });
-        }
+        // Add click event to open popup
+        imageBox.addEventListener('click', () => openPopup(url));
+
+        const downloadButton = document.createElement('button');
+        downloadButton.textContent = 'Download';
+        downloadButton.onclick = (e) => {
+            e.stopPropagation(); // Prevent opening popup when clicking download
+            window.location.href = `/download?url=${encodeURIComponent(url)}`;
+        };
+        
+        imageBox.appendChild(downloadButton);
+        resultGrid.appendChild(imageBox);
+    });
+
+    // Add the new images to the previous images grid
+    const previousImagesGrid = document.querySelector('.previous-images-grid');
+    imageUrls.forEach(url => {
+        const imageBox = document.createElement('div');
+        imageBox.className = 'previous-image-box fade-in';
+        
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = 'Generated image';
+        img.addEventListener('click', () => openPopup(url));
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'previous-image-info';
+        infoDiv.innerHTML = `
+            <p>Prompt: ${document.getElementById('prompt').value}</p>
+            <p>Style: ${selectedStyle}</p>
+            <p>Color: ${selectedColor}</p>
+            <p>Generated on: ${new Date().toLocaleString()}</p>
+        `;
+        
+        imageBox.appendChild(img);
+        imageBox.appendChild(infoDiv);
+        previousImagesGrid.prepend(imageBox);
+    });
+}
+function openPopup(imageUrl) {
+    const popup = document.getElementById('imagePopup');
+    const popupImage = document.getElementById('popupImage');
+    popupImage.src = imageUrl;
+    popup.style.display = 'flex';
+}
+
+function closePopup() {
+    const popup = document.getElementById('imagePopup');
+    popup.style.display = 'none';
+}
+
+// Close popup when clicking outside the image
+document.getElementById('imagePopup').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closePopup();
+    }
+});
 
         // Update the generate button click handler
         document.getElementById('generateButton').addEventListener('click', function() {
+            const generateButton = this;
             const formData = new FormData();
             const fileInput = document.getElementById('fileInput');
             const prompt = document.getElementById('prompt').value;
@@ -664,6 +889,10 @@
                 formData.append('file', fileInput.files[0]);
             }
 
+            // Disable the generate button and show loading state
+            generateButton.disabled = true;
+            generateButton.textContent = 'Generate';
+
             // Show skeleton loading in image boxes
             const resultGrid = document.getElementById('resultGrid');
             resultGrid.innerHTML = '';
@@ -673,20 +902,52 @@
                 resultGrid.appendChild(imageBox);
             }
 
-            // Actual API call
             axios.post('/transform', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             })
             .then(response => {
-                const imageUrls = response.data.image_urls;
-                displayGeneratedImages(imageUrls);
+                if (response.data.quota_exceeded) {
+                    if (response.data.is_premium) {
+                        alert('You have reached your monthly quota of 1600 images. Your quota will reset at the beginning of next month.');
+                    } else {
+                        if (confirm('You have used all your free credits. Upgrade to premium for more?')) {
+                            window.location.href = '/premium';
+                        }
+                    }
+                } else if (response.data.nsfw_content) {
+                    alert('The generated content may be NSFW. Please try a different prompt.');
+                } else {
+                    const imageUrls = response.data.image_urls;
+                    displayGeneratedImages(imageUrls);
+                }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while generating the images.');
-                resultGrid.innerHTML = '<div class="error fade-in">Error generating images. Please try again.</div>';
+                if (error.response) {
+                    if (error.response.status === 403) {
+                        if (error.response.data.is_premium) {
+                            alert('You have reached your monthly quota of 1600 images. Your quota will reset at the beginning of next month.');
+                        } else {
+                            if (confirm('You have used all your free credits. Upgrade to premium for more?')) {
+                                window.location.href = '/premium';
+                            }
+                        }
+                    } else if (error.response.status === 429) {
+                        alert('Rate limit exceeded. Please try again later.');
+                    } else {
+                        alert('An error occurred while generating the images. Please try again.');
+                    }
+                } else {
+                    console.error('Error:', error);
+                    alert('An error occurred while generating the images. Please try again.');
+                    resultGrid.innerHTML = '<div class="error fade-in">Error generating images. Please try again.</div>';
+                }
+            })
+            .finally(() => {
+                // Re-enable the generate button and restore its text
+                generateButton.disabled = false;
+                generateButton.textContent = 'Generate';
             });
         });
 
@@ -709,21 +970,6 @@
                 localStorage.setItem('darkMode', null);
             }
         });
-
-        // Fetch previously generated images on page load
-        fetch('/previous_images')
-            .then(response => response.json())
-            .then(data => {
-                const container = document.getElementById('images-container');
-                data.images.forEach(url => {
-                    const img = document.createElement('img');
-                    img.src = url;
-                    img.alt = 'Generated Image';
-                    img.style.width = '200px'; // Adjust size as needed
-                    img.style.margin = '10px';
-                    container.appendChild(img);
-                });
-            });
     </script>
 </body>
 </html>
