@@ -5,23 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modern Adobe Firefly Replica</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         :root {
-            --bg-color: #f5f5f5;
+            --bg-color: #f6f7f9;
             --panel-bg: #ffffff;
             --text-color: #333333;
             --text-secondary: #666666;
-            --accent-color: #0066cc;
+            --accent-color: #2680eb;
             --border-color: #e0e0e0;
             --hover-color: #f0f0f0;
         }
 
         .dark-mode {
-            --bg-color: #1a1a1a;
-            --panel-bg: #2a2a2a;
+            --bg-color: #1e1e1e;
+            --panel-bg: #2d2d2d;
             --text-color: #ffffff;
             --text-secondary: #b0b0b0;
-            --accent-color: #4d9fff;
+            --accent-color: #4b9cf5;
             --border-color: #3a3a3a;
             --hover-color: #333333;
         }
@@ -41,6 +42,8 @@
             flex-direction: column;
             overflow: hidden;
             transition: background-color 0.3s, color 0.3s;
+            background-image: linear-gradient(to bottom right, var(--bg-color), var(--panel-bg));
+            min-height: 100vh;
         }
 
         .header {
@@ -49,16 +52,24 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .dark-mode .header {
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .logo {
             width: 30px;
             height: 30px;
-            background-color: var(--accent-color);
+            background: linear-gradient(45deg, #fa0f00, #ff4d4d);
             border-radius: 8px;
             transition: background-color 0.3s;
+            box-shadow: 0 0 20px rgba(0, 102, 204, 0.5);
+            animation: pulse 2s infinite;
         }
 
         .header-title {
@@ -91,8 +102,15 @@
             background-color: var(--panel-bg);
             padding: 25px;
             overflow-y: auto;
-            border-right: 1px solid var(--border-color);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             transition: background-color 0.3s;
+            backdrop-filter: blur(10px);
+            box-shadow: 1px 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .sidebar {
+            background: rgba(0, 0, 0, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .section {
@@ -111,8 +129,8 @@
         select, .custom-select {
             width: 100%;
             padding: 12px;
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: var(--text-color);
             border-radius: 8px;
             font-size: 14px;
@@ -122,7 +140,7 @@
         }
 
         select:hover, .custom-select:hover {
-            background-color: var(--hover-color);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .content-type-buttons {
@@ -139,16 +157,18 @@
             border-radius: 8px;
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s, box-shadow 0.3s;
         }
 
         .content-type-buttons button:hover {
-            background-color: var(--hover-color);
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .content-type-buttons button.active {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
+            background: var(--accent-color);
+            border-color: transparent;
             color: white;
         }
 
@@ -162,7 +182,7 @@
         .toggle-switch {
             width: 50px;
             height: 28px;
-            background-color: var(--bg-color);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 14px;
             position: relative;
             cursor: pointer;
@@ -183,7 +203,7 @@
         }
 
         .toggle-switch.active {
-            background-color: var(--accent-color);
+            background: linear-gradient(45deg, var(--accent-color), #00a0ff);
         }
 
         .toggle-switch.active::after {
@@ -199,17 +219,19 @@
         .upload-buttons button {
             flex: 1;
             padding: 12px;
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: var(--text-color);
             border-radius: 8px;
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s, box-shadow 0.3s;
         }
 
         .upload-buttons button:hover {
-            background-color: var(--hover-color);
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .reference-images {
@@ -221,7 +243,7 @@
         .reference-images .image {
             width: 80px;
             height: 80px;
-            background-color: var(--bg-color);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             transition: background-color 0.3s;
         }
@@ -247,18 +269,21 @@
             background-color: var(--panel-bg);
             border-radius: 12px;
             overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
             position: relative;
             display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
     color: var(--text-secondary);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .image-box:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
         }
 
         .image-box button {
@@ -268,7 +293,7 @@
             opacity: 0;
             transition: opacity 0.3s;
             padding: 8px 12px;
-            background-color: var(--accent-color);
+            background: linear-gradient(45deg, var(--accent-color), #00a0ff);
             color: white;
             border: none;
             border-radius: 4px;
@@ -285,10 +310,17 @@
             left: 320px;
             right: 0;
             background-color: var(--panel-bg);
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding: 20px;
             z-index: 1000;
             transition: background-color 0.3s;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .prompt-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         #prompt {
@@ -300,13 +332,14 @@
             border-radius: 8px;
             font-size: 14px;
             margin-right: 15px;
-            transition: all 0.3s;
+            transition: all 0.3s, box-shadow 0.3s;
         }
 
         #prompt:focus {
             outline: none;
+            background: rgba(255, 255, 255, 0.2);
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.3);
         }
 
         #generateButton {
@@ -318,11 +351,13 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
         }
 
         #generateButton:hover {
-            background-color: #0052a3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
         }
 
         @media (max-width: 768px) {
@@ -335,18 +370,95 @@
             }
         }
 
-        #darkModeToggle {
-            background: none;
-            border: none;
-            color: var(--text-color);
-            font-size: 18px;
-            cursor: pointer;
-            transition: color 0.3s;
+        .dark-mode-toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
         }
 
-        #darkModeToggle:hover {
-            color: var(--accent-color);
+        .dark-mode-input {
+            opacity: 0;
+            width: 0;
+            height: 0;
         }
+
+        .dark-mode-label {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .dark-mode-label:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .dark-mode-input:checked + .dark-mode-label {
+            background-color: var(--accent-color);
+        }
+
+        .dark-mode-input:checked + .dark-mode-label:before {
+            transform: translateX(26px);
+        }
+
+        .dark-mode-label:after {
+            content: '🌞';
+            position: absolute;
+            top: 50%;
+            left: 8px;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+
+        .dark-mode-input:checked + .dark-mode-label:after {
+            content: '🌙';
+            left: auto;
+            right: 8px;
+        }
+
+        .dark-mode {
+            --bg-color: #1a1a1a;
+            --panel-bg: #2a2a2a;
+            --text-color: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #3a3a3a;
+            --hover-color: #333333;
+        }
+
+        .dark-mode .header,
+        .dark-mode .sidebar,
+        .dark-mode .prompt-container {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-mode .image-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode #prompt {
+            background: rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode #prompt:focus {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
         @keyframes skeletonLoading {
     0% {
         background-color: hsl(200, 20%, 80%);
@@ -359,17 +471,57 @@
 .skeleton-loading {
     animation: skeletonLoading 1s linear infinite alternate;
 }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(0, 102, 204, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(0, 102, 204, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 102, 204, 0); }
+}
+
+.logo {
+    animation: pulse 2s infinite;
+}
+.logout-btn {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.3s;
+    margin-left: 15px;
+}
+
+.logout-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
     </style>
 </head>
 <body>
+
     <div class="header">
         <div class="logo"></div>
         <div class="header-title">Text to Image</div>
         <div class="header-actions">
-            <button>💬</button>
-            <button>⬆️</button>
-            <button>⋯</button>
-            <button id="darkModeToggle">🌓</button>
+            <button aria-label="Chat"><i class="fas fa-comment"></i></button>
+            <button aria-label="Upload"><i class="fas fa-upload"></i></button>
+            <button aria-label="Menu"><i class="fas fa-ellipsis-v"></i></button>
+            <div class="dark-mode-toggle">
+                <input type="checkbox" id="darkModeToggle" class="dark-mode-input">
+                <label for="darkModeToggle" class="dark-mode-label"></label>
+            </div>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        {% endif %}
         </div>
     </div>
     <div class="content">
@@ -449,65 +601,93 @@
             }
         });
     
-        document.getElementById('generateButton').addEventListener('click', function() {
-    const formData = new FormData();
-    const fileInput = document.getElementById('fileInput');
-    const prompt = document.getElementById('prompt').value;
+        // Enhance the image generation with a staggered fade-in effect
+        function displayGeneratedImages(imageUrls) {
+            const resultGrid = document.getElementById('resultGrid');
+            resultGrid.innerHTML = '';
+            
+            imageUrls.forEach((url, index) => {
+                const imageBox = document.createElement('div');
+                imageBox.className = 'image-box fade-in';
+                imageBox.style.animationDelay = `${index * 0.1}s`;
+                imageBox.style.backgroundImage = `url('${url}')`;
+                imageBox.style.backgroundSize = 'cover';
 
-    if (!prompt) {
-        alert('Please enter a prompt.');
-        return;
-    }
-
-    formData.append('image_size', document.getElementById('image_size').value);
-    formData.append('style', selectedStyle);
-    formData.append('color', selectedColor);
-    formData.append('prompt', prompt);
-
-    // Add file to formData if one is uploaded
-    if (fileInput.files.length > 0) {
-        formData.append('file', fileInput.files[0]);
-    }
-
-    // Show skeleton loading in image boxes
-    const resultGrid = document.getElementById('resultGrid');
-    resultGrid.innerHTML = '';
-    for (let i = 0; i < 4; i++) {
-        const imageBox = document.createElement('div');
-        imageBox.className = 'image-box skeleton-loading';
-        resultGrid.appendChild(imageBox);
-    }
-
-    // Actual API call
-    axios.post('/transform', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    })
-    .then(response => {
-        const imageUrls = response.data.image_urls;
-        const generatedCount = response.data.generated_count;
-        
-        document.querySelectorAll('.image-box').forEach((box, index) => {
-            box.classList.remove('skeleton-loading');
-            if (index < imageUrls.length && imageUrls[index]) {
-                box.style.backgroundImage = `url('${imageUrls[index]}')`;
-                box.style.backgroundSize = 'cover';
-                
                 const downloadButton = document.createElement('button');
                 downloadButton.textContent = 'Download';
-                downloadButton.onclick = () => window.location.href = `/download?url=${encodeURIComponent(imageUrls[index])}`;
+                downloadButton.onclick = () => window.location.href = `/download?url=${encodeURIComponent(url)}`;
                 
-                box.appendChild(downloadButton);
+                imageBox.appendChild(downloadButton);
+                resultGrid.appendChild(imageBox);
+            });
+        }
+
+        // Update the generate button click handler
+        document.getElementById('generateButton').addEventListener('click', function() {
+            const formData = new FormData();
+            const fileInput = document.getElementById('fileInput');
+            const prompt = document.getElementById('prompt').value;
+
+            if (!prompt) {
+                alert('Please enter a prompt.');
+                return;
+            }
+
+            formData.append('image_size', document.getElementById('image_size').value);
+            formData.append('style', selectedStyle);
+            formData.append('color', selectedColor);
+            formData.append('prompt', prompt);
+
+            // Add file to formData if one is uploaded
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            }
+
+            // Show skeleton loading in image boxes
+            const resultGrid = document.getElementById('resultGrid');
+            resultGrid.innerHTML = '';
+            for (let i = 0; i < 4; i++) {
+                const imageBox = document.createElement('div');
+                imageBox.className = 'image-box skeleton-loading';
+                resultGrid.appendChild(imageBox);
+            }
+
+            // Actual API call
+            axios.post('/transform', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            .then(response => {
+                const imageUrls = response.data.image_urls;
+                displayGeneratedImages(imageUrls);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while generating the images.');
+                resultGrid.innerHTML = '<div class="error fade-in">Error generating images. Please try again.</div>';
+            });
+        });
+
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        // Check for saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            darkModeToggle.checked = true;
+        }
+
+        darkModeToggle.addEventListener('change', () => {
+            if (darkModeToggle.checked) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', null);
             }
         });
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while generating the images.');
-        resultGrid.innerHTML = '<div class="error">Error generating images. Please try again.</div>';
-    });
-});
     </script>
 </body>
 </html>
