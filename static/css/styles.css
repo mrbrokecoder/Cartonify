@@ -158,11 +158,14 @@ select:hover, .custom-select:hover {
 
 .content-type-buttons {
     display: flex;
-    gap: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .content-type-buttons button {
-    flex: 1;
+    flex: 1 0 calc(33.333% - 10px);
+    min-width: 80px;
+    margin-bottom: 10px;
     padding: 12px;
     background-color: var(--bg-color);
     border: 1px solid var(--border-color);
@@ -183,6 +186,14 @@ select:hover, .custom-select:hover {
     background: var(--accent-color);
     border-color: transparent;
     color: white;
+}
+
+.content-type-buttons br {
+    width: 100%;
+    content: "";
+    display: block;
+    margin: 0;
+    padding: 0;
 }
 
 .toggle {
