@@ -12,3 +12,4 @@ flask_caching
 celery
 redis
 flask_session
+Pillow

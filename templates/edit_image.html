@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Edit Image</h2>
+        <div id="tui-image-editor"></div>
+        <button id="save-button" class="btn btn-primary mt-3">Save Changes</button>
+        <button id="inpaint-button" class="btn btn-secondary mt-3 ml-2">Inpaint</button>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
+    <script src="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.js"></script>
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.css">
+    
+    <script>
+        var imageEditor = new tui.ImageEditor('#tui-image-editor', {
+            includeUI: {
+                loadImage: {
+                    path: '{{ image[2] }}',
+                    name: 'SampleImage'
+                },
+                theme: {
+                    // You can customize the theme here
+                },
+                menu: ['crop', 'flip', 'rotate', 'draw', 'shape', 'icon', 'text', 'mask', 'filter'],
+                initMenu: 'filter',
+                uiSize: {
+                    width: '100%',
+                    height: '700px'
+                },
+                menuBarPosition: 'bottom'
+            },
+            cssMaxWidth: 700,
+            cssMaxHeight: 500,
+            selectionStyle: {
+                cornerSize: 20,
+                rotatingPointOffset: 70
+            }
+        });
+    
+        document.getElementById('save-button').addEventListener('click', function() {
+            var dataURL = imageEditor.toDataURL();
+            fetch('/save_edited_image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    image_id: {{ image[0] }},
+                    edited_image: dataURL
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Image saved successfully!');
+                    window.location.href = '/dashboard';
+                } else {
+                    alert('Error saving image: ' + data.error);
+                }
+            });
+        });
+    
+        document.getElementById('inpaint-button').addEventListener('click', function() {
+            var canvas = imageEditor.getImageData();
+            var maskCanvas = imageEditor.getCanvas().getObjects().find(obj => obj.type === 'rect' || obj.type === 'polygon');
+            
+            if (!maskCanvas) {
+                alert('Please create a selection area for inpainting.');
+                return;
+            }
+            
+            var prompt = prompt('Enter a prompt for inpainting:');
+            if (!prompt) return;
+            
+            var maskDataURL = maskCanvas.toDataURL();
+            
+            var formData = new FormData();
+            formData.append('file', dataURLtoBlob(canvas.toDataURL()), 'image.png');
+            formData.append('mask', dataURLtoBlob(maskDataURL), 'mask.png');
+            formData.append('prompt', prompt);
+            
+            fetch('/transform', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.image_urls && data.image_urls.length > 0) {
+                    imageEditor.loadImageFromURL(data.image_urls[0], 'InpaintedImage');
+                } else {
+                    alert('Error generating inpainted image');
+                }
+            });
+        });
+    
+        function dataURLtoBlob(dataURL) {
+            var arr = dataURL.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+            while(n--){
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new Blob([u8arr], {type:mime});
+        }
+    </script>
+</body>
+</html>

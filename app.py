@@ -30,7 +30,7 @@ import os
 
 load_dotenv()  # This loads the variables from .env
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER')
 app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_CONTENT_LENGTH'))  # 16MB max upload size
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -537,11 +537,37 @@ def transform_image():
             except Exception as e:
                 app.logger.error(f"Error removing file: {str(e)}")
 
+    # Check if inpainting is requested
+    if 'mask' in request.files:
+        mask_file = request.files['mask']
+        if mask_file and mask_file.filename != '':
+            mask_filename = secure_filename(mask_file.filename)
+            mask_filepath = os.path.join(app.config['UPLOAD_FOLDER'], mask_filename)
+            mask_file.save(mask_filepath)
+
+            with open(mask_filepath, "rb") as mask_file:
+                mask_encoded_string = base64.b64encode(mask_file.read()).decode('utf-8')
+            input_data["mask"] = f"data:image/png;base64,{mask_encoded_string}"
+
+            try:
+                os.remove(mask_filepath)
+            except Exception as e:
+                app.logger.error(f"Error removing mask file: {str(e)}")
+
+            # Use the inpainting model
+            model = "stability-ai/stable-diffusion-inpainting"
+        else:
+            # Use the regular image generation model
+            model = "black-forest-labs/flux-schnell"
+    else:
+        # Use the regular image generation model
+        model = "black-forest-labs/flux-schnell"
+
     try:
         image_urls = []
         for _ in range(2):
             output = replicate.run(
-                "black-forest-labs/flux-schnell",
+                model,
                 input=input_data
             )
             app.logger.info(f"API Output: {output}")
