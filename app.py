@@ -22,9 +22,7 @@ from email.mime.multipart import MIMEMultipart
 import random
 import redis
 from flask_session import Session
-import openai
 from PIL import Image
-import io
 
 load_dotenv()
 

@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-
 </head>
 <body>
     <div class="popup-overlay" id="imagePopup">
@@ -137,7 +136,6 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         let selectedStyle = 'art style';
         let selectedColor = 'vibrant colors';
@@ -164,111 +162,109 @@
     
         // Enhance the image generation with a staggered fade-in effect
         function displayGeneratedImages(imageUrls) {
-    const resultGrid = document.getElementById('resultGrid');
-    resultGrid.innerHTML = '';
-    
-    imageUrls.forEach((url, index) => {
-        const imageBox = document.createElement('div');
-        imageBox.className = 'image-box fade-in';
-        imageBox.style.animationDelay = `${index * 0.1}s`;
-        imageBox.style.backgroundImage = `url('${url}')`;
-        imageBox.style.backgroundSize = 'cover';
+            const resultGrid = document.getElementById('resultGrid');
+            resultGrid.innerHTML = '';
+            
+            imageUrls.forEach((url, index) => {
+                const imageBox = document.createElement('div');
+                imageBox.className = 'image-box fade-in';
+                imageBox.style.animationDelay = `${index * 0.1}s`;
+                imageBox.style.backgroundImage = `url('${url}')`;
+                imageBox.style.backgroundSize = 'cover';
 
-        // Add click event to open popup
-        imageBox.addEventListener('click', () => openPopup(url));
+                // Add click event to open popup
+                imageBox.addEventListener('click', () => openPopup(url));
 
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = 'button-container';
+                const buttonContainer = document.createElement('div');
+                buttonContainer.className = 'button-container';
 
-        const downloadButton = document.createElement('button');
-        downloadButton.textContent = 'Download';
-        downloadButton.onclick = (e) => {
-            e.stopPropagation(); // Prevent opening popup when clicking download
-            window.location.href = `/download?url=${encodeURIComponent(url)}`;
-        };
-        
-        const editButton = document.createElement('button');
-        editButton.innerHTML = '<i class="fas fa-edit"></i>'; // Assuming you're using Font Awesome for icons
-        editButton.onclick = (e) => {
-            e.stopPropagation(); // Prevent opening popup when clicking edit
-            // Here we need to save the image first, then redirect to the edit page
-            saveImageThenEdit(url);
-        };
-        
-        buttonContainer.appendChild(downloadButton);
-        buttonContainer.appendChild(editButton);
-        imageBox.appendChild(buttonContainer);
-        resultGrid.appendChild(imageBox);
-    });
+                const downloadButton = document.createElement('button');
+                downloadButton.innerHTML = '<i class="fas fa-download"></i>';
+                downloadButton.onclick = (e) => {
+                    e.stopPropagation(); // Prevent opening popup when clicking download
+                    window.location.href = `/download?url=${encodeURIComponent(url)}`;
+                };
+                
+                const editButton = document.createElement('button');
+                editButton.innerHTML = '<i class="fas fa-edit"></i>';
+                editButton.onclick = (e) => {
+                    e.stopPropagation(); // Prevent opening popup when clicking edit
+                    saveImageThenEdit(url);
+                };
+                
+                buttonContainer.appendChild(downloadButton);
+                buttonContainer.appendChild(editButton);
+                imageBox.appendChild(buttonContainer);
+                resultGrid.appendChild(imageBox);
+            });
 
-    // Add the new images to the previous images grid
-    const previousImagesGrid = document.querySelector('.previous-images-grid');
-    imageUrls.forEach(url => {
-        const imageBox = document.createElement('div');
-        imageBox.className = 'previous-image-box fade-in';
-        
-        const img = document.createElement('img');
-        img.src = url;
-        img.alt = 'Generated image';
-        img.addEventListener('click', () => openPopup(url));
-        
-        const infoDiv = document.createElement('div');
-        infoDiv.className = 'previous-image-info';
-        infoDiv.innerHTML = `
-            <p>Prompt: ${document.getElementById('prompt').value}</p>
-            <p>Style: ${selectedStyle}</p>
-            <p>Color: ${selectedColor}</p>
-            <p>Generated on: ${new Date().toLocaleString()}</p>
-        `;
-        
-        imageBox.appendChild(img);
-        imageBox.appendChild(infoDiv);
-        previousImagesGrid.prepend(imageBox);
-    });
-}
-
-// Add this new function to save the image and then redirect to the edit page
-function saveImageThenEdit(imageUrl) {
-    fetch('/save_generated_image', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            image_url: imageUrl,
-            prompt: document.getElementById('prompt').value,
-            style: selectedStyle,
-            color: selectedColor
-        }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.location.href = `/edit_image/${data.image_id}`;
-        } else {
-            alert('Error saving image: ' + data.error);
+            // Add the new images to the previous images grid
+            const previousImagesGrid = document.querySelector('.previous-images-grid');
+            imageUrls.forEach(url => {
+                const imageBox = document.createElement('div');
+                imageBox.className = 'previous-image-box fade-in';
+                
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = 'Generated image';
+                img.addEventListener('click', () => openPopup(url));
+                
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'previous-image-info';
+                infoDiv.innerHTML = `
+                    <p>Prompt: ${document.getElementById('prompt').value}</p>
+                    <p>Style: ${selectedStyle}</p>
+                    <p>Color: ${selectedColor}</p>
+                    <p>Generated on: ${new Date().toLocaleString()}</p>
+                `;
+                
+                imageBox.appendChild(img);
+                imageBox.appendChild(infoDiv);
+                previousImagesGrid.prepend(imageBox);
+            });
         }
-    });
-}
 
-function openPopup(imageUrl) {
-    const popup = document.getElementById('imagePopup');
-    const popupImage = document.getElementById('popupImage');
-    popupImage.src = imageUrl;
-    popup.style.display = 'flex';
-}
+        function openPopup(imageUrl) {
+            const popup = document.getElementById('imagePopup');
+            const popupImage = document.getElementById('popupImage');
+            popupImage.src = imageUrl;
+            popup.style.display = 'flex';
+        }
 
-function closePopup() {
-    const popup = document.getElementById('imagePopup');
-    popup.style.display = 'none';
-}
+        function closePopup() {
+            const popup = document.getElementById('imagePopup');
+            popup.style.display = 'none';
+        }
 
-// Close popup when clicking outside the image
-document.getElementById('imagePopup').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closePopup();
-    }
-});
+        // Close popup when clicking outside the image
+        document.getElementById('imagePopup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePopup();
+            }
+        });
+
+        function saveImageThenEdit(imageUrl) {
+            fetch('/save_generated_image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    image_url: imageUrl,
+                    prompt: document.getElementById('prompt').value,
+                    style: selectedStyle,
+                    color: selectedColor
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = `/edit_image/${data.image_id}`;
+                } else {
+                    alert('Error saving image: ' + data.error);
+                }
+            });
+        }
 
         // Update the generate button click handler
         document.getElementById('generateButton').addEventListener('click', function() {
