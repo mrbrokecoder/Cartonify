@@ -22,6 +22,8 @@ from email.mime.multipart import MIMEMultipart
 import random
 import redis
 from flask_session import Session
+from flask import send_from_directory
+
 
 load_dotenv()
 
@@ -884,6 +886,12 @@ scheduler.start()
 
 # Make sure to shut down the scheduler when the app is closing
 atexit.register(lambda: scheduler.shutdown())
+
+@app.route('/admin')
+@login_required
+def admin_dashboard():
+    # You might want to add an additional check here to ensure only admin users can access this page
+    return send_from_directory('.', 'admin_dashboard.html')
 
 if __name__ == '__main__':
     with app.app_context():
