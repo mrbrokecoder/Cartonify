@@ -106,7 +106,10 @@
                     location.reload();
                 },
                 error: function(xhr, status, error) {
-                    alert('Error updating credits: ' + error);
+                    console.error('XHR:', xhr);
+                    console.error('Status:', status);
+                    console.error('Error:', error);
+                    alert('Error updating credits. Check console for details.');
                 }
             });
         });

@@ -914,23 +914,43 @@ def update_user_credits(user_id):
     if not current_user.is_admin:
         return jsonify({'error': 'Unauthorized'}), 403
 
-    data = request.json
-    new_credits = data.get('monthly_quota')
+    try:
+        data = request.json
+        new_credits = data.get('monthly_quota')
 
-    if new_credits is None:
-        return jsonify({'error': 'Invalid data'}), 400
+        if new_credits is None:
+            return jsonify({'error': 'Invalid data: monthly_quota is missing'}), 400
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute(
-        "UPDATE users SET monthly_quota = %s WHERE id = %s",
-        (new_credits, user_id)
-    )
-    conn.commit()
-    cur.close()
-    conn.close()
+        new_credits = int(new_credits)  # Ensure it's an integer
 
-    return jsonify({'message': 'User credits updated successfully'})
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE users SET monthly_quota = %s WHERE id = %s",
+            (new_credits, user_id)
+        )
+        affected_rows = cur.rowcount
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        if affected_rows == 0:
+            return jsonify({'error': 'User not found or no changes made'}), 404
+
+        return jsonify({'message': 'User credits updated successfully'})
+    except Exception as e:
+        app.logger.error(f"Error updating credits: {str(e)}")
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
+        cur.close()
+        conn.close()
+
+        if affected_rows == 0:
+            return jsonify({'error': 'User not found or no changes made'}), 404
+
+        return jsonify({'message': 'User credits updated successfully'})
+    except Exception as e:
+        app.logger.error(f"Error updating credits: {str(e)}")
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
 
 if __name__ == '__main__':
     with app.app_context():
