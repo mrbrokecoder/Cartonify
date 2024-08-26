@@ -96,7 +96,7 @@ def load_user(user_id):
             int(user_data[b'prompt_count']),
             datetime.fromisoformat(user_data[b'subscription_start'].decode('utf-8')) if user_data[b'subscription_start'] else None,
             int(user_data[b'monthly_quota']),
-            bool(int(user_data[b'is_admin']))
+            bool(int(user_data.get(b'is_admin', b'0')))  # Default to False if not present
         )
     
     conn = get_db_connection()
@@ -575,6 +575,27 @@ def is_nsfw(prompt):
 def update_user_quota(user):
     # Update user's quota in the database
     pass
+
+def update_users_with_admin_field():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET is_admin = FALSE WHERE is_admin IS NULL")
+    conn.commit()
+    cur.close()
+    conn.close()
+
+# Run this function once to update all existing users
+update_users_with_admin_field()
+
+def create_user(email, password):
+    hashed_password = generate_password_hash(password)
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO users (email, password, is_admin) VALUES (%s, %s, %s)", 
+                (email, hashed_password, False))
+    conn.commit()
+    cur.close()
+    conn.close()
 
 @app.route('/download', methods=['GET'])
 @login_required
