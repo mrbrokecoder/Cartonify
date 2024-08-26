@@ -4,94 +4,212 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; }
-        h1 { color: #333; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        button { cursor: pointer; padding: 5px 10px; }
-        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
-        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; }
-        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
-        .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #f4f6f9;
+        }
+        .sidebar {
+            height: 100vh;
+            background-color: #343a40;
+            color: #fff;
+        }
+        .sidebar .nav-link {
+            color: #ced4da;
+        }
+        .sidebar .nav-link:hover {
+            color: #fff;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .table th {
+            background-color: #f8f9fa;
+        }
     </style>
 </head>
 <body>
-    <h1>Admin Dashboard</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Email</th>
-                <th>Premium</th>
-                <th>Prompt Count</th>
-                <th>Monthly Quota</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-            <tr>
-                <td>{{ user.id }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ 'Yes' if user.is_premium else 'No' }}</td>
-                <td>{{ user.prompt_count }}</td>
-                <td>{{ user.monthly_quota }}</td>
-                <td>
-                    <button onclick="editCredits({{ user.id }}, {{ user.monthly_quota }})">Edit Credits</button>
-                    <button onclick="viewPrompts({{ user.id }})">View Prompts</button>
-                    {% if not user.is_premium %}
-                    <button onclick="convertToPremium({{ user.id }})">Convert to Premium</button>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-users me-2"></i>
+                                Users
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Analytics
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-cog me-2"></i>
+                                Settings
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
 
-    <div id="editCreditsModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Edit Credits</h2>
-            <form id="editCreditsForm">
-                <input type="hidden" id="editUserId" name="userId">
-                <label for="newCredits">New Credit Amount:</label>
-                <input type="number" id="newCredits" name="newCredits" required>
-                <button type="submit">Update Credits</button>
-            </form>
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Admin Dashboard</h1>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Users</h5>
+                                <p class="card-text display-4">{{ users|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Premium Users</h5>
+                                <p class="card-text display-4">{{ users|selectattr('is_premium', 'equalto', true)|list|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Prompts</h5>
+                                <p class="card-text display-4">{{ users|sum(attribute='prompt_count') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Table -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">User Management</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Email</th>
+                                        <th>Premium</th>
+                                        <th>Prompt Count</th>
+                                        <th>Monthly Quota</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in users %}
+                                    <tr>
+                                        <td>{{ user.id }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ 'success' if user.is_premium else 'secondary' }}">
+                                                {{ 'Yes' if user.is_premium else 'No' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ user.prompt_count }}</td>
+                                        <td>{{ user.monthly_quota }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary" onclick="editCredits({{ user.id }}, {{ user.monthly_quota }})">
+                                                <i class="fas fa-edit"></i> Edit Credits
+                                            </button>
+                                            <button class="btn btn-sm btn-info" onclick="viewPrompts({{ user.id }})">
+                                                <i class="fas fa-eye"></i> View Prompts
+                                            </button>
+                                            {% if not user.is_premium %}
+                                            <button class="btn btn-sm btn-success" onclick="convertToPremium({{ user.id }})">
+                                                <i class="fas fa-star"></i> Convert to Premium
+                                            </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
 
-    <div id="viewPromptsModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>User Prompts</h2>
-            <div id="promptsList"></div>
+    <!-- Modals -->
+    <div id="editCreditsModal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Credits</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCreditsForm">
+                        <input type="hidden" id="editUserId" name="userId">
+                        <div class="mb-3">
+                            <label for="newCredits" class="form-label">New Credit Amount:</label>
+                            <input type="number" class="form-control" id="newCredits" name="newCredits" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Credits</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
+    <div id="viewPromptsModal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">User Prompts</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="promptsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        var editCreditsModal = document.getElementById("editCreditsModal");
-        var viewPromptsModal = document.getElementById("viewPromptsModal");
-        var spans = document.getElementsByClassName("close");
-
         function editCredits(userId, currentCredits) {
             document.getElementById("editUserId").value = userId;
             document.getElementById("newCredits").value = currentCredits;
-            editCreditsModal.style.display = "block";
+            new bootstrap.Modal(document.getElementById('editCreditsModal')).show();
         }
 
         function viewPrompts(userId) {
             $.get(`/admin/user_prompts/${userId}`, function(data) {
-                var promptsHtml = '<ul>';
+                var promptsHtml = '<ul class="list-group">';
                 data.prompts.forEach(function(prompt) {
-                    promptsHtml += `<li>${prompt.prompt} (${prompt.created_at})</li>`;
+                    promptsHtml += `<li class="list-group-item">${prompt.prompt} <small class="text-muted">(${new Date(prompt.created_at).toLocaleString()})</small></li>`;
                 });
                 promptsHtml += '</ul>';
                 document.getElementById("promptsList").innerHTML = promptsHtml;
-                viewPromptsModal.style.display = "block";
+                new bootstrap.Modal(document.getElementById('viewPromptsModal')).show();
             });
         }
 
@@ -105,8 +223,6 @@
                         location.reload();
                     },
                     error: function(xhr, status, error) {
-                        console.error('XHR:', xhr);
-                        console.error('Status:', status);
                         console.error('Error:', error);
                         alert('Error converting user to premium. Check console for details.');
                     }
@@ -128,27 +244,11 @@
                     location.reload();
                 },
                 error: function(xhr, status, error) {
-                    console.error('XHR:', xhr);
-                    console.error('Status:', status);
                     console.error('Error:', error);
                     alert('Error updating credits. Check console for details.');
                 }
             });
         });
-
-        for (var i = 0; i < spans.length; i++) {
-            spans[i].onclick = function() {
-                editCreditsModal.style.display = "none";
-                viewPromptsModal.style.display = "none";
-            }
-        }
-
-        window.onclick = function(event) {
-            if (event.target == editCreditsModal || event.target == viewPromptsModal) {
-                editCreditsModal.style.display = "none";
-                viewPromptsModal.style.display = "none";
-            }
-        }
     </script>
 </body>
 </html>
