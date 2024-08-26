@@ -3,16 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>AI Image Generator - Inspired by Leonardo AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            line-height: 1.6;
-            color: #ffffff;
-            background-color: #1e1e2e;
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --accent-color: #5465ff;
+            --secondary-bg: #111111;
+            --card-bg: #1e1e1e;
+        }
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
         }
         .container {
             max-width: 1200px;
@@ -20,158 +30,207 @@
             padding: 0 20px;
         }
         header {
-            background-color: #2d2d3f;
-            box-shadow: 0 2px 4px rgba(255,255,255,0.1);
-            padding: 20px 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        h1 {
-            color: #ffffff;
-            text-align: center;
-            margin: 0;
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
         }
-        main {
-            padding: 40px 0;
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
         }
-        .intro {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        h2 {
-            color: #ffffff;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-        }
-        .cta {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .btn {
-            display: inline-block;
-            padding: 12px 24px;
-            margin: 0 10px;
+        .nav-links a {
+            color: var(--text-color);
             text-decoration: none;
-            border-radius: 25px;
+            margin-left: 1.5rem;
+            font-weight: 500;
+        }
+        .hero {
+            padding: 120px 0 60px;
+            text-align: center;
+            background: linear-gradient(to bottom, var(--bg-color), var(--secondary-bg));
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #5465ff, #ff54a2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            color: #a0a0a0;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            padding: 0.8rem 2rem;
+            border-radius: 5px;
+            text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
         }
-        .btn-primary {
-            background: linear-gradient(45deg, #3498db, #2ecc71);
-            color: white;
-        }
-        .btn-secondary {
-            background: linear-gradient(45deg, #e74c3c, #f39c12);
-            color: white;
-        }
-        .btn:hover {
+        .cta-button:hover {
+            background-color: #4355ff;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(255,255,255,0.2);
+            box-shadow: 0 4px 10px rgba(84, 101, 255, 0.3);
         }
         .features {
-            background-color: #2d2d3f;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(255,255,255,0.1);
-            margin-bottom: 40px;
+            padding: 4rem 0;
+            background-color: var(--secondary-bg);
         }
-        .features h3 {
-            color: #ffffff;
-            margin-top: 0;
-        }
-        .features ul {
-            padding-left: 20px;
-        }
-        .generated-images h3 {
+        .features h2 {
             text-align: center;
-            color: #ffffff;
-            margin-bottom: 30px;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        .feature-item {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .feature-item:hover {
+            transform: translateY(-5px);
+        }
+        .feature-item h3 {
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+        .recent-images {
+            padding: 4rem 0;
+        }
+        .recent-images h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
         }
         .image-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
         }
         .image-item {
-            background-color: #2d2d3f;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(255,255,255,0.1);
-            transition: all 0.3s ease;
+            background-color: var(--card-bg);
+            transition: transform 0.3s ease;
         }
         .image-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(255,255,255,0.15);
+            transform: scale(1.03);
         }
         .image-item img {
             width: 100%;
-            height: 200px;
+            height: 250px;
             object-fit: cover;
         }
         .image-info {
-            padding: 15px;
+            padding: 1rem;
         }
-        .image-prompt {
+        .image-info p {
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 0.5rem;
         }
-        .image-details, .image-date {
-            font-size: 0.9em;
-            color: #cccccc;
+        .image-info small {
+            color: #a0a0a0;
         }
         footer {
-            background-color: #2d2d3f;
-            color: white;
+            background-color: var(--secondary-bg);
             text-align: center;
-            padding: 20px 0;
-            margin-top: 40px;
+            padding: 2rem 0;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>AI Image Generator</h1>
-        </header>
-        <main>
-            <section class="intro">
-                <h2>Transform Your Ideas into Images</h2>
-                <p>Welcome to our AI-powered image generation platform. Create stunning visuals from text descriptions in seconds!</p>
-            </section>
-            <section class="cta">
-                <a href="#" class="btn btn-primary">Login</a>
-                <a href="#" class="btn btn-secondary">Sign Up</a>
-            </section>
-            <section class="features">
-                <h3>Features:</h3>
-                <ul>
-                    <li>Generate images from text descriptions</li>
-                    <li>Customize image style and color</li>
-                    <li>Save and download your creations</li>
-                    <li>Premium plans for unlimited generations</li>
-                </ul>
-            </section>
-            
-            <section class="generated-images">
-                <h3>Recently Generated Images</h3>
-                <div class="image-grid">
-                    <!-- Image items would be dynamically inserted here -->
-                    {% for image in images %}
-                    <div class="image-item">
-                        <img src="{{ image.url }}" alt="Generated Image">
-                        <div class="image-info">
-                            <p class="image-prompt">{{ image.prompt }}</p>
-                            <p class="image-details">Style: {{ image.style }}, Color: {{ image.color }}</p>
-                            <p class="image-date">Created: {{ image.created_at|custom_datetime }}</p>
-                        </div>
+    <header>
+        <nav class="container">
+            <div class="logo">AI Image Generator</div>
+            <div class="nav-links">
+                <a href="{{ url_for('home') }}">Home</a>
+                <a href="#">Explore</a>
+                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('signup') }}" class="cta-button">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Create Stunning AI Art</h1>
+                <p>Transform your imagination into reality with our cutting-edge AI image generation technology.</p>
+                <a href="{{ url_for('signup') }}" class="cta-button">Start Creating</a>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="container">
+                <h2>Unleash Your Creativity</h2>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <h3>Text to Image</h3>
+                        <p>Turn your words into visually stunning artwork</p>
                     </div>
-                {% endfor %}
+                    <div class="feature-item">
+                        <h3>Style Customization</h3>
+                        <p>Tailor the aesthetic to match your vision</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>High Resolution</h3>
+                        <p>Generate detailed, high-quality images</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Rapid Generation</h3>
+                        <p>Create multiple variations in seconds</p>
+                    </div>
                 </div>
-            </section>
-        </main>
-        <footer>
+            </div>
+        </section>
+
+        <section class="recent-images">
+            <div class="container">
+                <h2>Community Masterpieces</h2>
+                <div class="image-grid">
+                    {% for image in images %}
+                        <div class="image-item">
+                            <img src="{{ image.url }}" alt="AI Generated Image">
+                            <div class="image-info">
+                                <p>{{ image.prompt }}</p>
+                                <small>Style: {{ image.style }} | Created by: {{ image.user }}</small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
             <p>&copy; 2023 AI Image Generator. All rights reserved.</p>
-        </footer>
-    </div>
+        </div>
+    </footer>
 </body>
 </html>
-            <!-- Updated section for displaying generated images -->
  
