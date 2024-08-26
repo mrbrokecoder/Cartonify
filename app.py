@@ -349,7 +349,7 @@ def signup():
             # Send OTP via email
             send_otp_email(email, otp)
             
-            flash('OTP sent to your email. Please enter it to complete signup.')
+            flash('OTP sent to your email. Please enter it to complete signup. check Spam')
             return render_template('signup.html', email=email, show_otp=True)
     
     return render_template('signup.html', show_otp=False)
