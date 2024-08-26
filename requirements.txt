@@ -7,3 +7,8 @@ replicate
 requests
 stripe
 APScheduler
+gunicorn
+flask_caching
+celery
+redis
+flask_session

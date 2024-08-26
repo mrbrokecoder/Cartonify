@@ -751,7 +751,7 @@
                 {% if images %}
                 {% for image in images %}
                     <div class="previous-image-box">
-                        <img src="{{ image.url }}" alt="{{ image.prompt }}">
+                        <img src="{{ image.url }}" alt="{{ image.prompt }}" loading="lazy">
                         <div class="previous-image-info">
                             <p>Prompt: {{ image.prompt }}</p>
                             <p>Style: {{ image.style }}</p>

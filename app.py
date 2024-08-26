@@ -20,6 +20,8 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
+import redis
+from flask_session import Session
 
 load_dotenv()
 
@@ -48,6 +50,18 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
 stripe.api_key = app.config['STRIPE_SECRET_KEY']
 app.config['SESSION_TYPE'] = 'filesystem'
 
+# Redis Configuration
+app.config['REDIS_URL'] = os.getenv('REDIS_URL', 'redis://localhost:6379')
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True
+app.config['SESSION_REDIS'] = redis.from_url(app.config['REDIS_URL'])
+
+# Initialize Redis
+redis_client = redis.from_url(app.config['REDIS_URL'])
+
+# Initialize Flask-Session
+Session(app)
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
@@ -67,13 +81,40 @@ class User(UserMixin):
 
 @login_manager.user_loader
 def load_user(user_id):
+    user_key = f'user:{user_id}'
+    user_data = redis_client.hgetall(user_key)
+    
+    if user_data:
+        return User(
+            int(user_data[b'id']),
+            user_data[b'email'].decode('utf-8'),
+            user_data[b'password'].decode('utf-8'),
+            bool(int(user_data[b'is_premium'])),
+            int(user_data[b'prompt_count']),
+            datetime.fromisoformat(user_data[b'subscription_start'].decode('utf-8')) if user_data[b'subscription_start'] else None,
+            int(user_data[b'monthly_quota'])
+        )
+    
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("SELECT id, email, password, COALESCE(is_premium, FALSE) as is_premium, COALESCE(prompt_count, 0) as prompt_count, subscription_start, monthly_quota FROM users WHERE id = %s", (user_id,))
     user = cur.fetchone()
     cur.close()
     conn.close()
+    
     if user:
+        # Cache user data in Redis
+        redis_client.hmset(user_key, {
+            'id': user[0],
+            'email': user[1],
+            'password': user[2],
+            'is_premium': int(user[3]),
+            'prompt_count': user[4],
+            'subscription_start': user[5].isoformat() if user[5] else '',
+            'monthly_quota': user[6]
+        })
+        redis_client.expire(user_key, 3600)  # Cache for 1 hour
+        
         return User(user[0], user[1], user[2], user[3], user[4], user[5], user[6])
     return None
 
@@ -430,6 +471,16 @@ def check_user_quota(user):
 @app.route('/transform', methods=['POST'])
 @login_required
 def transform_image():
+    rate_limit_key = f'rate_limit:{current_user.id}'
+    current_count = redis_client.get(rate_limit_key)
+    
+    if current_count is None:
+        redis_client.setex(rate_limit_key, 3600, 1)  # Set initial count with 1 hour expiry
+    elif int(current_count) >= 10:
+        return jsonify({'error': 'Rate limit exceeded. Please try again later.'}), 429
+    else:
+        redis_client.incr(rate_limit_key)
+    
     if not check_user_quota(current_user):
         return jsonify({
             'quota_exceeded': True,
@@ -750,14 +801,18 @@ def reset_monthly_quota():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
-        UPDATE users 
-        SET monthly_quota = 1600 
+        SELECT id FROM users 
         WHERE is_premium = TRUE AND subscription_start IS NOT NULL 
         AND subscription_start + INTERVAL '30 days' > NOW()
     """)
-    conn.commit()
+    premium_users = cur.fetchall()
     cur.close()
     conn.close()
+    
+    for user in premium_users:
+        user_key = f'user:{user[0]}'
+        redis_client.hset(user_key, 'monthly_quota', 1600)
+        redis_client.expire(user_key, 3600)  # Refresh cache expiry
 
 # Initialize the scheduler
 scheduler = BackgroundScheduler()
