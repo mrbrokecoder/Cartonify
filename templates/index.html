@@ -124,12 +124,12 @@
                 {% if images %}
                 {% for image in images %}
                     <div class="previous-image-box">
-                        <img src="{{ image.url }}" alt="{{ image.prompt }}" loading="lazy">
+                        <img src="{{ image[0] }}" alt="{{ image[1] }}" loading="lazy">
                         <div class="previous-image-info">
-                            <p>Prompt: {{ image.prompt }}</p>
-                            <p>Style: {{ image.style }}</p>
-                            <p>Color: {{ image.color }}</p>
-                            <p>Created at: {{ image.created_at | custom_datetime }}</p>
+                            <p>Prompt: {{ image[1] }}</p>
+                            <p>Style: {{ image[2] }}</p>
+                            <p>Color: {{ image[3] }}</p>
+                            <p>Created at: {{ image[4] | custom_datetime }}</p>
                         </div>
                     </div>
                 {% endfor %}

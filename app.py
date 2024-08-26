@@ -253,7 +253,7 @@ login_manager.login_view = 'home'
 def index():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM images WHERE user_id = %s ORDER BY created_at DESC", (current_user.id,))
+    cur.execute("SELECT url, prompt, style, color, created_at FROM images WHERE user_id = %s ORDER BY created_at DESC", (current_user.id,))
     images = cur.fetchall()
     
     # Get user's premium status and remaining credits

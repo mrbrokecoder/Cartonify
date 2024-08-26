@@ -755,3 +755,39 @@ gap: 10px;
 #viewAllImages:hover {
     background-color: #45a049;
 }
+.previous-images {
+    margin-top: 2rem;
+}
+
+.previous-images h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.previous-images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.previous-image-box {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.5rem;
+}
+
+.previous-image-box img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.previous-image-info {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.previous-image-info p {
+    margin: 0.2rem 0;
+}
