@@ -829,8 +829,28 @@ atexit.register(lambda: scheduler.shutdown())
 @app.route('/admin')
 @login_required
 def admin_dashboard():
-    if not current_user.is_admin:
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Check if the current user's email is gptadarsh1@gmail.com
+    if current_user.email == 'gptadarsh1@gmail.com':
+        # If it is, make sure they're set as an admin in the database
+        cur.execute("UPDATE users SET is_admin = TRUE WHERE email = %s", (current_user.email,))
+        conn.commit()
+        flash('You have been granted admin access.', 'success')
+    
+    # Now check if the user is an admin
+    cur.execute("SELECT is_admin FROM users WHERE id = %s", (current_user.id,))
+    is_admin = cur.fetchone()[0]
+    
+    if not is_admin:
+        cur.close()
+        conn.close()
+        flash('You do not have permission to access the admin dashboard.', 'error')
         return redirect(url_for('index'))
+    
+    cur.close()
+    conn.close()
     return send_from_directory('.', 'admin_dashboard.html')
 
 
