@@ -941,6 +941,16 @@ def update_user_credits(user_id):
     except Exception as e:
         app.logger.error(f"Error updating credits: {str(e)}")
         return jsonify({'error': f'Server error: {str(e)}'}), 500
+        cur.close()
+        conn.close()
+
+        if affected_rows == 0:
+            return jsonify({'error': 'User not found or no changes made'}), 404
+
+        return jsonify({'message': 'User credits updated successfully'})
+    except Exception as e:
+        app.logger.error(f"Error updating credits: {str(e)}")
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
 
 if __name__ == '__main__':
     with app.app_context():

@@ -101,12 +101,6 @@
                 method: 'PUT',
                 contentType: 'application/json',
                 data: JSON.stringify({ monthly_quota: newCredits }),
-                xhrFields: {
-                    withCredentials: true
-                },
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token() }}'
-                },
                 success: function(data) {
                     alert(data.message);
                     location.reload();
@@ -115,7 +109,7 @@
                     console.error('XHR:', xhr);
                     console.error('Status:', status);
                     console.error('Error:', error);
-                    alert('Error updating credits: ' + (xhr.responseJSON ? xhr.responseJSON.error : error));
+                    alert('Error updating credits. Check console for details.');
                 }
             });
         });
