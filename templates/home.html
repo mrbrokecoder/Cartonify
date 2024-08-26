@@ -1,236 +1,1501 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- This site was created in Webflow. https://webflow.com --><!-- Last Published: Fri Aug 16 2024 14:53:12 GMT+0000 (Coordinated Universal Time) -->
+<html data-wf-domain="designizy.webflow.io" data-wf-page="66a79380acf7d0022491e7cf"
+    data-wf-site="66a79380acf7d0022491e7e1" lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Generator - Inspired by Leonardo AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <meta charset="utf-8" />
+    <title>Designizy – Webflow Ecommerce Website Template</title>
+    <meta
+        content="Embrace the future with Designizy, a Webflow template for leading digital agencies. With 3D animations, a colorful color palette and fun creative design, it captivates and engages instantly."
+        name="description" />
+    <meta content="Designizy – Webflow Ecommerce Website Template" property="og:title" />
+    <meta
+        content="Embrace the future with Designizy, a Webflow template for leading digital agencies. With 3D animations, a colorful color palette and fun creative design, it captivates and engages instantly."
+        property="og:description" />
+    <meta
+        content="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66b56d45f836a728ea15495a_open-graph-image.jpg"
+        property="og:image" />
+    <meta content="Designizy – Webflow Ecommerce Website Template" property="twitter:title" />
+    <meta
+        content="Embrace the future with Designizy, a Webflow template for leading digital agencies. With 3D animations, a colorful color palette and fun creative design, it captivates and engages instantly."
+        property="twitter:description" />
+    <meta
+        content="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66b56d45f836a728ea15495a_open-graph-image.jpg"
+        property="twitter:image" />
+    <meta property="og:type" content="website" />
+    <meta content="summary_large_image" name="twitter:card" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta content="Webflow" name="generator" />
+    <link href="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/css/designizy.webflow.8d5e3a9c7.css"
+        rel="stylesheet" type="text/css" />
     <style>
-        :root {
-            --bg-color: #000000;
-            --text-color: #ffffff;
-            --accent-color: #5465ff;
-            --secondary-bg: #111111;
-            --card-bg: #1e1e1e;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        header {
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-        }
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-color);
-        }
-        .nav-links a {
-            color: var(--text-color);
-            text-decoration: none;
-            margin-left: 1.5rem;
-            font-weight: 500;
-        }
-        .hero {
-            padding: 120px 0 60px;
-            text-align: center;
-            background: linear-gradient(to bottom, var(--bg-color), var(--secondary-bg));
-        }
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, #5465ff, #ff54a2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .hero p {
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto 2rem;
-            color: #a0a0a0;
-        }
-        .cta-button {
-            display: inline-block;
-            background-color: var(--accent-color);
-            color: var(--text-color);
-            padding: 0.8rem 2rem;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        .cta-button:hover {
-            background-color: #4355ff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(84, 101, 255, 0.3);
-        }
-        .features {
-            padding: 4rem 0;
-            background-color: var(--secondary-bg);
-        }
-        .features h2 {
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 2.5rem;
-        }
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-        .feature-item {
-            background-color: var(--card-bg);
-            padding: 2rem;
-            border-radius: 10px;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-        .feature-item:hover {
-            transform: translateY(-5px);
-        }
-        .feature-item h3 {
-            margin-bottom: 1rem;
-            color: var(--accent-color);
-        }
-        .recent-images {
-            padding: 4rem 0;
-        }
-        .recent-images h2 {
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 2.5rem;
-        }
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-        .image-item {
-            border-radius: 10px;
-            overflow: hidden;
-            background-color: var(--card-bg);
-            transition: transform 0.3s ease;
-        }
-        .image-item:hover {
-            transform: scale(1.03);
-        }
-        .image-item img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-        }
-        .image-info {
-            padding: 1rem;
-        }
-        .image-info p {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        .image-info small {
-            color: #a0a0a0;
-        }
-        footer {
-            background-color: var(--secondary-bg);
-            text-align: center;
-            padding: 2rem 0;
-            margin-top: 4rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        @media (min-width:992px) {
+            html.w-mod-js:not(.w-mod-ix) [data-w-id="09d1da1e-29ed-842a-8767-21483a4d8521"] {
+                -webkit-transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+                -moz-transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+                -ms-transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+                transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+            }
+
+            html.w-mod-js:not(.w-mod-ix) [data-w-id="09d1da1e-29ed-842a-8767-21483a4d8538"] {
+                -webkit-transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+                -moz-transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+                -ms-transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+                transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+            }
+
+            html.w-mod-js:not(.w-mod-ix) [data-w-id="09d1da1e-29ed-842a-8767-21483a4d854f"] {
+                -webkit-transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+                -moz-transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+                -ms-transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+                transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+            }
+
+            html.w-mod-js:not(.w-mod-ix) [data-w-id="09d1da1e-29ed-842a-8767-21483a4d8566"] {
+                -webkit-transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+                -moz-transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+                -ms-transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+                transform: translate3d(0, 0, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);
+            }
         }
     </style>
+    <script
+        type="text/javascript">!function (o, c) { var n = c.documentElement, t = " w-mod-"; n.className += t + "js", ("ontouchstart" in o || o.DocumentTouch && c instanceof DocumentTouch) && (n.className += t + "touch") }(window, document);</script>
+    <link href="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66b549945842c68bede59cd8_favicon.svg"
+        rel="shortcut icon" type="image/x-icon" />
+    <link href="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66b5499ab70b952589b0abc7_webclip.svg"
+        rel="apple-touch-icon" />
+
 </head>
+
 <body>
-    <header>
-        <nav class="container">
-            <div class="logo">AI Image Generator</div>
-            <div class="nav-links">
-                <a href="{{ url_for('home') }}">Home</a>
-                <a href="#">Explore</a>
-                <a href="{{ url_for('login') }}">Login</a>
-                <a href="{{ url_for('signup') }}" class="cta-button">Sign Up</a>
-            </div>
-        </nav>
-    </header>
-
-    <main>
-        <section class="hero">
-            <div class="container">
-                <h1>Create Stunning AI Art</h1>
-                <p>Transform your imagination into reality with our cutting-edge AI image generation technology.</p>
-                <a href="{{ url_for('signup') }}" class="cta-button">Start Creating</a>
-            </div>
-        </section>
-
-        <section class="features">
-            <div class="container">
-                <h2>Unleash Your Creativity</h2>
-                <div class="feature-grid">
-                    <div class="feature-item">
-                        <h3>Text to Image</h3>
-                        <p>Turn your words into visually stunning artwork</p>
-                    </div>
-                    <div class="feature-item">
-                        <h3>Style Customization</h3>
-                        <p>Tailor the aesthetic to match your vision</p>
-                    </div>
-                    <div class="feature-item">
-                        <h3>High Resolution</h3>
-                        <p>Generate detailed, high-quality images</p>
-                    </div>
-                    <div class="feature-item">
-                        <h3>Rapid Generation</h3>
-                        <p>Create multiple variations in seconds</p>
+    <div class="page-wrapper">
+        <div style="display:block;opacity:1" class="preloader">
+            <div class="preloader-container">
+                <div class="preloader-padding">
+                    <div class="preloader-wrapper">
+                        <div style="width:25vw;height:3px" class="preloader-line">
+                            <div style="width:0%" class="preloader-progress-bar"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <section class="recent-images">
-            <div class="container">
-                <h2>Community Masterpieces</h2>
-                <div class="image-grid">
-                    {% for image in images %}
-                        <div class="image-item">
-                            <img src="{{ image.url }}" alt="AI Generated Image">
-                            <div class="image-info">
-                                <p>{{ image.prompt }}</p>
-                                <small>Style: {{ image.style }} | Created by: {{ image.user }}</small>
+        </div>
+        
+        <div id="top" class="nav-wrapper">
+            <div class="padding-global">
+                <div class="container-large">
+                    <div class="w-layout-grid nav-grid-wrapper">
+                        <div id="w-node-a9b70a2b-115f-0f3a-7e5c-c21798b7ff3f-f5a4d093" class="navbar-container-wrapper">
+                            <a id="w-node-f4f81c24-7d69-b5bd-84a1-6d15f5a4d099-f5a4d093"
+                                data-w-id="f4f81c24-7d69-b5bd-84a1-6d15f5a4d099" href="/" aria-current="page"
+                                class="brand-link w-inline-block w--current"><img
+                                    src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66b54db7f64d5c5e235b2fa3_logo.svg"
+                                    loading="lazy" alt="Logo – Designizy Webflow Template " class="logo" /><img
+                                    src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66b54db7f64d5c5e235b2fa3_logo.svg"
+                                    loading="lazy" alt="Logo – Designizy Webflow Template " class="logo" /></a>
+                            <div class="cart-item">
+                                <div data-open-product="" data-wf-cart-type="modal" data-wf-cart-query="query Dynamo2 {
+    database {
+      id
+      commerceOrder {
+        comment
+        extraItems {
+          name
+          pluginId
+          pluginName
+          price {
+            value
+            unit
+            decimalValue
+            string
+          }
+        }
+        id
+        startedOn
+        statusFlags {
+          hasDownloads
+          hasSubscription
+          isFreeOrder
+          requiresShipping
+        }
+        subtotal {
+          value
+          unit
+          decimalValue
+          string
+        }
+        total {
+          value
+          unit
+          decimalValue
+          string
+        }
+        updatedOn
+        userItems {
+          count
+          id
+          price {
+            value
+            unit
+            decimalValue
+            string
+          }
+          product {
+            id
+            cmsLocaleId
+            f__draft_0ht
+            f__archived_0ht
+            f_ec_product_type_2dr10dr {
+              id
+              name
+            }
+            f_name_
+            f_sku_properties_3dr {
+              id
+              name
+              enum {
+                id
+                name
+                slug
+              }
+            }
+          }
+          rowTotal {
+            value
+            unit
+            decimalValue
+            string
+          }
+          sku {
+            cmsLocaleId
+            f__draft_0ht
+            f__archived_0ht
+            f_main_image_4dr {
+              url
+              file {
+                size
+                origFileName
+                createdOn
+                updatedOn
+                mimeType
+                width
+                height
+                variants {
+                  origFileName
+                  quality
+                  height
+                  width
+                  s3Url
+                  error
+                  size
+                }
+              }
+              alt
+            }
+            f_sku_values_3dr {
+              property {
+                id
+              }
+              value {
+                id
+              }
+            }
+            id
+          }
+          subscriptionFrequency
+          subscriptionInterval
+          subscriptionTrial
+        }
+        userItemsCount
+      }
+    }
+    site {
+      id
+      commerce {
+        businessAddress {
+          country
+        }
+        defaultCountry
+        defaultCurrency
+        quickCheckoutEnabled
+      }
+    }
+  }" data-wf-page-link-href-prefix="" class="w-commerce-commercecartwrapper cart"
+                                    data-node-type="commerce-cart-wrapper"><a
+                                        class="w-commerce-commercecartopenlink cart-button w-inline-block" role="button"
+                                        aria-haspopup="dialog" aria-label="Open cart"
+                                        data-node-type="commerce-cart-open-link" href="#"><img
+                                            src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66b54df33700b8d98c39c2d6_bag-icon%201.svg"
+                                            loading="lazy" alt="Bag Icon – Designizy Webflow Template "
+                                            class="bag-icon" />
+                                        <div data-wf-bindings="%5B%7B%22innerHTML%22%3A%7B%22type%22%3A%22Number%22%2C%22filter%22%3A%7B%22type%22%3A%22numberPrecision%22%2C%22params%22%3A%5B%220%22%2C%22numberPrecision%22%5D%7D%2C%22dataPath%22%3A%22database.commerceOrder.userItemsCount%22%7D%7D%5D"
+                                            class="w-commerce-commercecartopenlinkcount cart-quantity">0</div>
+                                    </a>
+                                    <div style="display:none"
+                                        class="w-commerce-commercecartcontainerwrapper w-commerce-commercecartcontainerwrapper--cartType-modal cart-wrapper"
+                                        data-node-type="commerce-cart-container-wrapper">
+                                        <div data-node-type="commerce-cart-container" role="dialog"
+                                            class="w-commerce-commercecartcontainer cart-container">
+                                            <div class="w-commerce-commercecartheader cart-header">
+                                                <h4 class="w-commerce-commercecartheading">Your Cart</h4><a
+                                                    class="w-commerce-commercecartcloselink close-button w-inline-block"
+                                                    role="button" aria-label="Close cart"
+                                                    data-node-type="commerce-cart-close-link"><svg width="16px"
+                                                        height="16px" viewBox="0 0 16 16">
+                                                        <g stroke="none" stroke-width="1" fill="none"
+                                                            fill-rule="evenodd">
+                                                            <g fill-rule="nonzero" fill="#333333">
+                                                                <polygon
+                                                                    points="6.23223305 8 0.616116524 13.6161165 2.38388348 15.3838835 8 9.76776695 13.6161165 15.3838835 15.3838835 13.6161165 9.76776695 8 15.3838835 2.38388348 13.6161165 0.616116524 8 6.23223305 2.38388348 0.616116524 0.616116524 2.38388348 6.23223305 8">
+                                                                </polygon>
+                                                            </g>
+                                                        </g>
+                                                    </svg></a>
+                                            </div>
+                                            <div class="w-commerce-commercecartformwrapper cart-form-wrapper">
+                                                <form style="display:none" class="w-commerce-commercecartform"
+                                                    data-node-type="commerce-cart-form">
+                                                    <div class="w-commerce-commercecartlist"
+                                                        data-wf-collection="database.commerceOrder.userItems"
+                                                        data-wf-template-id="wf-template-3fc81cd3-b4fc-6168-f77c-7671c7e35857">
+                                                        <div class="w-commerce-commercecartitem"><img
+                                                                data-wf-bindings="%5B%7B%22src%22%3A%7B%22type%22%3A%22ImageRef%22%2C%22filter%22%3A%7B%22type%22%3A%22identity%22%2C%22params%22%3A%5B%5D%7D%2C%22dataPath%22%3A%22database.commerceOrder.userItems%5B%5D.sku.f_main_image_4dr%22%7D%7D%5D"
+                                                                src="" alt=""
+                                                                class="w-commerce-commercecartitemimage cart-image w-dyn-bind-empty" />
+                                                            <div class="w-commerce-commercecartiteminfo">
+                                                                <div data-wf-bindings="%5B%7B%22innerHTML%22%3A%7B%22type%22%3A%22PlainText%22%2C%22filter%22%3A%7B%22type%22%3A%22identity%22%2C%22params%22%3A%5B%5D%7D%2C%22dataPath%22%3A%22database.commerceOrder.userItems%5B%5D.product.f_name_%22%7D%7D%5D"
+                                                                    class="w-commerce-commercecartproductname w-dyn-bind-empty">
+                                                                </div>
+                                                                <div
+                                                                    data-wf-bindings="%5B%7B%22innerHTML%22%3A%7B%22type%22%3A%22CommercePrice%22%2C%22filter%22%3A%7B%22type%22%3A%22price%22%2C%22params%22%3A%5B%5D%7D%2C%22dataPath%22%3A%22database.commerceOrder.userItems%5B%5D.price%22%7D%7D%5D">
+                                                                    $ 0.00 USD</div>
+                                                                <ul data-wf-bindings="%5B%7B%22optionSets%22%3A%7B%22type%22%3A%22CommercePropTable%22%2C%22filter%22%3A%7B%22type%22%3A%22identity%22%2C%22params%22%3A%5B%5D%7D%2C%22dataPath%22%3A%22database.commerceOrder.userItems%5B%5D.product.f_sku_properties_3dr[]%22%7D%7D%2C%7B%22optionValues%22%3A%7B%22type%22%3A%22CommercePropValues%22%2C%22filter%22%3A%7B%22type%22%3A%22identity%22%2C%22params%22%3A%5B%5D%7D%2C%22dataPath%22%3A%22database.commerceOrder.userItems%5B%5D.sku.f_sku_values_3dr%22%7D%7D%5D"
+                                                                    class="w-commerce-commercecartoptionlist"
+                                                                    data-wf-collection="database.commerceOrder.userItems%5B%5D.product.f_sku_properties_3dr"
+                                                                    data-wf-template-id="wf-template-3fc81cd3-b4fc-6168-f77c-7671c7e3585d">
+                                                                    <li><span
+                                                                            data-wf-bindings="%5B%7B%22innerHTML%22%3A%7B%22type%22%3A%22PlainText%22%2C%22filter%22%3A%7B%22type%22%3A%22identity%22%2C%22params%22%3A%5B%5D%7D%2C%22dataPath%22%3A%22database.commerceOrder.userItems%5B%5D.product.f_sku_properties_3dr%5B%5D.name%22%7D%7D%5D"
+                                                                            class="w-dyn-bind-empty"></span><span>:
+                                                                        </span><span
+                                                                            data-wf-bindings="%5B%7B%22innerHTML%22%3A%7B%22type%22%3A%22CommercePropValues%22%2C%22filter%22%3A%7B%22type%22%3A%22identity%22%2C%22params%22%3A%5B%5D%7D%2C%22dataPath%22%3A%22database.commerceOrder.userItems%5B%5D.product.f_sku_properties_3dr%5B%5D%22%7D%7D%5D"
+                                                                            class="w-dyn-bind-empty"></span></li>
+                                                                </ul><a href="#" role="button"
+                                                                    data-wf-bindings="%5B%7B%22data-commerce-sku-id%22%3A%7B%22type%22%3A%22ItemRef%22%2C%22filter%22%3A%7B%22type%22%3A%22identity%22%2C%22params%22%3A%5B%5D%7D%2C%22dataPath%22%3A%22database.commerceOrder.userItems%5B%5D.sku.id%22%7D%7D%5D"
+                                                                    class="remove-button w-inline-block"
+                                                                    data-wf-cart-action="remove-item"
+                                                                    data-commerce-sku-id=""
+                                                                    aria-label="Remove item from cart">
+                                                                    <div>Remove</div>
+                                                                </a>
+                                                            </div><input aria-label="Update quantity"
+                                                                data-wf-bindings="%5B%7B%22value%22%3A%7B%22type%22%3A%22Number%22%2C%22filter%22%3A%7B%22type%22%3A%22numberPrecision%22%2C%22params%22%3A%5B%220%22%2C%22numberPrecision%22%5D%7D%2C%22dataPath%22%3A%22database.commerceOrder.userItems%5B%5D.count%22%7D%7D%2C%7B%22data-commerce-sku-id%22%3A%7B%22type%22%3A%22ItemRef%22%2C%22filter%22%3A%7B%22type%22%3A%22identity%22%2C%22params%22%3A%5B%5D%7D%2C%22dataPath%22%3A%22database.commerceOrder.userItems%5B%5D.sku.id%22%7D%7D%5D"
+                                                                data-wf-conditions="%7B%22condition%22%3A%7B%22fields%22%3A%7B%22product%3Aec-product-type%22%3A%7B%22ne%22%3A%22e348fd487d0102946c9179d2a94bb613%22%2C%22type%22%3A%22Option%22%7D%7D%7D%2C%22dataPath%22%3A%22database.commerceOrder.userItems%5B%5D%22%7D"
+                                                                class="w-commerce-commercecartquantity" required=""
+                                                                pattern="^[0-9]+$" inputMode="numeric" type="number"
+                                                                name="quantity" autoComplete="off"
+                                                                data-wf-cart-action="update-item-quantity"
+                                                                data-commerce-sku-id="" value="1" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="w-commerce-commercecartfooter cart-footer">
+                                                        <div aria-atomic="true" aria-live="polite"
+                                                            class="w-commerce-commercecartlineitem">
+                                                            <div>Subtotal</div>
+                                                            <div data-wf-bindings="%5B%7B%22innerHTML%22%3A%7B%22type%22%3A%22CommercePrice%22%2C%22filter%22%3A%7B%22type%22%3A%22price%22%2C%22params%22%3A%5B%5D%7D%2C%22dataPath%22%3A%22database.commerceOrder.subtotal%22%7D%7D%5D"
+                                                                class="w-commerce-commercecartordervalue"></div>
+                                                        </div>
+                                                        <div>
+                                                            <div data-node-type="commerce-cart-quick-checkout-actions"
+                                                                style="display:none"><a
+                                                                    data-node-type="commerce-cart-apple-pay-button"
+                                                                    role="button" aria-label="Apple Pay"
+                                                                    aria-haspopup="dialog"
+                                                                    style="background-image:-webkit-named-image(apple-pay-logo-white);background-size:100% 50%;background-position:50% 50%;background-repeat:no-repeat"
+                                                                    class="w-commerce-commercecartapplepaybutton apple-pay"
+                                                                    tabindex="0">
+                                                                    <div></div>
+                                                                </a><a
+                                                                    data-node-type="commerce-cart-quick-checkout-button"
+                                                                    role="button" tabindex="0" aria-haspopup="dialog"
+                                                                    style="display:none"
+                                                                    class="w-commerce-commercecartquickcheckoutbutton"><svg
+                                                                        class="w-commerce-commercequickcheckoutgoogleicon"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                                        width="16" height="16" viewBox="0 0 16 16">
+                                                                        <defs>
+                                                                            <polygon id="google-mark-a"
+                                                                                points="0 .329 3.494 .329 3.494 7.649 0 7.649">
+                                                                            </polygon>
+                                                                            <polygon id="google-mark-c"
+                                                                                points=".894 0 13.169 0 13.169 6.443 .894 6.443">
+                                                                            </polygon>
+                                                                        </defs>
+                                                                        <g fill="none" fill-rule="evenodd">
+                                                                            <path fill="#4285F4"
+                                                                                d="M10.5967,12.0469 L10.5967,14.0649 L13.1167,14.0649 C14.6047,12.6759 15.4577,10.6209 15.4577,8.1779 C15.4577,7.6339 15.4137,7.0889 15.3257,6.5559 L7.8887,6.5559 L7.8887,9.6329 L12.1507,9.6329 C11.9767,10.6119 11.4147,11.4899 10.5967,12.0469">
+                                                                            </path>
+                                                                            <path fill="#34A853"
+                                                                                d="M7.8887,16 C10.0137,16 11.8107,15.289 13.1147,14.067 C13.1147,14.066 13.1157,14.065 13.1167,14.064 L10.5967,12.047 C10.5877,12.053 10.5807,12.061 10.5727,12.067 C9.8607,12.556 8.9507,12.833 7.8887,12.833 C5.8577,12.833 4.1387,11.457 3.4937,9.605 L0.8747,9.605 L0.8747,11.648 C2.2197,14.319 4.9287,16 7.8887,16">
+                                                                            </path>
+                                                                            <g transform="translate(0 4)">
+                                                                                <mask id="google-mark-b" fill="#fff">
+                                                                                    <use xlink:href="#google-mark-a">
+                                                                                    </use>
+                                                                                </mask>
+                                                                                <path fill="#FBBC04"
+                                                                                    d="M3.4639,5.5337 C3.1369,4.5477 3.1359,3.4727 3.4609,2.4757 L3.4639,2.4777 C3.4679,2.4657 3.4749,2.4547 3.4789,2.4427 L3.4939,0.3287 L0.8939,0.3287 C0.8799,0.3577 0.8599,0.3827 0.8459,0.4117 C-0.2821,2.6667 -0.2821,5.3337 0.8459,7.5887 L0.8459,7.5997 C0.8549,7.6167 0.8659,7.6317 0.8749,7.6487 L3.4939,5.6057 C3.4849,5.5807 3.4729,5.5587 3.4639,5.5337"
+                                                                                    mask="url(#google-mark-b)"></path>
+                                                                            </g>
+                                                                            <mask id="google-mark-d" fill="#fff">
+                                                                                <use xlink:href="#google-mark-c"></use>
+                                                                            </mask>
+                                                                            <path fill="#EA4335"
+                                                                                d="M0.894,4.3291 L3.478,6.4431 C4.113,4.5611 5.843,3.1671 7.889,3.1671 C9.018,3.1451 10.102,3.5781 10.912,4.3671 L13.169,2.0781 C11.733,0.7231 9.85,-0.0219 7.889,0.0001 C4.941,0.0001 2.245,1.6791 0.894,4.3291"
+                                                                                mask="url(#google-mark-d)"></path>
+                                                                        </g>
+                                                                    </svg><svg
+                                                                        class="w-commerce-commercequickcheckoutmicrosofticon"
+                                                                        xmlns="http://www.w3.org/2000/svg" width="16"
+                                                                        height="16" viewBox="0 0 16 16">
+                                                                        <g fill="none" fill-rule="evenodd">
+                                                                            <polygon fill="#F05022"
+                                                                                points="7 7 1 7 1 1 7 1"></polygon>
+                                                                            <polygon fill="#7DB902"
+                                                                                points="15 7 9 7 9 1 15 1"></polygon>
+                                                                            <polygon fill="#00A4EE"
+                                                                                points="7 15 1 15 1 9 7 9"></polygon>
+                                                                            <polygon fill="#FFB700"
+                                                                                points="15 15 9 15 9 9 15 9"></polygon>
+                                                                        </g>
+                                                                    </svg>
+                                                                    <div>Pay with browser.</div>
+                                                                </a></div><a href="/checkout"
+                                                                value="Continue to Checkout"
+                                                                class="w-commerce-commercecartcheckoutbutton button"
+                                                                data-loading-text="Hang Tight..."
+                                                                data-node-type="cart-checkout-button">Continue to
+                                                                Checkout</a>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                                <div class="w-commerce-commercecartemptystate">
+                                                    <div aria-label="This cart is empty" aria-live="polite">No items
+                                                        found.</div>
+                                                </div>
+                                                <div aria-live="assertive" style="display:none"
+                                                    data-node-type="commerce-cart-error"
+                                                    class="w-commerce-commercecarterrorstate form-message-error">
+                                                    <div class="w-cart-error-msg"
+                                                        data-w-cart-quantity-error="Product is not available in this quantity."
+                                                        data-w-cart-general-error="Something went wrong when adding this item to the cart."
+                                                        data-w-cart-checkout-error="Checkout is disabled on this site."
+                                                        data-w-cart-cart_order_min-error="The order minimum was not met. Add more items to your cart to continue."
+                                                        data-w-cart-subscription_error-error="Before you purchase, please use your email invite to verify your address so we can send order updates.">
+                                                        Product is not available in this quantity.</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-layout-grid navbar-component-grid">
+                                <div id="w-node-f4f81c24-7d69-b5bd-84a1-6d15f5a4d097-f5a4d093" data-animation="default"
+                                    data-collapse="all" data-duration="400" data-easing="ease" data-easing2="ease"
+                                    role="banner" class="navbar w-nav">
+                                    <nav role="navigation" class="nav-menu w-nav-menu">
+                                        <div class="navbar-content-wrapper">
+                                            <div class="w-layout-grid nav-inner-grid"><a href="/"
+                                                    id="w-node-_1234cb8b-da46-fe27-7677-2bb02fcea6d7-f5a4d093"
+                                                    data-w-id="1234cb8b-da46-fe27-7677-2bb02fcea6d7" aria-current="page"
+                                                    class="link-button w-inline-block w--current">
+                                                    <div class="link-flex">
+                                                        <div id="w-node-_1234cb8b-da46-fe27-7677-2bb02fcea6d9-f5a4d093"
+                                                            class="arrow-item">
+                                                            <div id="w-node-_1234cb8b-da46-fe27-7677-2bb02fcea6da-f5a4d093"
+                                                                class="arrow-link text-color-black w-embed"><svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path d="M16 12L10 18V6L16 12Z"></path>
+                                                                </svg></div>
+                                                        </div>
+                                                        <div id="w-node-_1234cb8b-da46-fe27-7677-2bb02fcea6db-f5a4d093"
+                                                            class="link-text-wrapper">
+                                                            <div class="link-text">Home 01</div>
+                                                            <div class="link-text">Home 01</div>
+                                                        </div>
+                                                    </div>
+                                                </a><a href="/contact/contact"
+                                                    id="w-node-b1e69fa1-062e-a140-ff86-228b792a6083-f5a4d093"
+                                                    data-w-id="b1e69fa1-062e-a140-ff86-228b792a6083"
+                                                    class="link-button w-inline-block">
+                                                    <div class="link-flex">
+                                                        <div id="w-node-b1e69fa1-062e-a140-ff86-228b792a6085-f5a4d093"
+                                                            class="arrow-item">
+                                                            <div id="w-node-b1e69fa1-062e-a140-ff86-228b792a6086-f5a4d093"
+                                                                class="arrow-link text-color-black w-embed"><svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path d="M16 12L10 18V6L16 12Z"></path>
+                                                                </svg></div>
+                                                        </div>
+                                                        <div id="w-node-b1e69fa1-062e-a140-ff86-228b792a6087-f5a4d093"
+                                                            class="link-text-wrapper">
+                                                            <div class="link-text">Contact 01</div>
+                                                            <div class="link-text">Contact 01</div>
+                                                        </div>
+                                                    </div>
+                                                </a><a href="/home-02"
+                                                    id="w-node-_8b69a5ff-e532-97a0-80f8-5b2c2cf4c400-f5a4d093"
+                                                    data-w-id="8b69a5ff-e532-97a0-80f8-5b2c2cf4c400"
+                                                    class="link-button w-inline-block">
+                                                    <div class="link-flex">
+                                                        <div id="w-node-_8b69a5ff-e532-97a0-80f8-5b2c2cf4c402-f5a4d093"
+                                                            class="arrow-item">
+                                                            <div id="w-node-_8b69a5ff-e532-97a0-80f8-5b2c2cf4c403-f5a4d093"
+                                                                class="arrow-link text-color-black w-embed"><svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path d="M16 12L10 18V6L16 12Z"></path>
+                                                                </svg></div>
+                                                        </div>
+                                                        <div id="w-node-_8b69a5ff-e532-97a0-80f8-5b2c2cf4c404-f5a4d093"
+                                                            class="link-text-wrapper">
+                                                            <div class="link-text">Home 02</div>
+                                                            <div class="link-text">Home 02</div>
+                                                        </div>
+                                                    </div>
+                                                </a><a href="/contact/contact-02"
+                                                    id="w-node-_213d9b55-2068-2b46-be2a-48c7b5ef4017-f5a4d093"
+                                                    data-w-id="213d9b55-2068-2b46-be2a-48c7b5ef4017"
+                                                    class="link-button w-inline-block">
+                                                    <div class="link-flex">
+                                                        <div id="w-node-_213d9b55-2068-2b46-be2a-48c7b5ef4019-f5a4d093"
+                                                            class="arrow-item">
+                                                            <div id="w-node-_213d9b55-2068-2b46-be2a-48c7b5ef401a-f5a4d093"
+                                                                class="arrow-link text-color-black w-embed"><svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path d="M16 12L10 18V6L16 12Z"></path>
+                                                                </svg></div>
+                                                        </div>
+                                                        <div id="w-node-_213d9b55-2068-2b46-be2a-48c7b5ef401b-f5a4d093"
+                                                            class="link-text-wrapper">
+                                                            <div class="link-text">Contact 02</div>
+                                                            <div class="link-text">Contact 02</div>
+                                                        </div>
+                                                    </div>
+                                                </a><a href="/home-03"
+                                                    id="w-node-_694ae399-315c-f35b-c4e8-1f9f0fe0d656-f5a4d093"
+                                                    data-w-id="694ae399-315c-f35b-c4e8-1f9f0fe0d656"
+                                                    class="link-button w-inline-block">
+                                                    <div class="link-flex">
+                                                        <div id="w-node-_694ae399-315c-f35b-c4e8-1f9f0fe0d658-f5a4d093"
+                                                            class="arrow-item">
+                                                            <div id="w-node-_694ae399-315c-f35b-c4e8-1f9f0fe0d659-f5a4d093"
+                                                                class="arrow-link text-color-black w-embed"><svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path d="M16 12L10 18V6L16 12Z"></path>
+                                                                </svg></div>
+                                                        </div>
+                                                        <div id="w-node-_694ae399-315c-f35b-c4e8-1f9f0fe0d65a-f5a4d093"
+                                                            class="link-text-wrapper">
+                                                            <div class="link-text">Home 03</div>
+                                                            <div class="link-text">Home 03</div>
+                                                        </div>
+                                                    </div>
+                                                </a><a href="/contact/contact-03"
+                                                    id="w-node-_146a4b59-30c8-58f1-913e-1caa9c4122cb-f5a4d093"
+                                                    data-w-id="146a4b59-30c8-58f1-913e-1caa9c4122cb"
+                                                    class="link-button w-inline-block">
+                                                    <div class="link-flex">
+                                                        <div id="w-node-_146a4b59-30c8-58f1-913e-1caa9c4122cd-f5a4d093"
+                                                            class="arrow-item">
+                                                            <div id="w-node-_146a4b59-30c8-58f1-913e-1caa9c4122ce-f5a4d093"
+                                                                class="arrow-link text-color-black w-embed"><svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path d="M16 12L10 18V6L16 12Z"></path>
+                                                                </svg></div>
+                                                        </div>
+                                                        <div id="w-node-_146a4b59-30c8-58f1-913e-1caa9c4122cf-f5a4d093"
+                                                            class="link-text-wrapper">
+                                                            <div class="link-text">Contact 03</div>
+                                                            <div class="link-text">Contact 03</div>
+                                                        </div>
+                                                    </div>
+                                                </a><a href="/about/about"
+                                                    id="w-node-_8f59073e-ffc1-1de2-9749-d86f4cfca560-f5a4d093"
+                                                    data-w-id="8f59073e-ffc1-1de2-9749-d86f4cfca560"
+                                                    class="link-button w-inline-block">
+                                                    <div class="link-flex">
+                                                        <div id="w-node-_8f59073e-ffc1-1de2-9749-d86f4cfca562-f5a4d093"
+                                                            class="arrow-item">
+                                                            <div id="w-node-_8f59073e-ffc1-1de2-9749-d86f4cfca563-f5a4d093"
+                                                                class="arrow-link text-color-black w-embed"><svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path d="M16 12L10 18V6L16 12Z"></path>
+                                                                </svg></div>
+                                                        </div>
+                                                        <div id="w-node-_8f59073e-ffc1-1de2-9749-d86f4cfca564-f5a4d093"
+                                                            class="link-text-wrapper">
+                                                            <div class="link-text">About 01</div>
+                                                            <div class="link-text">About 01</div>
+                                                        </div>
+                                                    </div>
+                                                </a><a href="/services"
+                                                    id="w-node-aec5bd70-4255-77cd-bc79-53d7c0f300b4-f5a4d093"
+                                                    data-w-id="aec5bd70-4255-77cd-bc79-53d7c0f300b4"
+                                                    class="link-button w-inline-block">
+                                                    <div class="link-flex">
+                                                        <div id="w-node-aec5bd70-4255-77cd-bc79-53d7c0f300b6-f5a4d093"
+                                                            class="arrow-item">
+                                                            <div id="w-node-aec5bd70-4255-77cd-bc79-53d7c0f300b7-f5a4d093"
+                                                                class="arrow-link text-color-black w-embed"><svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path d="M16 12L10 18V6L16 12Z"></path>
+                                                                </svg></div>
+                                                        </div>
+                                                        <div id="w-node-aec5bd70-4255-77cd-bc79-53d7c0f300b8-f5a4d093"
+                                                            class="link-text-wrapper">
+                                                            <div class="link-text">Services</div>
+                                                            <div class="link-text">Services</div>
+                                                        </div>
+                                                    </div>
+                                                </a><a href="/about/about-02"
+                                                    id="w-node-_53fb7922-697d-148f-50c8-caff0ac15f06-f5a4d093"
+                                                    data-w-id="53fb7922-697d-148f-50c8-caff0ac15f06"
+                                                    class="link-button w-inline-block">
+                                                    <div class="link-flex">
+                                                        <div id="w-node-_53fb7922-697d-148f-50c8-caff0ac15f08-f5a4d093"
+                                                            class="arrow-item">
+                                                            <div id="w-node-_53fb7922-697d-148f-50c8-caff0ac15f09-f5a4d093"
+                                                                class="arrow-link text-color-black w-embed"><svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path d="M16 12L10 18V6L16 12Z"></path>
+                                                                </svg></div>
+                                                        </div>
+                                                        <div id="w-node-_53fb7922-697d-148f-50c8-caff0ac15f0a-f5a4d093"
+                                                            class="link-text-wrapper">
+                                                            <div class="link-text">About 02</div>
+                                                            <div class="link-text">About 02</div>
+                                                        </div>
+                                                    </div>
+                                                </a><a href="/projects"
+                                                    id="w-node-d4d718e6-d719-172a-c539-84641d402773-f5a4d093"
+                                                    data-w-id="d4d718e6-d719-172a-c539-84641d402773"
+                                                    class="link-button w-inline-block">
+                                                    <div class="link-flex">
+                                                        <div id="w-node-d4d718e6-d719-172a-c539-84641d402775-f5a4d093"
+                                                            class="arrow-item">
+                                                            <div id="w-node-d4d718e6-d719-172a-c539-84641d402776-f5a4d093"
+                                                                class="arrow-link text-color-black w-embed"><svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path d="M16 12L10 18V6L16 12Z"></path>
+                                                                </svg></div>
+                                                        </div>
+                                                        <div id="w-node-d4d718e6-d719-172a-c539-84641d402777-f5a4d093"
+                                                            class="link-text-wrapper">
+                                                            <div class="link-text">Projects</div>
+                                                            <div class="link-text">Projects</div>
+                                                        </div>
+                                                    </div>
+                                                </a><a href="/about/about-03"
+                                                    id="w-node-_7e87e652-50c8-e812-f436-6f9d2e5f28b8-f5a4d093"
+                                                    data-w-id="7e87e652-50c8-e812-f436-6f9d2e5f28b8"
+                                                    class="link-button w-inline-block">
+                                                    <div class="link-flex">
+                                                        <div id="w-node-_7e87e652-50c8-e812-f436-6f9d2e5f28ba-f5a4d093"
+                                                            class="arrow-item">
+                                                            <div id="w-node-_7e87e652-50c8-e812-f436-6f9d2e5f28bb-f5a4d093"
+                                                                class="arrow-link text-color-black w-embed"><svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path d="M16 12L10 18V6L16 12Z"></path>
+                                                                </svg></div>
+                                                        </div>
+                                                        <div id="w-node-_7e87e652-50c8-e812-f436-6f9d2e5f28bc-f5a4d093"
+                                                            class="link-text-wrapper">
+                                                            <div class="link-text">About 03</div>
+                                                            <div class="link-text">About 03</div>
+                                                        </div>
+                                                    </div>
+                                                </a><a href="/plans"
+                                                    id="w-node-_8e567933-4d81-98d3-eba5-11950b0e566f-f5a4d093"
+                                                    data-w-id="8e567933-4d81-98d3-eba5-11950b0e566f"
+                                                    class="link-button w-inline-block">
+                                                    <div class="link-flex">
+                                                        <div id="w-node-_8e567933-4d81-98d3-eba5-11950b0e5671-f5a4d093"
+                                                            class="arrow-item">
+                                                            <div id="w-node-_8e567933-4d81-98d3-eba5-11950b0e5672-f5a4d093"
+                                                                class="arrow-link text-color-black w-embed"><svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path d="M16 12L10 18V6L16 12Z"></path>
+                                                                </svg></div>
+                                                        </div>
+                                                        <div id="w-node-_8e567933-4d81-98d3-eba5-11950b0e5673-f5a4d093"
+                                                            class="link-text-wrapper">
+                                                            <div class="link-text">Plans</div>
+                                                            <div class="link-text">Plans</div>
+                                                        </div>
+                                                    </div>
+                                                </a></div>
+                                            <div class="nav-social-media-wrapper">
+                                                <div class="social-media-wrapper"><a href="https://twitter.com/"
+                                                        target="_blank" class="social-link w-inline-block">
+                                                        <div class="social-icon w-embed"><svg
+                                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                                fill="currentColor">
+                                                                <path
+                                                                    d="M8 2H1L9.26086 13.0145L1.44995 21.9999H4.09998L10.4883 14.651L16 22H23L14.3917 10.5223L21.8001 2H19.1501L13.1643 8.88578L8 2ZM17 20L5 4H7L19 20H17Z">
+                                                                </path>
+                                                            </svg></div>
+                                                    </a><a href="https://www.instagram.com/" target="_blank"
+                                                        class="social-link w-inline-block">
+                                                        <div class="social-icon w-embed"><svg
+                                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                                fill="currentColor">
+                                                                <path
+                                                                    d="M12.001 9C10.3436 9 9.00098 10.3431 9.00098 12C9.00098 13.6573 10.3441 15 12.001 15C13.6583 15 15.001 13.6569 15.001 12C15.001 10.3427 13.6579 9 12.001 9ZM12.001 7C14.7614 7 17.001 9.2371 17.001 12C17.001 14.7605 14.7639 17 12.001 17C9.24051 17 7.00098 14.7629 7.00098 12C7.00098 9.23953 9.23808 7 12.001 7ZM18.501 6.74915C18.501 7.43926 17.9402 7.99917 17.251 7.99917C16.5609 7.99917 16.001 7.4384 16.001 6.74915C16.001 6.0599 16.5617 5.5 17.251 5.5C17.9393 5.49913 18.501 6.0599 18.501 6.74915ZM12.001 4C9.5265 4 9.12318 4.00655 7.97227 4.0578C7.18815 4.09461 6.66253 4.20007 6.17416 4.38967C5.74016 4.55799 5.42709 4.75898 5.09352 5.09255C4.75867 5.4274 4.55804 5.73963 4.3904 6.17383C4.20036 6.66332 4.09493 7.18811 4.05878 7.97115C4.00703 9.0752 4.00098 9.46105 4.00098 12C4.00098 14.4745 4.00753 14.8778 4.05877 16.0286C4.0956 16.8124 4.2012 17.3388 4.39034 17.826C4.5591 18.2606 4.7605 18.5744 5.09246 18.9064C5.42863 19.2421 5.74179 19.4434 6.17187 19.6094C6.66619 19.8005 7.19148 19.9061 7.97212 19.9422C9.07618 19.9939 9.46203 20 12.001 20C14.4755 20 14.8788 19.9934 16.0296 19.9422C16.8117 19.9055 17.3385 19.7996 17.827 19.6106C18.2604 19.4423 18.5752 19.2402 18.9074 18.9085C19.2436 18.5718 19.4445 18.2594 19.6107 17.8283C19.8013 17.3358 19.9071 16.8098 19.9432 16.0289C19.9949 14.9248 20.001 14.5389 20.001 12C20.001 9.52552 19.9944 9.12221 19.9432 7.97137C19.9064 7.18906 19.8005 6.66149 19.6113 6.17318C19.4434 5.74038 19.2417 5.42635 18.9084 5.09255C18.573 4.75715 18.2616 4.55693 17.8271 4.38942C17.338 4.19954 16.8124 4.09396 16.0298 4.05781C14.9258 4.00605 14.5399 4 12.001 4ZM12.001 2C14.7176 2 15.0568 2.01 16.1235 2.06C17.1876 2.10917 17.9135 2.2775 18.551 2.525C19.2101 2.77917 19.7668 3.1225 20.3226 3.67833C20.8776 4.23417 21.221 4.7925 21.476 5.45C21.7226 6.08667 21.891 6.81333 21.941 7.8775C21.9885 8.94417 22.001 9.28333 22.001 12C22.001 14.7167 21.991 15.0558 21.941 16.1225C21.8918 17.1867 21.7226 17.9125 21.476 18.55C21.2218 19.2092 20.8776 19.7658 20.3226 20.3217C19.7668 20.8767 19.2076 21.22 18.551 21.475C17.9135 21.7217 17.1876 21.89 16.1235 21.94C15.0568 21.9875 14.7176 22 12.001 22C9.28431 22 8.94514 21.99 7.87848 21.94C6.81431 21.8908 6.08931 21.7217 5.45098 21.475C4.79264 21.2208 4.23514 20.8767 3.67931 20.3217C3.12348 19.7658 2.78098 19.2067 2.52598 18.55C2.27848 17.9125 2.11098 17.1867 2.06098 16.1225C2.01348 15.0558 2.00098 14.7167 2.00098 12C2.00098 9.28333 2.01098 8.94417 2.06098 7.8775C2.11014 6.8125 2.27848 6.0875 2.52598 5.45C2.78014 4.79167 3.12348 4.23417 3.67931 3.67833C4.23514 3.1225 4.79348 2.78 5.45098 2.525C6.08848 2.2775 6.81348 2.11 7.87848 2.06C8.94514 2.0125 9.28431 2 12.001 2Z">
+                                                                </path>
+                                                            </svg></div>
+                                                    </a><a href="https://www.linkedin.com/" target="_blank"
+                                                        class="social-link w-inline-block">
+                                                        <div class="social-icon w-embed"><svg
+                                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                                fill="currentColor">
+                                                                <path
+                                                                    d="M6.94048 4.99993C6.94011 5.81424 6.44608 6.54702 5.69134 6.85273C4.9366 7.15845 4.07187 6.97605 3.5049 6.39155C2.93793 5.80704 2.78195 4.93715 3.1105 4.19207C3.43906 3.44699 4.18654 2.9755 5.00048 2.99993C6.08155 3.03238 6.94097 3.91837 6.94048 4.99993ZM7.00048 8.47993H3.00048V20.9999H7.00048V8.47993ZM13.3205 8.47993H9.34048V20.9999H13.2805V14.4299C13.2805 10.7699 18.0505 10.4299 18.0505 14.4299V20.9999H22.0005V13.0699C22.0005 6.89993 14.9405 7.12993 13.2805 10.1599L13.3205 8.47993Z">
+                                                                </path>
+                                                            </svg></div>
+                                                    </a><a href="https://www.behance.net/" target="_blank"
+                                                        class="social-link w-inline-block">
+                                                        <div class="social-icon w-embed"><svg
+                                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                                fill="currentColor">
+                                                                <path
+                                                                    d="M7.44262 5.34998C8.08197 5.34998 8.67213 5.39945 9.21311 5.54786C9.7541 5.6468 10.1967 5.84468 10.5902 6.09203C10.9836 6.33938 11.2787 6.68566 11.4754 7.13089C11.6721 7.57612 11.7705 8.12029 11.7705 8.71393C11.7705 9.40651 11.623 10.0002 11.2787 10.4454C10.9836 10.8906 10.4918 11.2864 9.90164 11.5832C10.7377 11.8305 11.377 12.2758 11.7705 12.8694C12.1639 13.463 12.4098 14.2051 12.4098 15.0461C12.4098 15.7387 12.2623 16.3323 12.0164 16.827C11.7705 17.3217 11.377 17.7669 10.9344 18.0638C10.4918 18.3606 9.95082 18.6079 9.36066 18.7563C8.77049 18.9047 8.18033 19.0037 7.59016 19.0037H1V5.34998H7.44262ZM7.04918 10.8906C7.59016 10.8906 8.03279 10.7422 8.37705 10.4949C8.72131 10.2475 8.86885 9.80227 8.86885 9.2581C8.86885 8.96128 8.81967 8.66446 8.72131 8.46658C8.62295 8.2687 8.47541 8.12029 8.27869 7.97188C8.08197 7.87294 7.88525 7.774 7.63934 7.72453C7.39344 7.67506 7.14754 7.67506 6.85246 7.67506H4V10.8906H7.04918ZM7.19672 16.7281C7.4918 16.7281 7.78689 16.6786 8.03279 16.6291C8.27869 16.5797 8.52459 16.4807 8.72131 16.3323C8.91803 16.1839 9.06557 16.0355 9.21311 15.7881C9.31148 15.5408 9.40984 15.244 9.40984 14.8977C9.40984 14.2051 9.21312 13.7104 8.81967 13.3641C8.42623 13.0673 7.88525 12.9189 7.2459 12.9189H4V16.7281H7.19672ZM16.6885 16.6786C17.082 17.0744 17.6721 17.2722 18.459 17.2722C19 17.2722 19.4918 17.1238 19.8852 16.8765C20.2787 16.5797 20.5246 16.2828 20.623 15.986H23.0328C22.6393 17.1733 22.0492 18.0143 21.2623 18.5585C20.4754 19.0532 19.541 19.35 18.4098 19.35C17.6229 19.35 16.9344 19.2016 16.2951 18.9542C15.6557 18.7069 15.1639 18.3606 14.7213 17.8659C14.2787 17.4206 13.9344 16.8765 13.7377 16.2334C13.4918 15.5903 13.3934 14.8977 13.3934 14.1062C13.3934 13.3641 13.4918 12.6715 13.7377 12.0284C13.9836 11.3853 14.3279 10.8411 14.7705 10.3464C15.2131 9.90121 15.7541 9.50545 16.3443 9.2581C16.9836 9.01075 17.6229 8.86234 18.4098 8.86234C19.2459 8.86234 19.9836 9.01075 20.623 9.35704C21.2623 9.70333 21.7541 10.0991 22.1475 10.6927C22.541 11.2369 22.8361 11.88 23.0328 12.5726C23.1311 13.2652 23.1803 13.9577 23.1311 14.7493H16C16 15.5408 16.2951 16.2828 16.6885 16.6786ZM19.7869 11.4843C19.4426 11.138 18.9016 10.9401 18.2623 10.9401C17.8197 10.9401 17.4754 11.039 17.1803 11.1874C16.8852 11.3358 16.6885 11.5337 16.4918 11.7316C16.2951 11.9295 16.1967 12.1768 16.1475 12.4242C16.0984 12.6715 16.0492 12.8694 16.0492 13.0673H20.4754C20.3771 12.3252 20.1311 11.8305 19.7869 11.4843ZM15.459 6.2899H20.9672V7.62559H15.459V6.2899Z">
+                                                                </path>
+                                                            </svg></div>
+                                                    </a><a href="https://dribbble.com/" target="_blank"
+                                                        class="social-link w-inline-block">
+                                                        <div class="social-icon w-embed"><svg
+                                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                                fill="currentColor">
+                                                                <path
+                                                                    d="M19.9887 11.5716C19.9029 9.94513 19.3313 8.44745 18.4163 7.22097C18.1749 7.48407 17.8785 7.7698 17.4957 8.09159C16.5881 8.85458 15.4887 9.54307 14.1834 10.101C14.3498 10.4506 14.5029 10.7899 14.6376 11.1098L14.6388 11.1125C14.6652 11.1742 14.6879 11.2306 14.7321 11.3418C14.7379 11.3562 14.7433 11.3697 14.7485 11.3825C16.2621 11.2122 17.8576 11.2749 19.4049 11.4845C19.6106 11.5123 19.805 11.5415 19.9887 11.5716ZM10.6044 4.1213C10.7783 4.36621 10.9602 4.62859 11.1803 4.95378C11.7929 5.8589 12.396 6.81391 12.9604 7.79507C13.0749 7.99416 13.187 8.19289 13.2964 8.39112C14.5193 7.90993 15.5296 7.30281 16.3438 6.62486C16.6731 6.35063 16.9383 6.093 17.1403 5.86972C15.7501 4.70277 13.9571 4 12 4C11.524 4 11.0576 4.04158 10.6044 4.1213ZM4.25266 9.99755C4.83145 9.98452 5.48467 9.94941 6.29303 9.87518C7.90024 9.72758 9.54141 9.46249 11.1549 9.05274C10.5719 8.03721 9.93888 7.02331 9.29452 6.05378C8.98479 5.58775 8.68357 5.14992 8.45484 4.82642C6.39541 5.84613 4.83794 7.72658 4.25266 9.99755ZM5.78366 17.036C6.17111 16.4693 6.68061 15.8314 7.35797 15.1374C8.81199 13.6478 10.5286 12.4878 12.5139 11.8473C12.5417 11.8391 12.5604 11.8336 12.576 11.829C12.411 11.4651 12.2562 11.1405 12.1003 10.8342C10.2643 11.3687 8.3303 11.703 6.40279 11.8762C5.46319 11.9606 4.62005 11.9981 4 12.0044C4.00102 13.9112 4.66915 15.662 5.78366 17.036ZM15.0045 19.4166C14.9001 18.8745 14.7669 18.2706 14.5899 17.574C14.2689 16.3112 13.8668 15.012 13.373 13.7078C11.3712 14.4343 9.77574 15.4974 8.54309 16.7649C7.94904 17.3757 7.51244 17.9537 7.22642 18.4203C8.55892 19.4127 10.2109 20 12 20C13.0626 20 14.0769 19.7928 15.0045 19.4166ZM16.8778 18.3414C18.4073 17.1632 19.4985 15.444 19.8652 13.4703C19.5253 13.3865 19.094 13.3005 18.6196 13.2346C17.5756 13.0897 16.5014 13.0655 15.4409 13.2018C15.8933 14.4764 16.2642 15.7332 16.5608 16.9361C16.6903 17.4614 16.7958 17.9358 16.8778 18.3414ZM12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22Z">
+                                                                </path>
+                                                            </svg></div>
+                                                    </a></div>
+                                            </div>
+                                        </div>
+                                    </nav>
+                                    <div id="w-node-f4f81c24-7d69-b5bd-84a1-6d15f5a4d0a3-f5a4d093"
+                                        data-w-id="f4f81c24-7d69-b5bd-84a1-6d15f5a4d0a3"
+                                        class="menu-button w-nav-button">
+                                        <div class="menu-button-wrap">
+                                            <div class="menu-line-item">
+                                                <div class="menu-line top"></div>
+                                            </div>
+                                            <div class="menu-line-item">
+                                                <div class="menu-line middle"></div>
+                                            </div>
+                                            <div class="menu-line-item">
+                                                <div class="menu-line bottom"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    {% endfor %}
+                    </div>
                 </div>
             </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2023 AI Image Generator. All rights reserved.</p>
         </div>
-    </footer>
+
+        <main data-w-id="eca63333-17e6-c372-574c-875a5becf443" class="main-wrapper">
+            <header class="section-home-header">
+                <div class="padding-global">
+                    <div class="container-large">
+                        <div class="w-layout-grid home-grid-01">
+                            <div id="w-node-efffd8b6-7a10-27f3-b425-bb9c4a132ea1-2491e7cf" class="left-content">
+                                <div class="alternate-text-container">
+                                    <div class="asterisk">*</div>
+                                    <div id="w-node-_40cdd4ce-b3f2-93f2-df9b-8d585e24f784-2491e7cf"
+                                        class="alternate-text-wrap">
+                                        <div class="alternate-text-container-01">
+                                            <div style="-webkit-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                class="alternate-text-item _01">
+                                                <div class="alternate-text">Go</div>
+                                            </div>
+                                            <div style="-webkit-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                class="alternate-text-item _02">
+                                                <div class="alternate-text">Beyond</div>
+                                            </div>
+                                        </div>
+                                        <div class="alternate-text-container-01">
+                                            <div style="-webkit-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                class="alternate-text-item _01">
+                                                <div class="alternate-text">Stand</div>
+                                            </div>
+                                            <div style="-webkit-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                class="alternate-text-item _02">
+                                                <div class="alternate-text">Out</div>
+                                            </div>
+                                        </div>
+                                        <div class="alternate-text-container-01">
+                                            <div style="-webkit-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                class="alternate-text-item _01">
+                                                <div class="alternate-text">Create</div>
+                                            </div>
+                                            <div style="-webkit-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                class="alternate-text-item _02">
+                                                <div class="alternate-text">Impact</div>
+                                            </div>
+                                        </div>
+                                        <div class="alternate-text-container-01">
+                                            <div style="-webkit-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                class="alternate-text-item _01">
+                                                <div class="alternate-text">Go</div>
+                                            </div>
+                                            <div style="-webkit-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                class="alternate-text-item _02">
+                                                <div class="alternate-text">Beyond</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="spacer-small"></div>
+                                <div class="heading-wrap">
+                                    <h1 class="home-heading-01">Making Your Ideas Happen</h1>
+                                </div>
+                                <div class="spacer-small"></div>
+                                <div class="max-width-medium header-block">
+                                    <p class="text-size-regular"><strong>We are</strong> a creative web design agency,
+                                        crafting custom websites that are tailored to your brand and<strong> designed
+                                        </strong>to engage your audience.</p>
+                                </div>
+                                <div class="spacer-medium"></div>
+                                <div class="button-wrapper"><a data-w-id="efffd8b6-7a10-27f3-b425-bb9c4a132eb1"
+                                        href="/contact/contact" class="main-button w-inline-block">
+                                        <div class="text-button-wrap">
+                                            <div style="-webkit-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                class="text-button">GET STARTED</div>
+                                            <div style="-webkit-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                class="text-button">GET STARTED</div>
+                                        </div>
+                                        <div class="inner-circle-button"><img
+                                                style="-webkit-transform:translate3d(0rem, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0rem, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0rem, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0rem, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                loading="lazy" alt="Button Arrow – Designizy Webflow Template "
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a7a2de0eb7565b1cbf4c76_button-arrow.svg"
+                                                class="arrow-button _01" /><img
+                                                style="-webkit-transform:translate3d(-1.5rem, 1.5rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(-1.5rem, 1.5rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(-1.5rem, 1.5rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(-1.5rem, 1.5rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                loading="lazy" alt="Button Arrow – Designizy Webflow Template "
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a7a2de0eb7565b1cbf4c76_button-arrow.svg"
+                                                class="arrow-button _02" /></div>
+                                    </a></div>
+                            </div>
+                            <div id="w-node-efffd8b6-7a10-27f3-b425-bb9c4a132eba-2491e7cf" class="_3d-container">
+                                <div class="_3d-object-wrapper home-01">
+                                    <div style="-webkit-transform:translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0, 0);-moz-transform:translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0, 0);-ms-transform:translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0, 0);transform:translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0, 0);transform-style:preserve-3d"
+                                        class="_3d-object">
+                                        <div class="_3d-front"></div>
+                                        <div class="_3d-right"></div>
+                                        <div class="_3d-back"></div>
+                                        <div class="_3d-left"></div>
+                                        <div class="_3d-top"></div>
+                                        <div class="_3d-bottom"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <section class="section-home-partner">
+                <div class="padding-global">
+                    <div class="container-large">
+                        <div class="padding-section-medium">
+                            <div class="w-layout-grid partner-grid-wrapper">
+                                <div id="w-node-_050d26e2-6b07-c87a-c418-f327380b76bd-2491e7cf"
+                                    class="text-size-regular">Trusted by:</div>
+                                <div id="w-node-cfc55425-8dce-f10a-0395-49fd543be604-2491e7cf"
+                                    class="partner-container">
+                                    <div class="partners-logo-gradient-left"></div>
+                                    <div style="-webkit-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                        class="w-layout-grid partner-component-grid">
+                                        <div id="w-node-d5b37ac1-0bb0-e065-9809-10abd85c45ce-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463e30169e0a8524bf41_Delaware.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-d5b37ac1-0bb0-e065-9809-10abd85c45d0-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463ebf28e56caed9bde7_Monaco.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-d5b37ac1-0bb0-e065-9809-10abd85c45d2-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463f13d2210aaa2cf58c_Sweden.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-d5b37ac1-0bb0-e065-9809-10abd85c45d4-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463f802ae6b63ae8cd27_Frame%203.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-d5b37ac1-0bb0-e065-9809-10abd85c45d6-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463fcb8644253b447109_Springfield.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-d5b37ac1-0bb0-e065-9809-10abd85c45d8-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463925c92a5db771e50f_Amsterdam.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                    </div>
+                                    <div style="-webkit-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                        class="w-layout-grid partner-component-grid">
+                                        <div id="w-node-a6a3ae4c-8c85-d1c4-f7e6-2ed134663777-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463e30169e0a8524bf41_Delaware.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-a6a3ae4c-8c85-d1c4-f7e6-2ed134663779-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463ebf28e56caed9bde7_Monaco.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-a6a3ae4c-8c85-d1c4-f7e6-2ed13466377b-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463f13d2210aaa2cf58c_Sweden.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-a6a3ae4c-8c85-d1c4-f7e6-2ed13466377d-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463f802ae6b63ae8cd27_Frame%203.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-a6a3ae4c-8c85-d1c4-f7e6-2ed13466377f-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463fcb8644253b447109_Springfield.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-_2c52d9d7-7482-5d78-a084-7975fc122fa8-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463925c92a5db771e50f_Amsterdam.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                    </div>
+                                    <div style="-webkit-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                        class="w-layout-grid partner-component-grid">
+                                        <div id="w-node-_4273b039-cc1e-b644-675c-35c256d9675d-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463e30169e0a8524bf41_Delaware.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-_4273b039-cc1e-b644-675c-35c256d9675f-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463ebf28e56caed9bde7_Monaco.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-_4273b039-cc1e-b644-675c-35c256d96761-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463f13d2210aaa2cf58c_Sweden.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-_4273b039-cc1e-b644-675c-35c256d96763-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463f802ae6b63ae8cd27_Frame%203.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-_4273b039-cc1e-b644-675c-35c256d96765-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463fcb8644253b447109_Springfield.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                        <div id="w-node-_4273b039-cc1e-b644-675c-35c256d96767-2491e7cf"
+                                            class="partner-item"><img loading="lazy"
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463925c92a5db771e50f_Amsterdam.svg"
+                                                alt="Partner Logo – Designizy Webflow Template " class="partner-logo" />
+                                        </div>
+                                    </div>
+                                    <div class="partners-logo-gradient-right"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="section-home-about">
+                <div class="padding-global">
+                    <div class="container-large">
+                        <div class="padding-section-large">
+                            <div class="w-layout-grid content-component-grid">
+                                <div id="w-node-f4b1515e-bb14-cfdb-5755-04cc8949aa1c-2491e7cf" class="heading-wrapper">
+                                    <div class="subtitle-item">
+                                        <div class="subtitle-tag">About us</div>
+                                    </div>
+                                    <h2 class="heading-style-h3">Inspired <span class="text-shape image-01-h3"> </span>
+                                        by Your Vision</h2>
+                                </div>
+                                <div id="w-node-d964bcbc-8c5f-3c17-76d3-e1dca496794b-2491e7cf" class="max-width-medium">
+                                    <p class="text-size-regular">We strive for <strong>excellence</strong> in every
+                                        pixel, delivering top-notch web and branding <strong>designs</strong> that
+                                        captivate.</p>
+                                    <div class="spacer-medium"></div>
+                                    <div class="button-wrapper"><a data-w-id="9961b054-c8e8-414c-4e25-0e9151b69031"
+                                            href="/about/about" class="main-button w-inline-block">
+                                            <div class="text-button-wrap">
+                                                <div style="-webkit-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                    class="text-button">Our Story</div>
+                                                <div style="-webkit-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                    class="text-button">Our Story</div>
+                                            </div>
+                                            <div class="inner-circle-button"><img
+                                                    style="-webkit-transform:translate3d(0rem, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0rem, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0rem, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0rem, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                    loading="lazy" alt="Button Arrow – Designizy Webflow Template "
+                                                    src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a7a2de0eb7565b1cbf4c76_button-arrow.svg"
+                                                    class="arrow-button _01" /><img
+                                                    style="-webkit-transform:translate3d(-1.5rem, 1.5rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(-1.5rem, 1.5rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(-1.5rem, 1.5rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(-1.5rem, 1.5rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                    loading="lazy" alt="Button Arrow – Designizy Webflow Template "
+                                                    src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a7a2de0eb7565b1cbf4c76_button-arrow.svg"
+                                                    class="arrow-button _02" /></div>
+                                        </a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="section-home-service">
+                <div class="padding-global">
+                    <div class="container-large">
+                        <div class="padding-section-large">
+                            <div class="w-layout-grid content-component-grid">
+                                <div class="max-width-large">
+                                    <div class="subtitle-item">
+                                        <div class="subtitle-tag">Services</div>
+                                    </div>
+                                    <h2 class="heading-style-h3">Your Digital <span class="text-shape image-02-h3">
+                                        </span> Success Partner</h2>
+                                </div>
+                                <div id="w-node-_5b7ebf02-684a-2e25-70ae-aad2742e5d03-2491e7cf"
+                                    class="button-wrapper align-flex"><a
+                                        data-w-id="5b7ebf02-684a-2e25-70ae-aad2742e5d04" href="/services"
+                                        class="main-button w-inline-block">
+                                        <div class="text-button-wrap">
+                                            <div style="-webkit-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                class="text-button">All services</div>
+                                            <div style="-webkit-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                class="text-button">All services</div>
+                                        </div>
+                                        <div class="inner-circle-button"><img
+                                                style="-webkit-transform:translate3d(0rem, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0rem, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0rem, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0rem, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                loading="lazy" alt="Button Arrow – Designizy Webflow Template "
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a7a2de0eb7565b1cbf4c76_button-arrow.svg"
+                                                class="arrow-button _01" /><img
+                                                style="-webkit-transform:translate3d(-1.5rem, 1.5rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(-1.5rem, 1.5rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(-1.5rem, 1.5rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(-1.5rem, 1.5rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                loading="lazy" alt="Button Arrow – Designizy Webflow Template "
+                                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a7a2de0eb7565b1cbf4c76_button-arrow.svg"
+                                                class="arrow-button _02" /></div>
+                                    </a></div>
+                            </div>
+                            <div class="spacer-large"></div>
+                            <div class="w-layout-grid service-component-grid">
+                                <div id="w-node-_5b7ebf02-684a-2e25-70ae-aad2742e5d0f-2491e7cf"
+                                    class="service-block-item"><img
+                                        src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a966123249fe2361c1e31b_icon-1.svg"
+                                        loading="lazy" alt="Service icon – Designizy Webflow Template "
+                                        class="service-icon" />
+                                    <div class="service-title">Web Design</div>
+                                    <div class="spacer-medium"></div>
+                                    <p class="text-size-regular">Tailored websites that capture your brand’s essence and
+                                        provide an engaging user experience.</p>
+                                </div>
+                                <div class="service-block-item"><img
+                                        src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a96619cee1772b79ac01da_icon-6.svg"
+                                        loading="lazy" alt="Service icon – Designizy Webflow Template "
+                                        class="service-icon" />
+                                    <div class="service-title">UX/UI Design</div>
+                                    <div class="spacer-medium"></div>
+                                    <p class="text-size-regular">Optimizing user experience with intuitive and
+                                        aesthetically pleasing interface designs.</p>
+                                </div>
+                                <div id="w-node-_5b7ebf02-684a-2e25-70ae-aad2742e5d1d-2491e7cf"
+                                    class="service-block-item"><img
+                                        src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9661945ae5ba726693901_icon-5.svg"
+                                        loading="lazy" alt="Service icon – Designizy Webflow Template "
+                                        class="service-icon" />
+                                    <div class="service-title">Print Design</div>
+                                    <div class="spacer-medium"></div>
+                                    <p class="text-size-regular">Creating stunning print materials that complement your
+                                        digital presence and reinforce your brand identity.</p>
+                                </div>
+                                <div id="w-node-_5b7ebf02-684a-2e25-70ae-aad2742e5d24-2491e7cf"
+                                    class="service-block-item"><img
+                                        src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a966191e8e16e919972779_icon-2.svg"
+                                        loading="lazy" alt="Service icon – Designizy Webflow Template "
+                                        class="service-icon" />
+                                    <div class="service-title">SEO</div>
+                                    <div class="spacer-medium"></div>
+                                    <p class="text-size-regular">Boosting your online presence through strategic SEO and
+                                        targeted digital marketing campaigns.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="section-home-projects">
+                <div class="padding-global">
+                    <div class="container-large">
+                        <div class="padding-section-large">
+                            <div class="w-layout-grid heading-component-grid">
+                                <div id="w-node-_09d1da1e-29ed-842a-8767-21483a4d850d-2491e7cf" class="max-width-large">
+                                    <div class="subtitle-item">
+                                        <div class="subtitle-tag">Portfolio</div>
+                                    </div>
+                                    <h2 class="heading-style-h3">Our <span class="text-shape image-03-h3"> </span>
+                                        creative Showcase</h2>
+                                </div>
+                                <div id="w-node-_09d1da1e-29ed-842a-8767-21483a4d8513-2491e7cf"
+                                    class="text-size-small text-weight-semibold">(04)</div>
+                            </div>
+                            <div class="spacer-large"></div>
+                            <div class="project-content-wrapper">
+                                <div class="project-sticky-item">
+                                    <div class="w-dyn-list">
+                                        <div role="list" class="w-dyn-items">
+                                            <div role="listitem" class="w-dyn-item">
+                                                <div data-w-id="09d1da1e-29ed-842a-8767-21483a4d851b"
+                                                    class="project-container-wrapper _01"><a
+                                                        id="w-node-_09d1da1e-29ed-842a-8767-21483a4d851c-2491e7cf"
+                                                        href="/project/vision"
+                                                        class="project-image-wrapper w-inline-block"><img
+                                                            src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7f5/66a9832b713fa26c9572cf54_work-01.jpg"
+                                                            loading="lazy" alt="Vision" class="project-image" /></a>
+                                                    <div class="project-info-wrapper">
+                                                        <div class="project-name">Vision</div>
+                                                        <div class="project-service-text">UI/UX Design</div>
+                                                    </div><a id="w-node-_09d1da1e-29ed-842a-8767-21483a4d8521-2491e7cf"
+                                                        data-w-id="09d1da1e-29ed-842a-8767-21483a4d8521"
+                                                        href="/project/vision" class="view-button w-inline-block">
+                                                        <div class="view-button-text-wrap">
+                                                            <div style="-webkit-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                class="view-button-text">view</div>
+                                                            <div style="-webkit-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                class="view-button-text">view</div>
+                                                        </div>
+                                                        <div class="view-button-arrow-shape">
+                                                            <div class="view-button-arrow-wrap">
+                                                                <div style="-webkit-transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                    class="view-arrow _01 w-embed"><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 24 24" fill="currentColor">
+                                                                        <path
+                                                                            d="M16.0037 9.41421L7.39712 18.0208L5.98291 16.6066L14.5895 8H7.00373V6H18.0037V17H16.0037V9.41421Z">
+                                                                        </path>
+                                                                    </svg></div>
+                                                                <div style="-webkit-transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                    class="view-arrow _02 w-embed"><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 24 24" fill="currentColor">
+                                                                        <path
+                                                                            d="M16.0037 9.41421L7.39712 18.0208L5.98291 16.6066L14.5895 8H7.00373V6H18.0037V17H16.0037V9.41421Z">
+                                                                        </path>
+                                                                    </svg></div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div data-w-id="09d1da1e-29ed-842a-8767-21483a4d852e" class="project-sticky-item">
+                                    <div class="w-dyn-list">
+                                        <div role="list" class="w-dyn-items">
+                                            <div role="listitem" class="w-dyn-item">
+                                                <div data-w-id="09d1da1e-29ed-842a-8767-21483a4d8532"
+                                                    class="project-container-wrapper _02"><a
+                                                        id="w-node-_09d1da1e-29ed-842a-8767-21483a4d8533-2491e7cf"
+                                                        href="/project/tone"
+                                                        class="project-image-wrapper w-inline-block"><img
+                                                            src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7f5/66a983239ee3f4998a4ee9bd_work-02.jpg"
+                                                            loading="lazy" alt="Tone" class="project-image" /></a>
+                                                    <div class="project-info-wrapper">
+                                                        <div class="project-name">Tone</div>
+                                                        <div class="project-service-text">Web Design</div>
+                                                    </div><a id="w-node-_09d1da1e-29ed-842a-8767-21483a4d8538-2491e7cf"
+                                                        data-w-id="09d1da1e-29ed-842a-8767-21483a4d8538"
+                                                        href="/project/tone" class="view-button w-inline-block">
+                                                        <div class="view-button-text-wrap">
+                                                            <div style="-webkit-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                class="view-button-text">view</div>
+                                                            <div style="-webkit-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                class="view-button-text">view</div>
+                                                        </div>
+                                                        <div class="view-button-arrow-shape">
+                                                            <div class="view-button-arrow-wrap">
+                                                                <div style="-webkit-transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                    class="view-arrow _01 w-embed"><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 24 24" fill="currentColor">
+                                                                        <path
+                                                                            d="M16.0037 9.41421L7.39712 18.0208L5.98291 16.6066L14.5895 8H7.00373V6H18.0037V17H16.0037V9.41421Z">
+                                                                        </path>
+                                                                    </svg></div>
+                                                                <div style="-webkit-transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                    class="view-arrow _02 w-embed"><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 24 24" fill="currentColor">
+                                                                        <path
+                                                                            d="M16.0037 9.41421L7.39712 18.0208L5.98291 16.6066L14.5895 8H7.00373V6H18.0037V17H16.0037V9.41421Z">
+                                                                        </path>
+                                                                    </svg></div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div data-w-id="09d1da1e-29ed-842a-8767-21483a4d8545" class="project-sticky-item">
+                                    <div class="w-dyn-list">
+                                        <div role="list" class="w-dyn-items">
+                                            <div role="listitem" class="w-dyn-item">
+                                                <div data-w-id="09d1da1e-29ed-842a-8767-21483a4d8549"
+                                                    class="project-container-wrapper _03"><a
+                                                        id="w-node-_09d1da1e-29ed-842a-8767-21483a4d854a-2491e7cf"
+                                                        href="/project/pulse"
+                                                        class="project-image-wrapper w-inline-block"><img
+                                                            src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7f5/66a9831ae34ee4ec9e958d99_work-03.jpg"
+                                                            loading="lazy" alt="Pulse" class="project-image" /></a>
+                                                    <div class="project-info-wrapper">
+                                                        <div class="project-name">Pulse</div>
+                                                        <div class="project-service-text">UI/UX Design</div>
+                                                    </div><a id="w-node-_09d1da1e-29ed-842a-8767-21483a4d854f-2491e7cf"
+                                                        data-w-id="09d1da1e-29ed-842a-8767-21483a4d854f"
+                                                        href="/project/pulse" class="view-button w-inline-block">
+                                                        <div class="view-button-text-wrap">
+                                                            <div style="-webkit-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                class="view-button-text">view</div>
+                                                            <div style="-webkit-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                class="view-button-text">view</div>
+                                                        </div>
+                                                        <div class="view-button-arrow-shape">
+                                                            <div class="view-button-arrow-wrap">
+                                                                <div style="-webkit-transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                    class="view-arrow _01 w-embed"><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 24 24" fill="currentColor">
+                                                                        <path
+                                                                            d="M16.0037 9.41421L7.39712 18.0208L5.98291 16.6066L14.5895 8H7.00373V6H18.0037V17H16.0037V9.41421Z">
+                                                                        </path>
+                                                                    </svg></div>
+                                                                <div style="-webkit-transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                    class="view-arrow _02 w-embed"><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 24 24" fill="currentColor">
+                                                                        <path
+                                                                            d="M16.0037 9.41421L7.39712 18.0208L5.98291 16.6066L14.5895 8H7.00373V6H18.0037V17H16.0037V9.41421Z">
+                                                                        </path>
+                                                                    </svg></div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div data-w-id="09d1da1e-29ed-842a-8767-21483a4d855c" class="project-sticky-item">
+                                    <div class="w-dyn-list">
+                                        <div role="list" class="w-dyn-items">
+                                            <div role="listitem" class="w-dyn-item">
+                                                <div data-w-id="09d1da1e-29ed-842a-8767-21483a4d8560"
+                                                    class="project-container-wrapper _04"><a
+                                                        id="w-node-_09d1da1e-29ed-842a-8767-21483a4d8561-2491e7cf"
+                                                        href="/project/foward"
+                                                        class="project-image-wrapper w-inline-block"><img
+                                                            src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7f5/66a98592bf6055867b6e7046_project-img-04.avif"
+                                                            loading="lazy" alt="Foward"
+                                                            sizes="(max-width: 479px) 90vw, (max-width: 767px) 94vw, (max-width: 991px) 91vw, (max-width: 1439px) 93vw, 1338px"
+                                                            srcset="https://cdn.prod.website-files.com/66a79380acf7d0022491e7f5/66a98592bf6055867b6e7046_project-img-04-p-500.avif 500w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7f5/66a98592bf6055867b6e7046_project-img-04-p-800.avif 800w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7f5/66a98592bf6055867b6e7046_project-img-04-p-1080.avif 1080w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7f5/66a98592bf6055867b6e7046_project-img-04.avif 1920w"
+                                                            class="project-image" /></a>
+                                                    <div class="project-info-wrapper">
+                                                        <div class="project-name">Foward</div>
+                                                        <div class="project-service-text">Web Design</div>
+                                                    </div><a id="w-node-_09d1da1e-29ed-842a-8767-21483a4d8566-2491e7cf"
+                                                        data-w-id="09d1da1e-29ed-842a-8767-21483a4d8566"
+                                                        href="/project/foward" class="view-button w-inline-block">
+                                                        <div class="view-button-text-wrap">
+                                                            <div style="-webkit-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                class="view-button-text">view</div>
+                                                            <div style="-webkit-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                class="view-button-text">view</div>
+                                                        </div>
+                                                        <div class="view-button-arrow-shape">
+                                                            <div class="view-button-arrow-wrap">
+                                                                <div style="-webkit-transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0rem, 0rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                    class="view-arrow _01 w-embed"><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 24 24" fill="currentColor">
+                                                                        <path
+                                                                            d="M16.0037 9.41421L7.39712 18.0208L5.98291 16.6066L14.5895 8H7.00373V6H18.0037V17H16.0037V9.41421Z">
+                                                                        </path>
+                                                                    </svg></div>
+                                                                <div style="-webkit-transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(-1rem, 1rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)"
+                                                                    class="view-arrow _02 w-embed"><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 24 24" fill="currentColor">
+                                                                        <path
+                                                                            d="M16.0037 9.41421L7.39712 18.0208L5.98291 16.6066L14.5895 8H7.00373V6H18.0037V17H16.0037V9.41421Z">
+                                                                        </path>
+                                                                    </svg></div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="section-home-depoiments">
+                <div class="padding-global">
+                    <div class="container-large">
+                        <div class="padding-section-large">
+                            <div class="max-width-medium">
+                                <div class="subtitle-item">
+                                    <div class="subtitle-tag">Testimonials</div>
+                                </div>
+                                <h2 class="heading-style-h3">Our <span class="text-shape image-04-h3"> </span> clients
+                                    Love Us</h2>
+                            </div>
+                            <div class="spacer-large"></div>
+                            <div data-delay="4000" data-animation="slide" class="testimonial-slider w-slider"
+                                data-autoplay="false" data-easing="ease" data-hide-arrows="false"
+                                data-disable-swipe="false" data-autoplay-limit="0" data-nav-spacing="3"
+                                data-duration="500" data-infinite="true">
+                                <div class="testimonial-mask w-slider-mask">
+                                    <div class="slide w-slide">
+                                        <div class="slide-wrapper">
+                                            <div class="testimonial-card">
+                                                <div class="split-content"><img
+                                                        sizes="(max-width: 479px) 89vw, (max-width: 767px) 44vw, (max-width: 991px) 42vw, (max-width: 1279px) 39vw, (max-width: 1439px) 40vw, 570.75px"
+                                                        srcset="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d891c3fe62112105e4_client-02-p-500.webp 500w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d891c3fe62112105e4_client-02-p-800.webp 800w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d891c3fe62112105e4_client-02-p-1080.webp 1080w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d891c3fe62112105e4_client-02.webp 1280w"
+                                                        alt="Client Picture – Designizy Webflow Template "
+                                                        src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d891c3fe62112105e4_client-02.webp"
+                                                        class="avatar-client" /></div>
+                                                <div class="testimonial-content">
+                                                    <div class="testimonial-block"><img
+                                                            alt="Partner Logo – Designizy Webflow Template "
+                                                            src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463f802ae6b63ae8cd27_Frame%203.svg"
+                                                            class="testimonial-logo" />
+                                                        <p class="text-size-regular"><em>&quot;Designizy has brought our
+                                                                ideas to life in a way we never thought possible. Their
+                                                                approach to web design has given our company a fresh,
+                                                                modern look.&quot;</em></p>
+                                                        <div class="testimonial-detail-wrap">
+                                                            <div class="testimonial-detail-block">
+                                                                <h3 class="testimonial-name">Michael S.</h3>
+                                                                <div class="text-size-small">Creative Director</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slide w-slide">
+                                        <div class="slide-wrapper">
+                                            <div class="testimonial-card">
+                                                <div class="split-content"><img
+                                                        sizes="(max-width: 479px) 89vw, (max-width: 767px) 44vw, (max-width: 991px) 42vw, (max-width: 1279px) 39vw, (max-width: 1439px) 40vw, 570.75px"
+                                                        srcset="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d8550bde5054991d79_client-04-p-500.webp 500w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d8550bde5054991d79_client-04-p-800.webp 800w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d8550bde5054991d79_client-04-p-1080.webp 1080w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d8550bde5054991d79_client-04.webp 1280w"
+                                                        alt="Client Picture – Designizy Webflow Template "
+                                                        src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d8550bde5054991d79_client-04.webp"
+                                                        class="avatar-client" /></div>
+                                                <div class="testimonial-content">
+                                                    <div class="testimonial-block"><img
+                                                            alt="Partner Logo – Designizy Webflow Template "
+                                                            src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463fcb8644253b447109_Springfield.svg"
+                                                            class="testimonial-logo" />
+                                                        <p class="text-size-regular"><em>“Working with Designizy was a
+                                                                turning point for our brand. They understood our vision
+                                                                and created a brand identity that truly resonates with
+                                                                our audience.”</em></p>
+                                                        <div class="testimonial-detail-wrap">
+                                                            <div class="testimonial-detail-block">
+                                                                <h3 class="testimonial-name">James L.</h3>
+                                                                <div class="text-size-small">CEO</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slide w-slide">
+                                        <div class="slide-wrapper">
+                                            <div class="testimonial-card">
+                                                <div class="split-content"><img
+                                                        sizes="(max-width: 479px) 89vw, (max-width: 767px) 44vw, (max-width: 991px) 42vw, (max-width: 1279px) 39vw, (max-width: 1439px) 40vw, 570.75px"
+                                                        srcset="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d815ea379111c855d5_client-01-p-500.webp 500w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d815ea379111c855d5_client-01-p-800.webp 800w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d815ea379111c855d5_client-01-p-1080.webp 1080w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d815ea379111c855d5_client-01.webp 1280w"
+                                                        alt="Client Picture – Designizy Webflow Template "
+                                                        src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d815ea379111c855d5_client-01.webp"
+                                                        class="avatar-client" /></div>
+                                                <div class="testimonial-content">
+                                                    <div class="testimonial-block"><img
+                                                            alt="Partner Logo – Designizy Webflow Template "
+                                                            src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463e30169e0a8524bf41_Delaware.svg"
+                                                            class="testimonial-logo" />
+                                                        <p class="text-size-regular"><em>&quot;Designizy transformed our
+                                                                website into a stunning digital experience. Their
+                                                                attention to detail and creativity exceeded our
+                                                                expectations.&quot;</em></p>
+                                                        <div class="testimonial-detail-wrap">
+                                                            <div class="testimonial-detail-block">
+                                                                <h3 class="testimonial-name">Sarah T.</h3>
+                                                                <div class="text-size-small">Marketing Director</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slide w-slide">
+                                        <div class="slide-wrapper">
+                                            <div class="testimonial-card">
+                                                <div class="split-content"><img
+                                                        sizes="(max-width: 479px) 89vw, (max-width: 767px) 44vw, (max-width: 991px) 42vw, (max-width: 1279px) 39vw, (max-width: 1439px) 40vw, 570.75px"
+                                                        srcset="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d89791cce948f8b561_client-03-p-500.webp 500w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d89791cce948f8b561_client-03-p-800.webp 800w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d89791cce948f8b561_client-03-p-1080.webp 1080w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d89791cce948f8b561_client-03.webp 1280w"
+                                                        alt="Client Picture – Designizy Webflow Template "
+                                                        src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab96d89791cce948f8b561_client-03.webp"
+                                                        class="avatar-client" /></div>
+                                                <div class="testimonial-content">
+                                                    <div class="testimonial-block"><img
+                                                            alt="Partner Logo – Designizy Webflow Template "
+                                                            src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a9463ebf28e56caed9bde7_Monaco.svg"
+                                                            class="testimonial-logo" />
+                                                        <p class="text-size-regular"><em>&quot;The team at Designizy is
+                                                                simply amazing! From concept to execution, they handled
+                                                                everything with professionalism and flair.&quot;</em>
+                                                        </p>
+                                                        <div class="testimonial-detail-wrap">
+                                                            <div class="testimonial-detail-block">
+                                                                <h3 class="testimonial-name">Emily R.</h3>
+                                                                <div class="text-size-small">Business Owner</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slider-arrow left w-slider-arrow-left">
+                                    <div class="slide-arrow w-icon-slider-left"></div>
+                                </div>
+                                <div class="slider-arrow right w-slider-arrow-right">
+                                    <div class="slide-arrow w-icon-slider-right"></div>
+                                </div>
+                                <div class="display-none w-slider-nav w-round"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="cta-section">
+                <section class="cta-container">
+                    <div class="cta-top-content">
+                        <div class="padding-global">
+                            <div class="cta-content-wrapper">
+                                <div class="subtitle-item flex-center">
+                                    <div class="subtitle-tag">Get Started</div>
+                                </div>
+                                <h1 class="heading-style-h1 text-align-center">Let&#x27;s create together</h1>
+                                <div class="spacer-small"></div>
+                                <div class="max-width-medium align-center">
+                                    <p class="text-size-regular text-align-center">Ready to make your brand stand out?
+                                        <br />Partner with us to create stunning designs that captivate and convert. Get
+                                        in touch with us now!
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cta-image-wrapper">
+                        <div class="cta-images-container">
+                            <div data-w-id="b40122b2-0a0a-fee5-e338-9b6b370657fd" class="left-cta-image-block is-01">
+                                <img src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e2990ca05edfb224b1a_template-img-10.webp"
+                                    loading="lazy"
+                                    sizes="(max-width: 479px) 192px, (max-width: 767px) 224px, (max-width: 991px) 320px, 480px"
+                                    srcset="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e2990ca05edfb224b1a_template-img-10-p-500.webp 500w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e2990ca05edfb224b1a_template-img-10-p-800.webp 800w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e2990ca05edfb224b1a_template-img-10-p-1080.webp 1080w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e2990ca05edfb224b1a_template-img-10.webp 1280w"
+                                    alt="Template Image – Designizy Webflow Template " class="cta-image-item" />
+                            </div>
+                            <div data-w-id="b40122b2-0a0a-fee5-e338-9b6b370657ff" class="right-cta-image-block"><img
+                                    src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e28776b3ded292f0852_template-img-07.webp"
+                                    loading="lazy"
+                                    sizes="(max-width: 479px) 192px, (max-width: 767px) 224px, (max-width: 991px) 320px, 480px"
+                                    srcset="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e28776b3ded292f0852_template-img-07-p-500.webp 500w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e28776b3ded292f0852_template-img-07-p-800.webp 800w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e28776b3ded292f0852_template-img-07-p-1080.webp 1080w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e28776b3ded292f0852_template-img-07.webp 1280w"
+                                    alt="Template Image – Designizy Webflow Template " class="cta-image-item" /></div>
+                            <div data-w-id="b40122b2-0a0a-fee5-e338-9b6b37065801" class="left-cta-image-block"><img
+                                    src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e284ed382a9e2ff8b6c_template-img-11.webp"
+                                    loading="lazy"
+                                    sizes="(max-width: 479px) 192px, (max-width: 767px) 224px, (max-width: 991px) 320px, 480px"
+                                    srcset="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e284ed382a9e2ff8b6c_template-img-11-p-500.webp 500w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e284ed382a9e2ff8b6c_template-img-11-p-800.webp 800w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e284ed382a9e2ff8b6c_template-img-11-p-1080.webp 1080w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e284ed382a9e2ff8b6c_template-img-11.webp 1280w"
+                                    alt="Template Image – Designizy Webflow Template " class="cta-image-item" /></div>
+                            <div data-w-id="b40122b2-0a0a-fee5-e338-9b6b37065803" class="right-cta-image-block"><img
+                                    src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e28de67f456f155c841_template-img-09.webp"
+                                    loading="lazy"
+                                    sizes="(max-width: 479px) 192px, (max-width: 767px) 224px, (max-width: 991px) 320px, 480px"
+                                    srcset="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e28de67f456f155c841_template-img-09-p-500.webp 500w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e28de67f456f155c841_template-img-09-p-800.webp 800w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e28de67f456f155c841_template-img-09-p-1080.webp 1080w, https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66ab9e28de67f456f155c841_template-img-09.webp 1280w"
+                                    alt="Template Image – Designizy Webflow Template " class="cta-image-item" /></div>
+                        </div>
+                    </div>
+                </section>
+                <div id="w-node-b40122b2-0a0a-fee5-e338-9b6b37065805-370657eb" class="button-wrapper cta"><a
+                        data-w-id="b40122b2-0a0a-fee5-e338-9b6b37065806" href="/contact/contact"
+                        class="main-button w-inline-block">
+                        <div class="text-button-wrap">
+                            <div class="text-button">Get in Touch</div>
+                            <div class="text-button">Get in Touch</div>
+                        </div>
+                        <div class="inner-circle-button"><img loading="lazy"
+                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a7a2de0eb7565b1cbf4c76_button-arrow.svg"
+                                alt="Button Arrow – Designizy Webflow Template " class="arrow-button _01" /><img
+                                loading="lazy"
+                                src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/66a7a2de0eb7565b1cbf4c76_button-arrow.svg"
+                                alt="Button Arrow – Designizy Webflow Template " class="arrow-button _02" /></div>
+                    </a></div>
+                <div class="spacer-xhuge"></div>
+            </div>
+        </main>
+
+    </div>
+    <script src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=66a79380acf7d0022491e7e1"
+        type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.prod.website-files.com/66a79380acf7d0022491e7e1/js/webflow.0083d3191.js"
+        type="text/javascript"></script>
 </body>
+
 </html>
- 
