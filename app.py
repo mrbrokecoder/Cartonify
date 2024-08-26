@@ -833,6 +833,29 @@ def admin_dashboard():
         return redirect(url_for('index'))
     return send_from_directory('.', 'admin_dashboard.html')
 
+
+@app.route('/promote_to_admin/<email>')
+@login_required
+def promote_to_admin(email):
+    if not current_user.is_admin:
+        flash('You do not have permission to perform this action.', 'error')
+        return redirect(url_for('index'))
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET is_admin = TRUE WHERE email = %s", (email,))
+    affected_rows = cur.rowcount
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    if affected_rows > 0:
+        flash(f'User {email} has been promoted to admin.', 'success')
+    else:
+        flash(f'User {email} not found or already an admin.', 'error')
+
+    return redirect(url_for('admin_dashboard'))
+
 if __name__ == '__main__':
     with app.app_context():
         init_db()
