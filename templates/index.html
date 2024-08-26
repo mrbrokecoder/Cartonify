@@ -149,11 +149,11 @@
                 <div class="previous-images-list">
                     {% if images %}
                         {% for image in images[:5] %}
-                            <div class="previous-image-item" data-url="{{ image.url }}">
-                                <img src="{{ image.url }}" alt="Previous image" loading="lazy">
+                            <div class="previous-image-item" data-url="{{ image[0] }}">
+                                <img src="{{ image[0] }}" alt="Previous image" loading="lazy">
                                 <div class="image-info">
-                                    <p>{{ image.prompt[:20] }}...</p>
-                                    <p>{{ image.created_at | custom_datetime }}</p>
+                                    <p>{{ image[1][:20] }}...</p>
+                                    <p>{{ image[2] | custom_datetime }}</p>
                                 </div>
                             </div>
                         {% endfor %}
