@@ -6,6 +6,33 @@
     <title>Welcome to AI Image Generator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+<style>
+    .image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.image-item {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.5rem;
+    text-align: center;
+}
+
+.image-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.image-prompt {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #666;
+}
+</style>
 <body>
     <div class="container">
         <header>
@@ -28,6 +55,21 @@
                     <li>Save and download your creations</li>
                     <li>Premium plans for unlimited generations</li>
                 </ul>
+            </section>
+            
+            <!-- Updated section for displaying generated images -->
+            <section class="generated-images">
+                <h3>Recently Generated Images</h3>
+                <div class="image-grid">
+                    {% for image in images %}
+                        <div class="image-item">
+                            <img src="{{ image.url }}" alt="Generated Image">
+                            <p class="image-prompt">{{ image.prompt }}</p>
+                            <p class="image-details">Style: {{ image.style }}, Color: {{ image.color }}</p>
+                            <p class="image-date">Created: {{ image.created_at|custom_datetime }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
             </section>
         </main>
         <footer>

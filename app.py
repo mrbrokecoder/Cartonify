@@ -244,11 +244,24 @@ def home():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     
-    # Fetch the most recent generated images
+    # Fetch the most recent generated images with all necessary information
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT url, prompt FROM images ORDER BY created_at DESC LIMIT 12")
-    images = [{'url': row[0], 'prompt': row[1]} for row in cur.fetchall()]
+    cur.execute("""
+        SELECT url, prompt, style, color, created_at 
+        FROM images 
+        ORDER BY created_at DESC 
+        LIMIT 12
+    """)
+    images = [
+        {
+            'url': row[0],
+            'prompt': row[1],
+            'style': row[2],
+            'color': row[3],
+            'created_at': row[4]
+        } for row in cur.fetchall()
+    ]
     cur.close()
     conn.close()
     
