@@ -243,7 +243,16 @@ def custom_datetime(value):
 def home():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-    return render_template('home.html')
+    
+    # Fetch the most recent generated images
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT url, prompt FROM images ORDER BY created_at DESC LIMIT 12")
+    images = [{'url': row[0], 'prompt': row[1]} for row in cur.fetchall()]
+    cur.close()
+    conn.close()
+    
+    return render_template('home.html', images=images)
 
 # Update the login manager to use the new home page
 login_manager.login_view = 'home'
