@@ -311,7 +311,6 @@ input:checked + .slider:before {
 
 .main-content {
     flex-grow: 1;
-    margin-right: 120px; /* Match this to the new sidebar width */
     padding: 25px;
     display: flex;
     flex-direction: column;
@@ -369,7 +368,8 @@ color: var(--text-secondary);
 .prompt-container {
     position: fixed;
     bottom: 0;
-    left: 320px;
+    left: 250px;
+    right: 120px;
     right: 0;
     background-color: var(--panel-bg);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
