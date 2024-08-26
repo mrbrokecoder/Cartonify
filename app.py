@@ -51,7 +51,7 @@ stripe.api_key = app.config['STRIPE_SECRET_KEY']
 app.config['SESSION_TYPE'] = 'filesystem'
 
 # Redis Configuration
-app.config['REDIS_URL'] = os.getenv('REDIS_URL', 'redis://localhost:6379')
+app.config['REDIS_URL'] = os.getenv('REDIS_URL')
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
@@ -825,4 +825,4 @@ atexit.register(lambda: scheduler.shutdown())
 if __name__ == '__main__':
     with app.app_context():
         init_db()
-    app.run(debug=True, port=4000)
+    app.run(debug=False, port=4000)
