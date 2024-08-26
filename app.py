@@ -292,6 +292,9 @@ def send_otp_email(email, otp):
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
     if request.method == 'POST':
         if 'otp' in request.form:
             # OTP verification step
@@ -354,6 +357,9 @@ def signup():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
