@@ -888,6 +888,50 @@ def promote_to_admin(email):
 
     return redirect(url_for('admin_dashboard'))
 
+@app.route('/admin/user_prompts/<int:user_id>')
+@login_required
+def get_user_prompts(user_id):
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT prompt, created_at FROM images WHERE user_id = %s ORDER BY created_at DESC", (user_id,))
+    prompts = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return jsonify({
+        'prompts': [
+            {'prompt': prompt[0], 'created_at': prompt[1].isoformat()}
+            for prompt in prompts
+        ]
+    })
+
+@app.route('/admin/update_credits/<int:user_id>', methods=['PUT'])
+@login_required
+def update_user_credits(user_id):
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.json
+    new_credits = data.get('monthly_quota')
+
+    if new_credits is None:
+        return jsonify({'error': 'Invalid data'}), 400
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "UPDATE users SET monthly_quota = %s WHERE id = %s",
+        (new_credits, user_id)
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return jsonify({'message': 'User credits updated successfully'})
+
 if __name__ == '__main__':
     with app.app_context():
         init_db()

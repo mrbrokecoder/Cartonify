@@ -11,6 +11,10 @@
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #f2f2f2; }
         button { cursor: pointer; padding: 5px 10px; }
+        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
+        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+        .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -35,7 +39,7 @@
                 <td>{{ user.prompt_count }}</td>
                 <td>{{ user.monthly_quota }}</td>
                 <td>
-                    <button onclick="editCredits({{ user.id }})">Edit Credits</button>
+                    <button onclick="editCredits({{ user.id }}, {{ user.monthly_quota }})">Edit Credits</button>
                     <button onclick="viewPrompts({{ user.id }})">View Prompts</button>
                 </td>
             </tr>
@@ -43,15 +47,82 @@
         </tbody>
     </table>
 
+    <div id="editCreditsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Credits</h2>
+            <form id="editCreditsForm">
+                <input type="hidden" id="editUserId" name="userId">
+                <label for="newCredits">New Credit Amount:</label>
+                <input type="number" id="newCredits" name="newCredits" required>
+                <button type="submit">Update Credits</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="viewPromptsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>User Prompts</h2>
+            <div id="promptsList"></div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        function editCredits(userId) {
-            // Implement edit credits functionality
-            console.log('Edit credits for user', userId);
+        var editCreditsModal = document.getElementById("editCreditsModal");
+        var viewPromptsModal = document.getElementById("viewPromptsModal");
+        var spans = document.getElementsByClassName("close");
+
+        function editCredits(userId, currentCredits) {
+            document.getElementById("editUserId").value = userId;
+            document.getElementById("newCredits").value = currentCredits;
+            editCreditsModal.style.display = "block";
         }
 
         function viewPrompts(userId) {
-            // Implement view prompts functionality
-            console.log('View prompts for user', userId);
+            $.get(`/admin/user_prompts/${userId}`, function(data) {
+                var promptsHtml = '<ul>';
+                data.prompts.forEach(function(prompt) {
+                    promptsHtml += `<li>${prompt.prompt} (${prompt.created_at})</li>`;
+                });
+                promptsHtml += '</ul>';
+                document.getElementById("promptsList").innerHTML = promptsHtml;
+                viewPromptsModal.style.display = "block";
+            });
+        }
+
+        $("#editCreditsForm").submit(function(e) {
+            e.preventDefault();
+            var userId = document.getElementById("editUserId").value;
+            var newCredits = document.getElementById("newCredits").value;
+            $.ajax({
+                url: `/admin/update_credits/${userId}`,
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({ monthly_quota: newCredits }),
+                success: function(data) {
+                    alert(data.message);
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    alert('Error updating credits: ' + error);
+                }
+            });
+        });
+
+        for (var i = 0; i < spans.length; i++) {
+            spans[i].onclick = function() {
+                editCreditsModal.style.display = "none";
+                viewPromptsModal.style.display = "none";
+            }
+        }
+
+        window.onclick = function(event) {
+            if (event.target == editCreditsModal || event.target == viewPromptsModal) {
+                editCreditsModal.style.display = "none";
+                viewPromptsModal.style.display = "none";
+            }
         }
     </script>
 </body>
