@@ -108,11 +108,17 @@ body {
     width: 320px;
     background-color: var(--panel-bg);
     padding: 25px;
-    overflow-y: auto;
+    overflow-y: hidden; /* Change this to 'hidden' */
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For Internet Explorer and Edge */
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     transition: background-color 0.3s;
     backdrop-filter: blur(10px);
     box-shadow: 1px 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
 }
 
 .dark-mode .sidebar {
@@ -632,4 +638,13 @@ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 display: flex;
 align-items: center;
 gap: 10px;
+}
+.sidebar {
+    overflow-y: auto; /* Change this to 'hidden' */
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+}
+
+.sidebar::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
 }
