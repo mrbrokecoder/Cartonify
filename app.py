@@ -829,19 +829,38 @@ atexit.register(lambda: scheduler.shutdown())
 @app.route('/admin')
 @login_required
 def admin_dashboard():
-    if current_user.email == 'gptadarsh1@gmail.com':
-        # Ensure this user is always set as admin
+    if current_user.email == 'gptadarsh1@gmail.com' or current_user.is_admin:
+        if current_user.email == 'gptadarsh1@gmail.com':
+            # Ensure this user is always set as admin
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("UPDATE users SET is_admin = TRUE WHERE email = %s", (current_user.email,))
+            conn.commit()
+            cur.close()
+            conn.close()
+            current_user.is_admin = True  # Update the current user object
+            flash('Admin access granted.', 'success')
+        
+        # Fetch all users
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute("UPDATE users SET is_admin = TRUE WHERE email = %s", (current_user.email,))
-        conn.commit()
+        cur.execute("SELECT id, email, is_premium, prompt_count, monthly_quota FROM users")
+        users = cur.fetchall()
         cur.close()
         conn.close()
-        current_user.is_admin = True  # Update the current user object
-        flash('Admin access granted.', 'success')
-        return render_template('admin_dashboard.html')
-    elif current_user.is_admin:
-        return render_template('admin_dashboard.html')
+        
+        # Convert to list of dictionaries for easier use in template
+        users = [
+            {
+                'id': user[0],
+                'email': user[1],
+                'is_premium': user[2],
+                'prompt_count': user[3],
+                'monthly_quota': user[4]
+            } for user in users
+        ]
+        
+        return render_template('admin_dashboard.html', users=users)
     else:
         flash('You do not have permission to access the admin dashboard.', 'error')
         return redirect(url_for('index'))
