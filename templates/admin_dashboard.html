@@ -269,10 +269,10 @@
                 datasets: [{
                     label: 'Number of Users',
                     data: [
-                        {{ users|selectattr('prompt_count', 'lessthan', 11)|list|length }},
-                        {{ users|selectattr('prompt_count', 'greaterthanequal', 11)|selectattr('prompt_count', 'lessthan', 51)|list|length }},
-                        {{ users|selectattr('prompt_count', 'greaterthanequal', 51)|selectattr('prompt_count', 'lessthan', 101)|list|length }},
-                        {{ users|selectattr('prompt_count', 'greaterthanequal', 101)|list|length }}
+                        {{ users|selectattr('prompt_count', 'le', 10)|list|length }},
+                        {{ users|selectattr('prompt_count', 'gt', 10)|selectattr('prompt_count', 'le', 50)|list|length }},
+                        {{ users|selectattr('prompt_count', 'gt', 50)|selectattr('prompt_count', 'le', 100)|list|length }},
+                        {{ users|selectattr('prompt_count', 'gt', 100)|list|length }}
                     ],
                     backgroundColor: '#17a2b8'
                 }]
