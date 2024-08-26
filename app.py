@@ -271,7 +271,6 @@ def index():
         remaining_credits = 5 - prompt_count
     
     return render_template('index.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
-
 # ... (rest of your Flask application) ...
 @app.route('/check_login')
 def check_login():
@@ -991,22 +990,7 @@ def convert_to_premium(user_id):
         app.logger.error(f"Error converting user to premium: {str(e)}")
         return jsonify({'error': f'Server error: {str(e)}'}), 500
 
-@app.route('/get_previous_images')
-@login_required
-def get_previous_images():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT url, prompt FROM images WHERE user_id = %s ORDER BY created_at DESC LIMIT 20", (current_user.id,))
-    images = cur.fetchall()
-    cur.close()
-    conn.close()
 
-    return jsonify({
-        'images': [
-            {'url': image[0], 'prompt': image[1]}
-            for image in images
-        ]
-    })
 
 if __name__ == '__main__':
     with app.app_context():
