@@ -72,7 +72,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 class User(UserMixin):
-    def __init__(self, id, email, password, is_premium=False, prompt_count=0, subscription_start=None, monthly_quota=0):
+    def __init__(self, id, email, password, is_premium=False, prompt_count=0, subscription_start=None, monthly_quota=0, is_admin=False):
         self.id = id
         self.email = email
         self.password = password
@@ -80,6 +80,7 @@ class User(UserMixin):
         self.prompt_count = prompt_count
         self.subscription_start = subscription_start
         self.monthly_quota = monthly_quota
+        self.is_admin = is_admin
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -94,12 +95,13 @@ def load_user(user_id):
             bool(int(user_data[b'is_premium'])),
             int(user_data[b'prompt_count']),
             datetime.fromisoformat(user_data[b'subscription_start'].decode('utf-8')) if user_data[b'subscription_start'] else None,
-            int(user_data[b'monthly_quota'])
+            int(user_data[b'monthly_quota']),
+            bool(int(user_data[b'is_admin']))
         )
     
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT id, email, password, COALESCE(is_premium, FALSE) as is_premium, COALESCE(prompt_count, 0) as prompt_count, subscription_start, monthly_quota FROM users WHERE id = %s", (user_id,))
+    cur.execute("SELECT id, email, password, COALESCE(is_premium, FALSE) as is_premium, COALESCE(prompt_count, 0) as prompt_count, subscription_start, monthly_quota, COALESCE(is_admin, FALSE) as is_admin FROM users WHERE id = %s", (user_id,))
     user = cur.fetchone()
     cur.close()
     conn.close()
@@ -113,11 +115,12 @@ def load_user(user_id):
             'is_premium': int(user[3]),
             'prompt_count': user[4],
             'subscription_start': user[5].isoformat() if user[5] else '',
-            'monthly_quota': user[6]
+            'monthly_quota': user[6],
+            'is_admin': int(user[7])
         })
         redis_client.expire(user_key, 3600)  # Cache for 1 hour
         
-        return User(user[0], user[1], user[2], user[3], user[4], user[5], user[6])
+        return User(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7])
     return None
 
 def get_db_connection():
@@ -204,6 +207,11 @@ def init_db():
         ADD COLUMN IF NOT EXISTS monthly_quota INTEGER DEFAULT 0;
     """)
     
+    # Add is_admin column to users table
+    cur.execute("""
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
+    """)
+    
     conn.commit()
     cur.close()
     conn.close()
@@ -263,95 +271,6 @@ def index():
         remaining_credits = 5 - prompt_count
     
     return render_template('index.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
-
-# ... (existing imports and configurations) ...
-
-@app.route('/mobile')
-@login_required
-def mobile_home():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT is_premium, prompt_count, monthly_quota FROM users WHERE id = %s", (current_user.id,))
-    user_data = cur.fetchone()
-    is_premium, prompt_count, monthly_quota = user_data
-    
-    if is_premium:
-        remaining_credits = monthly_quota
-    else:
-        remaining_credits = 5 - prompt_count
-    
-    cur.close()
-    conn.close()
-    
-    return render_template('mobile.html', remaining_credits=remaining_credits)
-
-@app.route('/mobile/gallery')
-@login_required
-def mobile_gallery():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM images WHERE user_id = %s ORDER BY created_at DESC", (current_user.id,))
-    images = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template('mobile_gallery.html', images=images)
-
-@app.route('/mobile/settings', methods=['GET', 'POST'])
-@login_required
-def mobile_settings():
-    if request.method == 'POST':
-        # Save the user's settings
-        default_size = request.form.get('default_size')
-        default_style = request.form.get('default_style')
-        default_color = request.form.get('default_color')
-        
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("""
-            UPDATE users 
-            SET default_size = %s, default_style = %s, default_color = %s 
-            WHERE id = %s
-        """, (default_size, default_style, default_color, current_user.id))
-        conn.commit()
-        cur.close()
-        conn.close()
-        
-        flash('Settings saved successfully', 'success')
-        return redirect(url_for('mobile_settings'))
-    
-    # Get the user's current settings
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT default_size, default_style, default_color FROM users WHERE id = %s", (current_user.id,))
-    user_settings = cur.fetchone()
-    cur.close()
-    conn.close()
-    
-    default_size, default_style, default_color = user_settings or (512, 'art style', 'vibrant')
-    
-    return render_template('mobile_settings.html', 
-                           default_size=default_size, 
-                           default_style=default_style, 
-                           default_color=default_color)
-
-@app.route('/mobile/profile')
-@login_required
-def mobile_profile():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT is_premium, prompt_count, monthly_quota FROM users WHERE id = %s", (current_user.id,))
-    user_data = cur.fetchone()
-    is_premium, prompt_count, monthly_quota = user_data
-    
-    if is_premium:
-        remaining_credits = monthly_quota
-    else:
-        remaining_credits = 5 - prompt_count
-    
-    cur.close()
-    conn.close()
-    
-    return render_template('mobile_profile.html', remaining_credits=remaining_credits)
 
 # ... (rest of your Flask application) ...
 @app.route('/check_login')
@@ -445,7 +364,7 @@ def login():
         cur.close()
         conn.close()
         if user and check_password_hash(user[2], password):
-            user_obj = User(user[0], user[1], user[2], user[3], user[4], user[5], user[6])
+            user_obj = User(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7])
             login_user(user_obj)
             return redirect(url_for('index'))
         flash('Invalid email or password')
@@ -872,8 +791,7 @@ def reset_monthly_quota():
     """)
     premium_users = cur.fetchall()
     cur.close()
-    conn.close()
-    
+    conn.close() 
     for user in premium_users:
         user_key = f'user:{user[0]}'
         redis_client.hset(user_key, 'monthly_quota', 1600)
@@ -890,7 +808,8 @@ atexit.register(lambda: scheduler.shutdown())
 @app.route('/admin')
 @login_required
 def admin_dashboard():
-    # You might want to add an additional check here to ensure only admin users can access this page
+    if not current_user.is_admin:
+        return redirect(url_for('index'))
     return send_from_directory('.', 'admin_dashboard.html')
 
 if __name__ == '__main__':

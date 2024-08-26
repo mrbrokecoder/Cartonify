@@ -659,3 +659,15 @@ gap: 10px;
 .sidebar::-webkit-scrollbar {
     display: none; /* For Chrome, Safari, and Opera */
 }
+.admin-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-left: 10px;
+}
+
+.admin-btn:hover {
+    background-color: #45a049;
+}

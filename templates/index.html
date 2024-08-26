@@ -43,6 +43,9 @@
             {% if current_user.is_authenticated %}
                 <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
             {% endif %}
+            {% if current_user.is_authenticated and current_user.is_admin %}
+                <a href="{{ url_for('admin_dashboard') }}" class="admin-btn">Admin Dashboard</a>
+            {% endif %}
         </div>
     </div>
     <div class="content">
