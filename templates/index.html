@@ -49,59 +49,61 @@
         </div>
     </div>
     <div class="content">
-        <div class="sidebar">
+        <div class="sidebar left-sidebar">
             <div class="section">
-                <div class="section-title">General settings</div>
-
-                <select id="image_size">
-                    <option value="256">Small Square (256x256)</option>
-                    <option value="512">Medium Square (512x512)</option>
-                    <option value="768">Large Square (768x768)</option>
-                    <option value="1024">Extra Large Square (1024x1024)</option>
-                    <option value="512x768">Portrait (512x768)</option>
-                    <option value="768x512">Landscape (768x512)</option>
-                </select>
-                <select id="image_quality">
-                    <option value="standard">Standard Quality</option>
-                    <option value="high">High Quality</option>
-                    <option value="best">Best Quality</option>
-                </select>
+                <h3 class="section-title">General Settings</h3>
+                <div class="select-wrapper">
+                    <select id="image_size" class="styled-select">
+                        <option value="256">Small Square (256x256)</option>
+                        <option value="512">Medium Square (512x512)</option>
+                        <option value="768">Large Square (768x768)</option>
+                        <option value="1024">Extra Large Square (1024x1024)</option>
+                        <option value="512x768">Portrait (512x768)</option>
+                        <option value="768x512">Landscape (768x512)</option>
+                    </select>
+                </div>
+                <div class="select-wrapper">
+                    <select id="image_quality" class="styled-select">
+                        <option value="standard">Standard Quality</option>
+                        <option value="high">High Quality</option>
+                        <option value="best">Best Quality</option>
+                    </select>
+                </div>
             </div>
             <div class="section">
-                <div class="section-title">Content type</div>
+                <h3 class="section-title">Content Type</h3>
                 <div class="content-type-buttons">
-                    <button class="active" data-style="art style">Art</button>
-                    <button data-style="photo realistic">Photo</button>
-                    <button data-style="cartoon">Cartoon</button>
-                    <br>
-                    <button data-style="logo">Logo</button>
-                    <button data-style="water">Water</button>
-                    <button data-style="banner">Banner</button>
-                </div>
-                <br>
-                <div class="section">
-                    <div class="section-title">Color Scheme</div>
-                    <div class="color-scheme-buttons">
-                        <button class="active" data-color="vibrant">Vibrant</button>
-                        <button data-color="pastel">Pastel</button>
-                        <button data-color="monochrome">Monochrome</button>
-                        <button data-color="earthy">Earthy</button>
-                    </div>
-                    
-                </div>
-            <!--<a href="{{ url_for('api_management') }}">API Management</a>---> 
-                <div class="toggle">
-                    <span>Auto</span>
-                    <div class="toggle-switch"></div>
+                    <button class="styled-button active" data-style="art style">Art</button>
+                    <button class="styled-button" data-style="photo realistic">Photo</button>
+                    <button class="styled-button" data-style="cartoon">Cartoon</button>
+                    <button class="styled-button" data-style="logo">Logo</button>
+                    <button class="styled-button" data-style="water">Water</button>
+                    <button class="styled-button" data-style="banner">Banner</button>
                 </div>
             </div>
             <div class="section">
-                <div class="section-title">Composition</div>
+                <h3 class="section-title">Color Scheme</h3>
+                <div class="color-scheme-buttons">
+                    <button class="styled-button active" data-color="vibrant">Vibrant</button>
+                    <button class="styled-button" data-color="pastel">Pastel</button>
+                    <button class="styled-button" data-color="monochrome">Monochrome</button>
+                    <button class="styled-button" data-color="earthy">Earthy</button>
+                </div>
+                <div class="toggle-container">
+                    <span>Auto</span>
+                    <label class="switch">
+                        <input type="checkbox" id="autoToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="section">
+                <h3 class="section-title">Composition</h3>
                 <div class="custom-select">Reference</div>
                 <div class="upload-buttons">
                     <input type="file" id="fileInput" accept="image/*" style="display: none;">
-                    <button onclick="document.getElementById('fileInput').click()">Upload Image</button>
-                    <button>Browse gallery</button>
+                    <button class="styled-button" onclick="document.getElementById('fileInput').click()">Upload Image</button>
+                    <button class="styled-button">Browse gallery</button>
                 </div>
                 <div class="reference-images">
                     <div class="image" id="uploadedImage"></div>
@@ -109,7 +111,6 @@
                     <div class="image"></div>
                 </div>
             </div>
-            
         </div>
         <div class="main-content">
             <div class="image-grid" id="resultGrid">
@@ -140,6 +141,29 @@
             <div class="prompt-container">
                 <input type="text" id="prompt" placeholder="Enter your prompt here">
                 <button id="generateButton">Generate</button>
+            </div>
+        </div>
+        <div class="sidebar right-sidebar">
+            <div class="section">
+                <div class="section-title">Previous Images</div>
+                <div class="previous-images-list">
+                    {% if images %}
+                        {% for image in images[:5] %}
+                            <div class="previous-image-item" data-url="{{ image.url }}">
+                                <img src="{{ image.url }}" alt="Previous image" loading="lazy">
+                                <div class="image-info">
+                                    <p>{{ image.prompt[:20] }}...</p>
+                                    <p>{{ image.created_at | custom_datetime }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% if images|length > 5 %}
+                            <button id="viewAllImages">View All</button>
+                        {% endif %}
+                    {% else %}
+                        <p>No previous images found.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -341,6 +365,19 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
                 body.classList.remove('dark-mode');
                 localStorage.setItem('darkMode', null);
             }
+        });
+
+        // Add this new script for handling the right sidebar
+        document.querySelectorAll('.previous-image-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const imageUrl = this.dataset.url;
+                openPopup(imageUrl);
+            });
+        });
+
+        document.getElementById('viewAllImages')?.addEventListener('click', function() {
+            // You can implement a modal or a new page to show all images
+            alert('Viewing all images functionality to be implemented');
         });
     </script>
 </body>
