@@ -41,6 +41,9 @@
                 <td>
                     <button onclick="editCredits({{ user.id }}, {{ user.monthly_quota }})">Edit Credits</button>
                     <button onclick="viewPrompts({{ user.id }})">View Prompts</button>
+                    {% if not user.is_premium %}
+                    <button onclick="convertToPremium({{ user.id }})">Convert to Premium</button>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
@@ -90,6 +93,25 @@
                 document.getElementById("promptsList").innerHTML = promptsHtml;
                 viewPromptsModal.style.display = "block";
             });
+        }
+
+        function convertToPremium(userId) {
+            if (confirm('Are you sure you want to convert this user to premium?')) {
+                $.ajax({
+                    url: `/admin/convert_to_premium/${userId}`,
+                    method: 'POST',
+                    success: function(data) {
+                        alert(data.message);
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('XHR:', xhr);
+                        console.error('Status:', status);
+                        console.error('Error:', error);
+                        alert('Error converting user to premium. Check console for details.');
+                    }
+                });
+            }
         }
 
         $("#editCreditsForm").submit(function(e) {

@@ -941,15 +941,48 @@ def update_user_credits(user_id):
     except Exception as e:
         app.logger.error(f"Error updating credits: {str(e)}")
         return jsonify({'error': f'Server error: {str(e)}'}), 500
+
+@app.route('/admin/convert_to_premium/<int:user_id>', methods=['POST'])
+@login_required
+def convert_to_premium(user_id):
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        # First, check if the user exists and is not already premium
+        cur.execute("SELECT is_premium FROM users WHERE id = %s", (user_id,))
+        user = cur.fetchone()
+        
+        if not user:
+            cur.close()
+            conn.close()
+            return jsonify({'error': 'User not found'}), 404
+        
+        if user[0]:  # If user is already premium
+            cur.close()
+            conn.close()
+            return jsonify({'error': 'User is already premium'}), 400
+        
+        # Convert user to premium
+        subscription_start = datetime.now()
+        cur.execute("""
+            UPDATE users 
+            SET is_premium = TRUE, 
+                subscription_start = %s, 
+                monthly_quota = 1600 
+            WHERE id = %s
+        """, (subscription_start, user_id))
+        
+        conn.commit()
         cur.close()
         conn.close()
-
-        if affected_rows == 0:
-            return jsonify({'error': 'User not found or no changes made'}), 404
-
-        return jsonify({'message': 'User credits updated successfully'})
+        
+        return jsonify({'message': 'User successfully converted to premium'})
     except Exception as e:
-        app.logger.error(f"Error updating credits: {str(e)}")
+        app.logger.error(f"Error converting user to premium: {str(e)}")
         return jsonify({'error': f'Server error: {str(e)}'}), 500
 
 if __name__ == '__main__':
