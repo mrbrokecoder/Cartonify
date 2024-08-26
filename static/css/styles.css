@@ -370,7 +370,6 @@ color: var(--text-secondary);
     bottom: 0;
     left: 250px;
     right: 120px;
-    right: 0;
     background-color: var(--panel-bg);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding: 20px;
