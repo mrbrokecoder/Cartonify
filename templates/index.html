@@ -177,6 +177,9 @@
         // Add click event to open popup
         imageBox.addEventListener('click', () => openPopup(url));
 
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'button-container';
+
         const downloadButton = document.createElement('button');
         downloadButton.textContent = 'Download';
         downloadButton.onclick = (e) => {
@@ -184,7 +187,17 @@
             window.location.href = `/download?url=${encodeURIComponent(url)}`;
         };
         
-        imageBox.appendChild(downloadButton);
+        const editButton = document.createElement('button');
+        editButton.innerHTML = '<i class="fas fa-edit"></i>'; // Assuming you're using Font Awesome for icons
+        editButton.onclick = (e) => {
+            e.stopPropagation(); // Prevent opening popup when clicking edit
+            // Here we need to save the image first, then redirect to the edit page
+            saveImageThenEdit(url);
+        };
+        
+        buttonContainer.appendChild(downloadButton);
+        buttonContainer.appendChild(editButton);
+        imageBox.appendChild(buttonContainer);
         resultGrid.appendChild(imageBox);
     });
 
@@ -213,6 +226,31 @@
         previousImagesGrid.prepend(imageBox);
     });
 }
+
+// Add this new function to save the image and then redirect to the edit page
+function saveImageThenEdit(imageUrl) {
+    fetch('/save_generated_image', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            image_url: imageUrl,
+            prompt: document.getElementById('prompt').value,
+            style: selectedStyle,
+            color: selectedColor
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = `/edit_image/${data.image_id}`;
+        } else {
+            alert('Error saving image: ' + data.error);
+        }
+    });
+}
+
 function openPopup(imageUrl) {
     const popup = document.getElementById('imagePopup');
     const popupImage = document.getElementById('popupImage');
