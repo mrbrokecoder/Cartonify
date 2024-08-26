@@ -4,35 +4,128 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to AI Image Generator</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px 0;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin: 0;
+        }
+        main {
+            padding: 40px 0;
+        }
+        .intro {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h2 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        .cta {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 0 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .features {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        .features h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .features ul {
+            padding-left: 20px;
+        }
+        .generated-images h3 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .image-item {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .image-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .image-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .image-info {
+            padding: 15px;
+        }
+        .image-prompt {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .image-details, .image-date {
+            font-size: 0.9em;
+            color: #666;
+        }
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+    </style>
 </head>
-<style>
-    .image-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.image-item {
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 0.5rem;
-    text-align: center;
-}
-
-.image-item img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 4px;
-}
-
-.image-prompt {
-    margin-top: 0.5rem;
-    font-size: 0.8rem;
-    color: #666;
-}
-</style>
 <body>
     <div class="container">
         <header>
@@ -64,9 +157,11 @@
                     {% for image in images %}
                         <div class="image-item">
                             <img src="{{ image.url }}" alt="Generated Image">
-                            <p class="image-prompt">{{ image.prompt }}</p>
-                            <p class="image-details">Style: {{ image.style }}, Color: {{ image.color }}</p>
-                            <p class="image-date">Created: {{ image.created_at|custom_datetime }}</p>
+                            <div class="image-info">
+                                <p class="image-prompt">{{ image.prompt }}</p>
+                                <p class="image-details">Style: {{ image.style }}, Color: {{ image.color }}</p>
+                                <p class="image-date">Created: {{ image.created_at|custom_datetime }}</p>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
