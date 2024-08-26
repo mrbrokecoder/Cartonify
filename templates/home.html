@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to AI Image Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Image Generator</h1>
+        </header>
+        <main>
+            <section class="intro">
+                <h2>Transform Your Ideas into Images</h2>
+                <p>Welcome to our AI-powered image generation platform. Create stunning visuals from text descriptions in seconds!</p>
+            </section>
+            <section class="cta">
+                <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
+                <a href="{{ url_for('signup') }}" class="btn btn-secondary">Sign Up</a>
+            </section>
+            <section class="features">
+                <h3>Features:</h3>
+                <ul>
+                    <li>Generate images from text descriptions</li>
+                    <li>Customize image style and color</li>
+                    <li>Save and download your creations</li>
+                    <li>Premium plans for unlimited generations</li>
+                </ul>
+            </section>
+        </main>
+        <footer>
+            <p>&copy; 2023 AI Image Generator. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

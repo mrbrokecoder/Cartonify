@@ -230,6 +230,15 @@ def custom_datetime(value):
     return value
 
 @app.route('/')
+def home():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    return render_template('home.html')
+
+# Update the login manager to use the new home page
+login_manager.login_view = 'home'
+
+@app.route('/dashboard')
 @login_required
 def index():
     conn = get_db_connection()
