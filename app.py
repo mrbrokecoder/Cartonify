@@ -490,11 +490,41 @@ def transform_image():
     else:
         redis_client.incr(rate_limit_key)
     
-    if not check_user_quota(current_user):
-        return jsonify({
-            'quota_exceeded': True,
-            'is_premium': current_user.is_premium
-        }), 403
+    # Check user quota before proceeding with image generation
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT is_premium, prompt_count, monthly_quota, subscription_start FROM users WHERE id = %s", (current_user.id,))
+    user_data = cur.fetchone()
+    is_premium, prompt_count, monthly_quota, subscription_start = user_data
+
+    if is_premium:
+        # Check if the subscription has expired
+        if subscription_start and datetime.now() - subscription_start > timedelta(days=30):
+            cur.execute("""
+                UPDATE users 
+                SET is_premium = FALSE, 
+                    subscription_start = NULL, 
+                    monthly_quota = 0 
+                WHERE id = %s
+            """, (current_user.id,))
+            conn.commit()
+            is_premium = False
+            monthly_quota = 0
+        elif monthly_quota <= 0:
+            cur.close()
+            conn.close()
+            return jsonify({
+                'quota_exceeded': True,
+                'is_premium': True
+            }), 403
+    else:
+        if prompt_count >= 5:
+            cur.close()
+            conn.close()
+            return jsonify({
+                'quota_exceeded': True,
+                'is_premium': False
+            }), 403
     
     prompt = request.form.get('prompt')
     if not prompt:
@@ -585,8 +615,6 @@ def transform_image():
         image_urls = image_urls + [None] * (2 - len(image_urls))
 
         # Save image information to the database
-        conn = get_db_connection()
-        cur = conn.cursor()
         for url in image_urls:
             if url:
                 cur.execute("""
@@ -595,7 +623,7 @@ def transform_image():
                 """, (current_user.id, url, prompt, style, color, datetime.now()))
 
         # Update quota after successful generation
-        if current_user.is_premium:
+        if is_premium:
             cur.execute("UPDATE users SET monthly_quota = monthly_quota - 1 WHERE id = %s", (current_user.id,))
         else:
             cur.execute("UPDATE users SET prompt_count = prompt_count + 1 WHERE id = %s", (current_user.id,))
@@ -608,7 +636,7 @@ def transform_image():
             "image_urls": image_urls,
             "generated_count": len([url for url in image_urls if url is not None]),
             "quota_exceeded": False,
-            "is_premium": current_user.is_premium
+            "is_premium": is_premium
         })
     except Exception as e:
         cur.close()
