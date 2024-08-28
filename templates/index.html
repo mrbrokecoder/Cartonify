@@ -51,7 +51,7 @@
     <div class="content">
         <div class="sidebar left-sidebar">
             <div class="section">
-                <h3 class="section-title">General Settings</h3>
+                <h3 class="section-title">Image Settings</h3>
                 <div class="select-wrapper">
                     <select id="image_size" class="styled-select">
                         <option value="256">Small Square (256x256)</option>
@@ -71,8 +71,8 @@
                 </div>
             </div>
             <div class="section">
-                <h3 class="section-title">Content Type</h3>
-                <div class="content-type-buttons">
+                <h3 class="section-title">Style</h3>
+                <div class="style-buttons">
                     <button class="styled-button active" data-style="art style">Art</button>
                     <button class="styled-button" data-style="photo realistic">Photo</button>
                     <button class="styled-button" data-style="cartoon">Cartoon</button>
@@ -98,18 +98,17 @@
                 </div>
             </div>
             <div class="section">
-                <h3 class="section-title">Composition</h3>
-                <div class="custom-select">Reference</div>
+                <h3 class="section-title">Reference Image</h3>
                 <div class="upload-buttons">
                     <input type="file" id="fileInput" accept="image/*" style="display: none;">
-                    <button class="styled-button" onclick="document.getElementById('fileInput').click()">Upload Image</button>
-                    <button class="styled-button">Browse gallery</button>
+                    <button class="styled-button upload-btn" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-upload"></i> Upload Image
+                    </button>
+                    <button class="styled-button gallery-btn">
+                        <i class="fas fa-images"></i> Browse Gallery
+                    </button>
                 </div>
-                <div class="reference-images">
-                    <div class="image" id="uploadedImage"></div>
-                    <div class="image"></div>
-                    <div class="image"></div>
-                </div>
+                <div class="reference-image" id="uploadedImage"></div>
             </div>
         </div>
         <div class="main-content">
@@ -146,18 +145,18 @@
         <div class="sidebar right-sidebar">
             <div class="section">
                 <h3 class="section-title">Recent Images</h3>
-                <div class="previous-images-list">
+                <div class="recent-images-grid">
                     {% if images %}
-                        {% for image in images[:5] %}
-                            <div class="previous-image-item" data-url="{{ image[0] }}">
-                                <img src="{{ image[0] }}" alt="Previous image" loading="lazy">
+                        {% for image in images[:6] %}
+                            <div class="recent-image-item" data-url="{{ image[0] }}">
+                                <img src="{{ image[0] }}" alt="Recent image" loading="lazy">
                             </div>
                         {% endfor %}
-                        {% if images|length > 5 %}
+                        {% if images|length > 6 %}
                             <button id="viewAllImages" class="view-all-btn">View All</button>
                         {% endif %}
                     {% else %}
-                        <p>No previous images found.</p>
+                        <p>No recent images found.</p>
                     {% endif %}
                 </div>
             </div>
@@ -169,9 +168,9 @@
         let selectedStyle = 'art style';
         let selectedColor = 'vibrant colors';
     
-        document.querySelectorAll('.content-type-buttons button').forEach(button => {
+        document.querySelectorAll('.style-buttons button').forEach(button => {
             button.addEventListener('click', function() {
-                document.querySelector('.content-type-buttons button.active').classList.remove('active');
+                document.querySelector('.style-buttons button.active').classList.remove('active');
                 this.classList.add('active');
                 selectedStyle = this.dataset.style;
             });
@@ -364,7 +363,7 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
         });
 
         // Add this new script for handling the right sidebar
-        document.querySelectorAll('.previous-image-item').forEach(item => {
+        document.querySelectorAll('.recent-image-item').forEach(item => {
             item.addEventListener('click', function() {
                 const imageUrl = this.dataset.url;
                 openPopup(imageUrl);
