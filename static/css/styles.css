@@ -108,7 +108,7 @@ body {
     padding: 20px;
     background-color: #f5f5f5;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     height: calc(100vh - 60px);
     overflow-y: auto;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
@@ -221,27 +221,91 @@ body {
 .styled-select {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: white;
-    font-size: 14px;
     margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.style-buttons, .color-scheme-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
 }
 
 .styled-button {
-    background-color: #f0f0f0;
+    padding: 10px;
     border: none;
-    padding: 8px 12px;
-    margin: 5px;
-    border-radius: 20px;
-    font-size: 14px;
+    border-radius: 5px;
+    background-color: #e0e0e0;
     cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
+    transition: background-color 0.3s;
 }
 
-.styled-button:hover, .styled-button.active {
+.styled-button.active {
     background-color: #007bff;
     color: white;
+}
+
+.upload-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.upload-btn, .gallery-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.reference-image {
+    width: 100%;
+    height: 150px;
+    background-color: #ddd;
+    border-radius: 5px;
+    background-size: cover;
+    background-position: center;
+}
+
+.recent-images-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.recent-image-item {
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.recent-image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.recent-image-item:hover img {
+    transform: scale(1.1);
+}
+
+.view-all-btn {
+    grid-column: 1 / -1;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.view-all-btn:hover {
+    background-color: #0056b3;
 }
 
 .toggle-container {
