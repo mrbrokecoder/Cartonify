@@ -59,6 +59,7 @@
 
         checkoutButton.addEventListener('click', function() {
             console.log('Button clicked');
+            console.log('Stripe public key:', '{{ stripe_public_key }}');
             checkoutButton.disabled = true;
             
             fetch('/create-checkout-session', {
