@@ -5,59 +5,161 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .dashboard-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+        :root {
+            --primary-color: #10a37f;
+            --secondary-color: #f0f0f0;
+            --text-color: #333;
+            --border-color: #e0e0e0;
         }
-        .api-key-section, .api-usage-section {
-            background-color: #f5f5f5;
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        h1, h2 {
+            margin-bottom: 1rem;
+        }
+        .tab-container {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+        .tab {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            font-weight: 600;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .card {
+            background-color: white;
             border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
         }
         .api-key-display {
-            background-color: #e0e0e0;
-            padding: 10px;
+            background-color: var(--secondary-color);
+            padding: 1rem;
             border-radius: 4px;
             font-family: monospace;
-            margin-bottom: 10px;
+            margin-bottom: 1rem;
+            word-break: break-all;
         }
         .button-group {
             display: flex;
-            gap: 10px;
+            gap: 1rem;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0d8c6d;
         }
         #apiUsageChart {
-            margin-top: 20px;
+            margin-top: 2rem;
+        }
+        pre {
+            background-color: var(--secondary-color);
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
         }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
+    <div class="container">
         <h1>API Dashboard</h1>
         
-        <div class="api-key-section">
-            <h2>Your API Key</h2>
-            <div class="api-key-display" id="apiKeyDisplay">
-                {% if api_key %}
-                    {{ api_key }}
-                {% else %}
-                    No API key generated
-                {% endif %}
-            </div>
-            <div class="button-group">
-                <button id="generateApiKey">Generate New API Key</button>
-                <button id="revokeApiKey">Revoke API Key</button>
+        <div class="tab-container">
+            <div class="tab active" data-tab="api-key">API Key</div>
+            <div class="tab" data-tab="usage">Usage</div>
+            <div class="tab" data-tab="instructions">Instructions</div>
+        </div>
+        
+        <div id="api-key" class="tab-content active">
+            <div class="card">
+                <h2>Your API Key</h2>
+                <div class="api-key-display" id="apiKeyDisplay">
+                    {% if api_key %}
+                        {{ api_key }}
+                    {% else %}
+                        No API key generated
+                    {% endif %}
+                </div>
+                <div class="button-group">
+                    <button id="generateApiKey">Generate New API Key</button>
+                    <button id="revokeApiKey">Revoke API Key</button>
+                </div>
             </div>
         </div>
         
-        <div class="api-usage-section">
-            <h2>API Usage</h2>
-            <p>Total API calls in the last 30 days: <span id="totalApiCalls">{{ api_usage }}</span></p>
-            <canvas id="apiUsageChart"></canvas>
+        <div id="usage" class="tab-content">
+            <div class="card">
+                <h2>API Usage</h2>
+                <p>Total API calls in the last 30 days: <strong id="totalApiCalls">{{ api_usage }}</strong></p>
+                <canvas id="apiUsageChart"></canvas>
+            </div>
+        </div>
+        
+        <div id="instructions" class="tab-content">
+            <div class="card">
+                <h2>API Usage Instructions</h2>
+                <p>To use the API for image generation in your projects, follow these steps:</p>
+                <ol>
+                    <li>Make sure you have a valid API key generated.</li>
+                    <li>Use the following endpoint for image generation:</li>
+                </ol>
+                <pre>POST https://your-domain.com/api/transform</pre>
+                <p>Include the following headers in your request:</p>
+                <pre>
+Content-Type: application/json
+X-API-Key: YOUR_API_KEY
+                </pre>
+                <p>The request body should be a JSON object with the following structure:</p>
+                <pre>
+{
+    "prompt": "Your image generation prompt",
+    "image_size": 512,
+    "style": "art style",
+    "color": "vibrant colors"
+}
+                </pre>
+                <p>The API will return a JSON response with the generated image URLs:</p>
+                <pre>
+{
+    "image_urls": [
+        "https://generated-image-url-1.jpg",
+        "https://generated-image-url-2.jpg"
+    ]
+}
+                </pre>
+            </div>
         </div>
     </div>
 
@@ -65,6 +167,8 @@
         const generateApiKeyBtn = document.getElementById('generateApiKey');
         const revokeApiKeyBtn = document.getElementById('revokeApiKey');
         const apiKeyDisplay = document.getElementById('apiKeyDisplay');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
 
         generateApiKeyBtn.addEventListener('click', async () => {
             const response = await fetch('/generate_api_key', { method: 'POST' });
@@ -78,7 +182,15 @@
             apiKeyDisplay.textContent = 'No API key generated';
         });
 
-        // Fetch and display API usage statistics
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
         async function fetchApiUsageStats() {
             const response = await fetch('/api_usage_stats');
             const data = await response.json();
@@ -94,8 +206,10 @@
                     datasets: [{
                         label: 'API Calls',
                         data: counts,
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
+                        borderColor: 'rgb(16, 163, 127)',
+                        backgroundColor: 'rgba(16, 163, 127, 0.1)',
+                        tension: 0.1,
+                        fill: true
                     }]
                 },
                 options: {
