@@ -1,0 +1,110 @@
+graph TD
+    A[Client] -->|HTTP/HTTPS| B[Flask Application]
+    
+    B --> C[Routes and Views]
+    B --> D[Data Layer]
+    B --> E[External Services]
+    B --> F[Background Jobs]
+    B --> G[Utilities]
+    B --> H[Configuration]
+
+    C --> C1[Authentication]
+    C1 --> C1a[Login Route]
+    C1 --> C1b[Logout Route]
+    C1 --> C1c[Signup Route]
+    C1 --> C1d[Password Hashing]
+    C1 --> C1e[Session Management]
+
+    C --> C2[Image Generation]
+    C2 --> C2a[Transform Route]
+    C2 --> C2b[Download Route]
+    C2 --> C2c[Prompt Processing]
+    C2 --> C2d[Image Storage]
+
+    C --> C3[User Management]
+    C3 --> C3a[Dashboard Route]
+    C3 --> C3b[Profile Update]
+    C3 --> C3c[Usage Statistics]
+
+    C --> C4[Admin Dashboard]
+    C4 --> C4a[User List]
+    C4 --> C4b[User Prompts]
+    C4 --> C4c[Credit Management]
+    C4 --> C4d[Premium Conversion]
+    C4 --> C4e[User Deletion]
+
+    C --> C5[API Management]
+    C5 --> C5a[API Transform Route]
+    C5 --> C5b[Generate API Key]
+    C5 --> C5c[Revoke API Key]
+    C5 --> C5d[Usage Tracking]
+
+    C --> C6[Premium Features]
+    C6 --> C6a[Premium Route]
+    C6 --> C6b[Checkout Session]
+    C6 --> C6c[Premium Success]
+    C6 --> C6d[Subscription Management]
+
+    D --> D1[Database]
+    D1 --> D1a[PostgreSQL]
+    D1a --> D1a1[Users Table]
+    D1a --> D1a2[Images Table]
+    D1a --> D1a3[API Usage Table]
+    D1 --> D1b[Redis]
+    D1b --> D1b1[Session Storage]
+    D1b --> D1b2[Rate Limiting]
+    D1b --> D1b3[User Data Caching]
+
+    D --> D2[ORM Layer]
+    D2 --> D2a[SQLAlchemy]
+    D2 --> D2b[Redis-Py]
+
+    E --> E1[Replicate API]
+    E1 --> E1a[Image Generation Model]
+    E1 --> E1b[Inpainting Model]
+
+    E --> E2[Stripe API]
+    E2 --> E2a[Payment Processing]
+    E2 --> E2b[Subscription Handling]
+
+    E --> E3[SMTP Server]
+    E3 --> E3a[Transactional Emails]
+    E3 --> E3b[OTP Delivery]
+
+    F --> F1[APScheduler]
+    F1 --> F1a[Monthly Quota Reset]
+    F1 --> F1b[Expired Premium Check]
+
+    G --> G1[Database Utilities]
+    G1 --> G1a[Connection Pool]
+    G1 --> G1b[Query Helpers]
+
+    G --> G2[Email Utilities]
+    G2 --> G2a[Email Formatting]
+    G2 --> G2b[SMTP Connection]
+
+    G --> G3[File Handling]
+    G3 --> G3a[Upload Management]
+    G3 --> G3b[File Validation]
+
+    G --> G4[User Quota Management]
+    G4 --> G4a[Usage Tracking]
+    G4 --> G4b[Limit Enforcement]
+
+    G --> G5[NSFW Content Detection]
+    G5 --> G5a[Content Analysis]
+    G5 --> G5b[Filtering Rules]
+
+    H --> H1[Environment Variables]
+    H1 --> H1a[.env File]
+    H1 --> H1b[OS Environment]
+
+    H --> H2[App Config]
+    H2 --> H2a[Upload Settings]
+    H2 --> H2b[Database Settings]
+    H2 --> H2c[API Keys]
+    H2 --> H2d[Email Settings]
+    H2 --> H2e[Redis Settings]
+
+    classDef routeClass fill:#f9f,stroke:#333,stroke-width:2px;
+    class C1,C2,C3,C4,C5,C6 routeClass;

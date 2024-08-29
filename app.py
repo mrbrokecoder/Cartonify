@@ -679,6 +679,18 @@ def transform_image():
             except Exception as e:
                 app.logger.error(f"Error removing file: {str(e)}")
 
+    # Check if image editing is requested
+    if request.form.get('edit_image') == 'true':
+        model = "tencentarc/gfpgan:0fbacf7afc6c144e5be9767cff80f25aff23e52b0708f17e20f9879b2f21516c"
+        input_data = {
+            "img": input_data["image"],
+            "version": "v1.4",
+            "scale": 2
+        }
+    else:
+        # Use the regular image generation model
+        model = "black-forest-labs/flux-schnell"
+
     # Check if inpainting is requested
     if 'mask' in request.files:
         mask_file = request.files['mask']
@@ -698,12 +710,6 @@ def transform_image():
 
             # Use the inpainting model
             model = "stability-ai/stable-diffusion-inpainting"
-        else:
-            # Use the regular image generation model
-            model = "black-forest-labs/flux-schnell"
-    else:
-        # Use the regular image generation model
-        model = "black-forest-labs/flux-schnell"
 
     try:
         image_urls = []
