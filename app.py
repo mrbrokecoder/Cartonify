@@ -308,6 +308,10 @@ def index():
 @app.route('/api_dashboard')
 @login_required
 def api_dashboard():
+    if not current_user.is_authenticated:
+        flash('Please log in to access the API dashboard.', 'warning')
+        return redirect(url_for('login'))
+    
     conn = get_db_connection()
     cur = conn.cursor()
     
