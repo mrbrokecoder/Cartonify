@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premium Subscription</title>
-    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -49,55 +49,78 @@
             <li>No 5 prompt limit</li>
             <li>Priority processing</li>
         </ul>
-        <p>All this for just $5!</p>
+        <p>All this for just ₹5!</p>
         <button id="checkout-button" class="btn">Upgrade Now</button>
     </div>
 
     <script>
-        var stripePublicKey = '{{ stripe_public_key }}';
-        console.log('Stripe public key:', stripePublicKey);
+        var razorpayKeyId = '{{ razorpay_key_id }}';
+        var checkoutButton = document.getElementById('checkout-button');
 
-        if (!stripePublicKey) {
-            console.error('Stripe public key is missing');
-            alert('Configuration error: Stripe public key is missing');
-        } else {
-            var stripe = Stripe(stripePublicKey);
-            var checkoutButton = document.getElementById('checkout-button');
-
-            checkoutButton.addEventListener('click', function() {
-                console.log('Button clicked');
-                console.log('Stripe public key:', '{{ stripe_public_key }}');
-                checkoutButton.disabled = true;
-                
-                fetch('/create-checkout-session', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
+        checkoutButton.addEventListener('click', function() {
+            checkoutButton.disabled = true;
+            
+            fetch('/create-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text) });
+                }
+                return response.json();
+            })
+            .then(function(order) {
+                var options = {
+                    "key": razorpayKeyId,
+                    "amount": "500", // Amount is in paise
+                    "currency": "INR",
+                    "name": "Your Company Name",
+                    "description": "Premium Subscription",
+                    "order_id": order.order_id,
+                    "handler": function (response){
+                        fetch('/premium-success', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(response)
+                        })
+                        .then(function(response) {
+                            return response.json();
+                        })
+                        .then(function(data) {
+                            if (data.success) {
+                                alert('Payment successful! You are now a premium user.');
+                                window.location.href = '/';
+                            } else {
+                                alert('Payment verification failed. Please contact support.');
+                            }
+                        })
+                        .catch(function(error) {
+                            alert('An error occurred: ' + error.message);
+                        });
                     },
-                    body: JSON.stringify({
-                        product: 'premium_subscription'
-                    })
-                })
-                .then(function(response) {
-                    console.log('Response received', response);
-                    if (!response.ok) {
-                        return response.text().then(text => { throw new Error(text) });
+                    "prefill": {
+                        "email": "{{ current_user.email }}"
+                    },
+                    "theme": {
+                        "color": "#007bff"
                     }
-                    return response.json();
-                })
-                .then(function(session) {
-                    console.log('Session ID received', session.id);
-                    return stripe.redirectToCheckout({ sessionId: session.id });
-                })
-                .catch(function(error) {
-                    console.error('Error:', error);
-                    alert('An error occurred: ' + error.message);
-                })
-                .finally(function() {
-                    checkoutButton.disabled = false;
-                });
+                };
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                alert('An error occurred: ' + error.message);
+            })
+            .finally(function() {
+                checkoutButton.disabled = false;
             });
-        }
+        });
     </script>
 </body>
 </html>

@@ -13,7 +13,7 @@ from psycopg2 import sql
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 import secrets  # Add this import at the top of the file
-import stripe
+import razorpay
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 import smtplib
@@ -37,9 +37,9 @@ app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER')
 app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_CONTENT_LENGTH'))  # 16MB max upload size
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
-app.config['STRIPE_PUBLIC_KEY'] = os.getenv('STRIPE_PUBLISHABLE_KEY')
-app.config['STRIPE_SECRET_KEY'] = os.getenv('STRIPE_SECRET_KEY')
-stripe.api_key = app.config['STRIPE_SECRET_KEY']
+app.config['RAZORPAY_KEY_ID'] = os.getenv('RAZORPAY_KEY_ID')
+app.config['RAZORPAY_KEY_SECRET'] = os.getenv('RAZORPAY_KEY_SECRET')
+razorpay_client = razorpay.Client(auth=(app.config['RAZORPAY_KEY_ID'], app.config['RAZORPAY_KEY_SECRET']))
 app.config['SESSION_TYPE'] = 'filesystem'
 
 # Add these configurations
@@ -49,7 +49,6 @@ app.config['SMTP_USERNAME'] = os.getenv('SMTP_USERNAME')
 app.config['SMTP_PASSWORD'] = os.getenv('SMTP_PASSWORD')
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
-stripe.api_key = app.config['STRIPE_SECRET_KEY']
 app.config['SESSION_TYPE'] = 'filesystem'
 
 # Redis Configuration
@@ -898,54 +897,54 @@ def api_management():
 @app.route('/premium')
 @login_required
 def premium():
-    return render_template('premium.html', stripe_public_key=app.config['STRIPE_PUBLIC_KEY'])
+    return render_template('premium.html', razorpay_key_id=app.config['RAZORPAY_KEY_ID'])
 
 @app.route('/create-checkout-session', methods=['POST'])
 @login_required
 def create_checkout_session():
     try:
-        checkout_session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[
-                {
-                    'price_data': {
-                        'currency': 'usd',
-                        'unit_amount': 500,
-                        'product_data': {
-                            'name': 'Premium Subscription',
-                            'description': 'Generate unlimited images',
-                        },
-                    },
-                    'quantity': 1,
-                },
-            ],
-            mode='payment',
-            success_url=url_for('premium_success', _external=True),
-            cancel_url=url_for('premium', _external=True),
-            client_reference_id=str(current_user.id),
-        )
-        return jsonify({'id': checkout_session.id})
+        checkout_session = razorpay_client.order.create({
+            'amount': 50000,  # Amount in paise (500 INR)
+            'currency': 'INR',
+            'payment_capture': 1,
+            'notes': {
+                'user_id': current_user.id
+            }
+        })
+        return jsonify({'id': checkout_session['id']})
     except Exception as e:
         return jsonify(error=str(e)), 403
 
-@app.route('/premium-success')
+@app.route('/premium-success', methods=['POST'])
 @login_required
 def premium_success():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    subscription_start = datetime.now()
-    cur.execute("""
-        UPDATE users 
-        SET is_premium = TRUE, 
-            subscription_start = %s, 
-            monthly_quota = 1600 
-        WHERE id = %s
-    """, (subscription_start, current_user.id))
-    conn.commit()
-    cur.close()
-    conn.close()
-    flash('You are now a premium user! Your subscription will last for 30 days.', 'success')
-    return redirect(url_for('index'))
+    try:
+        # Verify the payment signature
+        params_dict = {
+            'razorpay_order_id': request.form.get('razorpay_order_id'),
+            'razorpay_payment_id': request.form.get('razorpay_payment_id'),
+            'razorpay_signature': request.form.get('razorpay_signature')
+        }
+        razorpay_client.utility.verify_payment_signature(params_dict)
+        
+        # Payment successful, update user to premium
+        conn = get_db_connection()
+        cur = conn.cursor()
+        subscription_start = datetime.now()
+        cur.execute("""
+            UPDATE users 
+            SET is_premium = TRUE, 
+                subscription_start = %s, 
+                monthly_quota = 1600 
+            WHERE id = %s
+        """, (subscription_start, current_user.id))
+        conn.commit()
+        cur.close()
+        conn.close()
+        flash('You are now a premium user! Your subscription will last for 30 days.', 'success')
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 # Add a background task to reset monthly quota
 def reset_monthly_quota():
