@@ -72,10 +72,11 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 class User(UserMixin):
-    def __init__(self, id, email, password, is_premium=False, prompt_count=0, subscription_start=None, monthly_quota=0, is_admin=False):
+    def __init__(self, id, email, password, username=None, is_premium=False, prompt_count=0, subscription_start=None, monthly_quota=0, is_admin=False):
         self.id = id
         self.email = email
         self.password = password
+        self.username = username
         self.is_premium = is_premium
         self.prompt_count = prompt_count
         self.subscription_start = subscription_start
@@ -92,16 +93,17 @@ def load_user(user_id):
             int(user_data[b'id']),
             user_data[b'email'].decode('utf-8'),
             user_data[b'password'].decode('utf-8'),
+            user_data.get(b'username', b'').decode('utf-8') or None,
             bool(int(user_data[b'is_premium'])),
             int(user_data[b'prompt_count']),
             datetime.fromisoformat(user_data[b'subscription_start'].decode('utf-8')) if user_data[b'subscription_start'] else None,
             int(user_data[b'monthly_quota']),
-            bool(int(user_data.get(b'is_admin', b'0')))  # Default to False if not present
+            bool(int(user_data.get(b'is_admin', b'0')))
         )
     
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT id, email, password, COALESCE(is_premium, FALSE) as is_premium, COALESCE(prompt_count, 0) as prompt_count, subscription_start, monthly_quota, COALESCE(is_admin, FALSE) as is_admin FROM users WHERE id = %s", (user_id,))
+    cur.execute("SELECT id, email, password, username, COALESCE(is_premium, FALSE) as is_premium, COALESCE(prompt_count, 0) as prompt_count, subscription_start, monthly_quota, COALESCE(is_admin, FALSE) as is_admin FROM users WHERE id = %s", (user_id,))
     user = cur.fetchone()
     cur.close()
     conn.close()
@@ -112,15 +114,16 @@ def load_user(user_id):
             'id': user[0],
             'email': user[1],
             'password': user[2],
-            'is_premium': int(user[3]),
-            'prompt_count': user[4],
-            'subscription_start': user[5].isoformat() if user[5] else '',
-            'monthly_quota': user[6],
-            'is_admin': int(user[7])
+            'username': user[3] or '',
+            'is_premium': int(user[4]),
+            'prompt_count': user[5],
+            'subscription_start': user[6].isoformat() if user[6] else '',
+            'monthly_quota': user[7],
+            'is_admin': int(user[8])
         })
         redis_client.expire(user_key, 3600)  # Cache for 1 hour
         
-        return User(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7])
+        return User(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8])
     return None
 
 def get_db_connection():
@@ -232,6 +235,12 @@ def init_db():
             prompt TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
+    """)
+    
+    # Add username column to users table
+    cur.execute("""
+        ALTER TABLE users 
+        ADD COLUMN IF NOT EXISTS username VARCHAR(50) UNIQUE;
     """)
     
     conn.commit()
@@ -566,7 +575,7 @@ def login():
         cur.close()
         conn.close()
         if user and check_password_hash(user[2], password):
-            user_obj = User(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7])
+            user_obj = User(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8])
             login_user(user_obj)
             return redirect(url_for('index'))
         flash('Invalid email or password')
@@ -1270,6 +1279,38 @@ def get_user_videos():
             "created_at": video[2].isoformat()
         } for video in videos
     ])
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        # Check if username already exists
+        cur.execute("SELECT id FROM users WHERE username = %s AND id != %s", (username, current_user.id))
+        if cur.fetchone():
+            flash('Username already taken', 'error')
+        else:
+            # Update username
+            cur.execute("UPDATE users SET username = %s WHERE id = %s", (username, current_user.id))
+            conn.commit()
+            flash('Profile updated successfully', 'success')
+        
+        cur.close()
+        conn.close()
+        
+        # Update the current_user object
+        current_user.username = username
+        
+    # Fetch user's subscription details
+    subscription_end = None
+    if current_user.is_premium and current_user.subscription_start:
+        subscription_end = current_user.subscription_start + timedelta(days=30)
+    
+    return render_template('profile.html', user=current_user, subscription_end=subscription_end)
 
 if __name__ == '__main__':
     with app.app_context():
