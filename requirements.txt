@@ -13,3 +13,5 @@ celery
 redis
 flask_session
 Pillow
+Flask-Cors
+pygame
