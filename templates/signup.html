@@ -186,6 +186,17 @@
             color: var(--primary-hover);
         }
 
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        button:disabled:hover {
+            background: #cccccc;
+            transform: none;
+            box-shadow: none;
+        }
+
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
@@ -237,7 +248,7 @@
                         <label for="otp">OTP</label>
                         <input type="text" id="otp" name="otp" required>
                     </div>
-                    <button type="submit">Sign Up</button>
+                    <button type="submit" id="signupBtn" disabled>Sign Up</button>
                 </form>
                 <p class="login-link">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
             </div>
@@ -250,6 +261,10 @@
             const otpContainer = document.getElementById('otpContainer');
             const emailInput = document.getElementById('email');
             const signupForm = document.getElementById('signupForm');
+            const signupBtn = document.getElementById('signupBtn');
+            const otpInput = document.getElementById('otp');
+
+            let otpSent = false;
 
             requestOtpBtn.addEventListener('click', function() {
                 const email = emailInput.value;
@@ -259,17 +274,31 @@
                     otpContainer.classList.add('visible');
                     requestOtpBtn.textContent = 'Resend OTP';
                     alert('OTP sent to ' + email);
+                    otpSent = true;
                 } else {
                     alert('Please enter your email first');
                 }
             });
 
+            otpInput.addEventListener('input', function() {
+                if (otpSent && this.value.length === 6) { // Assuming OTP is 6 digits
+                    // Here you would typically verify the OTP with your server
+                    // For this example, we'll just enable the signup button
+                    signupBtn.disabled = false;
+                } else {
+                    signupBtn.disabled = true;
+                }
+            });
+
             signupForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                // Here you would typically validate the OTP and submit the form
-                // For this example, we'll just show an alert
-                alert('Form submitted. OTP verification would happen here.');
-                // signupForm.submit(); // Uncomment this line to actually submit the form
+                if (otpSent && !signupBtn.disabled) {
+                    // Here you would typically submit the form to your server
+                    alert('Form submitted. OTP verified.');
+                    // signupForm.submit(); // Uncomment this line to actually submit the form
+                } else {
+                    alert('Please verify OTP before submitting.');
+                }
             });
         });
     </script>
