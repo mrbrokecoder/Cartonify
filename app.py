@@ -369,19 +369,66 @@ def api_transform_image():
 
     user_id = user[0]
 
-    # ... (rest of the image generation logic)
+    # Get request data
+    data = request.json
+    prompt = data.get('prompt')
+    image_size = data.get('image_size', 512)
+    style = data.get('style', 'art style')
+    color = data.get('color', 'vibrant colors')
 
-    # After successful image generation, update the usage count
-    cur.execute("""
-        INSERT INTO api_usage (user_id, usage_date, count)
-        VALUES (%s, CURRENT_DATE, 1)
-        ON CONFLICT (user_id, usage_date)
-        DO UPDATE SET count = api_usage.count + 1
-    """, (user_id,))
-    conn.commit()
+    if not prompt:
+        return jsonify({'error': 'No prompt provided'}), 400
 
-    cur.close()
-    conn.close()
+    # Prepare input data for the image generation model
+    input_data = {
+        "detect_resolution": image_size,
+        "image_resolution": image_size,
+        "return_width": image_size,
+        "return_height": image_size,
+        "prompt": f"{prompt}, {style}, {color}",
+        "num_samples": 1,
+        "num_inference_steps": 20,
+        "guidance_scale": 9,
+        "nsfw": True
+    }
+
+    try:
+        # Use the image generation model (replace with your actual model)
+        output = replicate.run(
+            "stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf",
+            input=input_data
+        )
+
+        # Process the output
+        image_urls = output if isinstance(output, list) else [output]
+
+        # Save image information to the database
+        for url in image_urls:
+            cur.execute("""
+                INSERT INTO images (user_id, url, prompt, style, color, created_at)
+                VALUES (%s, %s, %s, %s, %s, NOW())
+            """, (user_id, url, prompt, style, color))
+
+        conn.commit()
+
+        # Update API usage count
+        cur.execute("""
+            INSERT INTO api_usage (user_id, usage_date, count)
+            VALUES (%s, CURRENT_DATE, 1)
+            ON CONFLICT (user_id, usage_date)
+            DO UPDATE SET count = api_usage.count + 1
+        """, (user_id,))
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
+        return jsonify({"image_urls": image_urls})
+
+    except Exception as e:
+        cur.close()
+        conn.close()
+        return jsonify({"error": str(e)}), 500
 
     # ... (return the generated image URLs)
 
