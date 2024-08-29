@@ -1083,7 +1083,7 @@ def get_user_details(user_id):
         cur = conn.cursor()
         
         cur.execute("""
-            SELECT id, email, is_premium, prompt_count, monthly_quota, subscription_start, created_at
+            SELECT id, email, is_premium, prompt_count, monthly_quota, subscription_start
             FROM users 
             WHERE id = %s
         """, (user_id,))
@@ -1101,8 +1101,7 @@ def get_user_details(user_id):
             'is_premium': user[2],
             'prompt_count': user[3],
             'monthly_quota': user[4],
-            'subscription_start': user[5].isoformat() if user[5] else None,
-            'created_at': user[6].isoformat()
+            'subscription_start': user[5].isoformat() if user[5] else None
         })
     except Exception as e:
         app.logger.error(f"Error fetching user details: {str(e)}")

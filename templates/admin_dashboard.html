@@ -433,7 +433,6 @@
                     <p><strong>Prompt Count:</strong> ${data.prompt_count}</p>
                     <p><strong>Monthly Quota:</strong> ${data.monthly_quota}</p>
                     <p><strong>Subscription Start:</strong> ${data.subscription_start || 'N/A'}</p>
-                    <p><strong>Created At:</strong> ${new Date(data.created_at).toLocaleString()}</p>
                 `;
                 $('#userDetailsContent').html(detailsHtml);
                 $('#userDetailsModal').modal('show');
