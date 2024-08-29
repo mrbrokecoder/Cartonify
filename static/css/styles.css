@@ -1,9 +1,12 @@
 :root {
+    --primary-color: #4B0082; /* Indigo */
+    --primary-color-light: #6A5ACD; /* A lighter shade of indigo */
+    --primary-color-dark: #301934; /* A darker shade of indigo */
     --bg-color: #f6f7f9;
     --panel-bg: #ffffff;
     --text-color: #333333;
     --text-secondary: #666666;
-    --accent-color: #ff69b4;
+    --accent-color: #4B0082;
     --border-color: #e0e0e0;
     --hover-color: #f0f0f0;
 }
@@ -13,7 +16,7 @@
     --panel-bg: #2d2d2d;
     --text-color: #ffffff;
     --text-secondary: #b0b0b0;
-    --accent-color: #ff69b4;
+    --accent-color: #4B0082;
     --border-color: #3a3a3a;
     --hover-color: #333333;
 }
@@ -38,7 +41,7 @@ body {
 }
 
 .header {
-    background-color: var(--panel-bg);
+    background-color: var(--primary-color);
     padding: 8px 25px;
     display: flex;
     justify-content: space-between;
@@ -242,7 +245,7 @@ body {
 }
 
 .styled-button.active {
-    background-color: #007bff;
+    background-color: var(--primary-color);
     color: white;
 }
 
@@ -296,7 +299,7 @@ body {
 .view-all-btn {
     grid-column: 1 / -1;
     padding: 10px;
-    background-color: #007bff;
+    background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 5px;
@@ -305,7 +308,7 @@ body {
 }
 
 .view-all-btn:hover {
-    background-color: #0056b3;
+    background-color: var(--primary-color-dark);
 }
 
 .toggle-container {
@@ -353,7 +356,7 @@ body {
 }
 
 input:checked + .slider {
-    background-color: #2196F3;
+    background-color: var(--primary-color);
 }
 
 input:checked + .slider:before {
@@ -469,7 +472,7 @@ color: var(--text-secondary);
 
 #generateButton {
     padding: 12px 25px;
-    background-color: var(--accent-color);
+    background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 8px;
@@ -706,7 +709,7 @@ transform: translateY(-2px);
 
 .color-scheme-buttons button:hover,
 .color-scheme-buttons button.active {
-    background: var(--accent-color);
+    background: var(--primary-color);
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
