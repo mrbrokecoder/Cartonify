@@ -36,6 +36,55 @@
         .dashboard-btn:hover {
             background-color: #0056b3;
         }
+
+        .content {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            max-width: calc(100% - 520px); /* Adjust based on sidebar widths */
+            margin: 0 20px;
+            overflow-x: hidden;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .image-box {
+            aspect-ratio: 1 / 1;
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            height: auto;
+        }
+
+        .previous-images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .previous-image-box img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -139,11 +188,10 @@
                     </button>
                 </div>
                 <div class="reference-image" id="uploadedImage"></div>
-                <!-- Updated section for image editing and enhancing -->
+                <!-- Updated checkbox for image editing -->
                 <div class="edit-image-option">
                     <input type="checkbox" id="editImageCheckbox">
-                    <label for="editImageCheckbox">Edit Uploaded Image</label>
-                    <button id="enhanceButton" class="styled-button" style="display: none;">Enhance Image</button>
+                    <label for="editImageCheckbox">Edit/Enhance Uploaded Image</label>
                 </div>
             </div>
         </div>
@@ -234,7 +282,6 @@
         imageBox.className = 'image-box fade-in';
         imageBox.style.animationDelay = `${index * 0.1}s`;
         imageBox.style.backgroundImage = `url('${url}')`;
-        imageBox.style.backgroundSize = 'cover';
 
         // Add click event to open popup
         imageBox.addEventListener('click', () => openPopup(url));
