@@ -139,10 +139,11 @@
                     </button>
                 </div>
                 <div class="reference-image" id="uploadedImage"></div>
-                <!-- Add this new checkbox for image editing -->
+                <!-- Updated section for image editing and enhancing -->
                 <div class="edit-image-option">
                     <input type="checkbox" id="editImageCheckbox">
-                    <label for="editImageCheckbox">Edit/Enhance Uploaded Image</label>
+                    <label for="editImageCheckbox">Edit Uploaded Image</label>
+                    <button id="enhanceButton" class="styled-button" style="display: none;">Enhance Image</button>
                 </div>
             </div>
         </div>
@@ -430,6 +431,67 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
                 styleButtons.style.display = 'flex';
                 colorSchemeButtons.style.display = 'flex';
             }
+        });
+
+        // Add this to your existing script
+        document.addEventListener('DOMContentLoaded', function() {
+            const editImageCheckbox = document.getElementById('editImageCheckbox');
+            const enhanceButton = document.getElementById('enhanceButton');
+            const generateButton = document.getElementById('generateButton');
+            const fileInput = document.getElementById('fileInput');
+
+            editImageCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    enhanceButton.style.display = 'inline-block';
+                } else {
+                    enhanceButton.style.display = 'none';
+                }
+            });
+
+            enhanceButton.addEventListener('click', function() {
+                if (fileInput.files.length === 0) {
+                    alert('Please upload an image to enhance.');
+                    return;
+                }
+                performImageOperation('enhance');
+            });
+
+            function performImageOperation(operation) {
+                const formData = new FormData();
+                formData.append('operation', operation);
+                if (fileInput.files.length > 0) {
+                    formData.append('file', fileInput.files[0]);
+                }
+
+                // Disable buttons and show loading state
+                generateButton.disabled = true;
+                enhanceButton.disabled = true;
+                generateButton.textContent = 'Processing...';
+
+                axios.post('/transform', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                .then(response => {
+                    console.log('Response:', response.data);
+                    if (response.data.image_urls) {
+                        displayGeneratedImages(response.data.image_urls);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while processing the image. Please try again.');
+                })
+                .finally(() => {
+                    // Re-enable buttons and restore text
+                    generateButton.disabled = false;
+                    enhanceButton.disabled = false;
+                    generateButton.textContent = 'Generate';
+                });
+            }
+
+            // Make sure to integrate this with your existing displayGeneratedImages function
         });
     </script>
 </body>

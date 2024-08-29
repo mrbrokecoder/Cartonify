@@ -638,6 +638,42 @@ def transform_image():
                 'is_premium': False
             }), 403
     
+    operation = request.form.get('operation', 'generate')
+
+    if operation == 'enhance':
+        if 'file' not in request.files:
+            return jsonify({"error": "No file uploaded"}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "No file selected"}), 400
+        
+        if file:
+            # Save the file temporarily
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+
+            with open(filepath, "rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+
+            # Use a model for image enhancement
+            model = "tencentarc/gfpgan:0fbacf7afc6c144e5be9767cff80f25aff23e52b0708f17e20f9879b2f21516c"
+            input_data = {
+                "img": f"data:image/png;base64,{encoded_string}",
+                "version": "v1.4",
+                "scale": 2
+            }
+
+            try:
+                output = replicate.run(model, input=input_data)
+                return jsonify({"image_urls": [output]})
+            except Exception as e:
+                return jsonify({"error": str(e)}), 500
+            finally:
+                # Clean up the temporary file
+                os.remove(filepath)
+
     prompt = request.form.get('prompt')
     if not prompt:
         return jsonify({'error': 'No prompt provided'}), 400
