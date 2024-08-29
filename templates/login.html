@@ -8,12 +8,12 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
         :root {
-            --primary-color: #4B0082;
-            --primary-hover: #3A006F;
+            --primary-color: #6C63FF;
+            --primary-hover: #5A52D5;
             --text-color: #333;
-            --bg-color: #f8f9fa;
+            --bg-color: #F0F2F5;
             --input-bg: #ffffff;
-            --shadow-color: rgba(75, 0, 130, 0.1);
+            --shadow-color: rgba(108, 99, 255, 0.1);
         }
 
         body, html {
@@ -27,17 +27,16 @@
 
         .container {
             display: flex;
-            height: 100vh; /* Ensures the container takes up full viewport height */
+            height: 100vh;
         }
 
         .image-side {
             flex: 1;
-            background-image: url('https://image.cdn2.seaart.ai/2024-08-06/cqos1lle878c7390ijq0/424448c1ffbe710f1fe25eb2290bd7b9aeafc894_high.webp');
+            background-image: url('https://source.unsplash.com/random/1200x900?nature');
             background-size: cover;
             background-position: center;
             position: relative;
             overflow: hidden;
-            min-height: 100vh; /* Ensures the image takes up full height */
         }
 
         .image-side::after {
@@ -47,7 +46,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(45deg, rgba(75, 0, 130, 0.6), rgba(75, 0, 130, 0.3));
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.7), rgba(108, 99, 255, 0.3));
         }
 
         .login-side {
@@ -56,28 +55,25 @@
             justify-content: center;
             align-items: center;
             background-color: var(--bg-color);
+            padding: 2rem;
         }
 
         .login-container {
-            width: 80%;
+            width: 100%;
             max-width: 400px;
-            padding: 3rem;
-            background-color: var(--input-bg);
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
             border-radius: 20px;
-            box-shadow: 0 10px 30px var(--shadow-color);
-            transition: transform 0.3s ease;
-        }
-
-        .login-container:hover {
-            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
         h2 {
-            text-align: center;
             color: var(--primary-color);
             font-weight: 600;
             margin: 0 0 2rem;
-            font-size: 2rem;
+            font-size: 2.5rem;
+            text-align: center;
         }
 
         form div {
@@ -95,8 +91,10 @@
         input {
             width: 100%;
             padding: 0.75rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            border: none;
+            border-radius: 10px;
+            background-color: var(--input-bg);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
             transition: all 0.3s ease;
             box-sizing: border-box;
             font-size: 1rem;
@@ -104,8 +102,7 @@
 
         input:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px var(--shadow-color);
+            box-shadow: 0 0 0 2px var(--primary-color);
         }
 
         button {
@@ -114,11 +111,11 @@
             background: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s ease;
-            margin-top: 1rem;
+            margin-top: 2rem;
             font-size: 1rem;
         }
 
@@ -167,15 +164,10 @@
                 flex-direction: column;
             }
             .image-side {
-                display: block; /* Show the image on smaller screens */
-                height: 30vh; /* Adjust this value as needed */
+                height: 30vh;
             }
             .login-side {
-                padding: 2rem 0;
-            }
-            .login-container {
-                width: 90%;
-                padding: 2rem;
+                padding: 2rem 1rem;
             }
         }
     </style>
