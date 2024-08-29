@@ -212,7 +212,17 @@
                                             <button class="btn btn-sm btn-outline-success" onclick="convertToPremium({{ user.id }})">
                                                 <i class="fas fa-star"></i> Convert to Premium
                                             </button>
+                                            {% else %}
+                                            <button class="btn btn-sm btn-outline-warning" onclick="revokePremium({{ user.id }})">
+                                                <i class="fas fa-star-half-alt"></i> Revoke Premium
+                                            </button>
                                             {% endif %}
+                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteUser({{ user.id }})">
+                                                <i class="fas fa-trash"></i> Delete User
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="viewUserDetails({{ user.id }})">
+                                                <i class="fas fa-user"></i> User Details
+                                            </button>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -256,6 +266,20 @@
                 </div>
                 <div class="modal-body">
                     <div id="promptsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userDetailsModalLabel">User Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="userDetailsContent">
+                    <!-- User details will be inserted here -->
                 </div>
             </div>
         </div>
@@ -364,6 +388,59 @@
                     }
                 });
             }
+        }
+
+        function revokePremium(userId) {
+            if (confirm('Are you sure you want to revoke this user\'s premium status?')) {
+                $.ajax({
+                    url: `/admin/revoke_premium/${userId}`,
+                    method: 'POST',
+                    success: function(data) {
+                        alert(data.message);
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                        alert('Error revoking premium status. Check console for details.');
+                    }
+                });
+            }
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+                $.ajax({
+                    url: `/admin/delete_user/${userId}`,
+                    method: 'DELETE',
+                    success: function(data) {
+                        alert(data.message);
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                        alert('Error deleting user. Check console for details.');
+                    }
+                });
+            }
+        }
+
+        function viewUserDetails(userId) {
+            $.get(`/admin/user_details/${userId}`, function(data) {
+                var detailsHtml = `
+                    <p><strong>ID:</strong> ${data.id}</p>
+                    <p><strong>Email:</strong> ${data.email}</p>
+                    <p><strong>Premium:</strong> ${data.is_premium ? 'Yes' : 'No'}</p>
+                    <p><strong>Prompt Count:</strong> ${data.prompt_count}</p>
+                    <p><strong>Monthly Quota:</strong> ${data.monthly_quota}</p>
+                    <p><strong>Subscription Start:</strong> ${data.subscription_start || 'N/A'}</p>
+                    <p><strong>Created At:</strong> ${new Date(data.created_at).toLocaleString()}</p>
+                `;
+                $('#userDetailsContent').html(detailsHtml);
+                $('#userDetailsModal').modal('show');
+            }).fail(function(xhr, status, error) {
+                console.error('Error:', error);
+                alert('Error fetching user details. Check console for details.');
+            });
         }
 
         $("#editCreditsForm").submit(function(e) {
