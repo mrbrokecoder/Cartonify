@@ -139,6 +139,11 @@
                     </button>
                 </div>
                 <div class="reference-image" id="uploadedImage"></div>
+                <!-- Add this new checkbox for image editing -->
+                <div class="edit-image-option">
+                    <input type="checkbox" id="editImageCheckbox">
+                    <label for="editImageCheckbox">Edit/Enhance Uploaded Image</label>
+                </div>
             </div>
         </div>
         <div class="main-content">
@@ -294,9 +299,10 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
             const formData = new FormData();
             const fileInput = document.getElementById('fileInput');
             const prompt = document.getElementById('prompt').value;
+            const editImage = document.getElementById('editImageCheckbox').checked;
 
-            if (!prompt) {
-                alert('Please enter a prompt.');
+            if (!editImage && !prompt) {
+                alert('Please enter a prompt or choose to edit an uploaded image.');
                 return;
             }
 
@@ -304,10 +310,14 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
             formData.append('style', selectedStyle);
             formData.append('color', selectedColor);
             formData.append('prompt', prompt);
+            formData.append('edit_image', editImage);
 
             // Add file to formData if one is uploaded
             if (fileInput.files.length > 0) {
                 formData.append('file', fileInput.files[0]);
+            } else if (editImage) {
+                alert('Please upload an image to edit.');
+                return;
             }
 
             // Disable the generate button and show loading state
@@ -403,6 +413,23 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
         document.getElementById('viewAllImages')?.addEventListener('click', function() {
             // You can implement a modal or a new page to show all images
             alert('Viewing all images functionality to be implemented');
+        });
+
+        // Add this new event listener for the edit image checkbox
+        document.getElementById('editImageCheckbox').addEventListener('change', function() {
+            const promptContainer = document.querySelector('.prompt-container');
+            const styleButtons = document.querySelector('.style-buttons');
+            const colorSchemeButtons = document.querySelector('.color-scheme-buttons');
+
+            if (this.checked) {
+                promptContainer.style.display = 'none';
+                styleButtons.style.display = 'none';
+                colorSchemeButtons.style.display = 'none';
+            } else {
+                promptContainer.style.display = 'flex';
+                styleButtons.style.display = 'flex';
+                colorSchemeButtons.style.display = 'flex';
+            }
         });
     </script>
 </body>
