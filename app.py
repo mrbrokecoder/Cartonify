@@ -1311,6 +1311,25 @@ def profile():
     
     return render_template('profile.html', user=current_user, subscription_end=subscription_end)
 
+
+@app.route('/create-order', methods=['POST'])
+@login_required
+def create_order():
+    try:
+        amount = 500  # Amount in paise (500 paise = 5 INR)
+        order_currency = 'INR'
+        
+        order_data = {
+            'amount': amount,
+            'currency': order_currency,
+            'payment_capture': '1'
+        }
+        
+        order = razorpay_client.order.create(data=order_data)
+        return jsonify({'order_id': order['id']})
+    except Exception as e:
+        return jsonify(error=str(e)), 403
+
 if __name__ == '__main__':
     with app.app_context():
         init_db()
