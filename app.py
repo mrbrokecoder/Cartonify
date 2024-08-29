@@ -898,7 +898,7 @@ def api_management():
 @app.route('/premium')
 @login_required
 def premium():
-    return render_template('premium.html', key=app.config['STRIPE_PUBLIC_KEY'])
+    return render_template('premium.html', stripe_public_key=app.config['STRIPE_PUBLIC_KEY'])
 
 @app.route('/create-checkout-session', methods=['POST'])
 @login_required

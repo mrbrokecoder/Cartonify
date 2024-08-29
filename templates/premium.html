@@ -54,42 +54,50 @@
     </div>
 
     <script>
-        var stripe = Stripe('{{ stripe_public_key }}');
-        var checkoutButton = document.getElementById('checkout-button');
+        var stripePublicKey = '{{ stripe_public_key }}';
+        console.log('Stripe public key:', stripePublicKey);
 
-        checkoutButton.addEventListener('click', function() {
-            console.log('Button clicked');
-            console.log('Stripe public key:', '{{ stripe_public_key }}');
-            checkoutButton.disabled = true;
-            
-            fetch('/create-checkout-session', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    product: 'premium_subscription'
+        if (!stripePublicKey) {
+            console.error('Stripe public key is missing');
+            alert('Configuration error: Stripe public key is missing');
+        } else {
+            var stripe = Stripe(stripePublicKey);
+            var checkoutButton = document.getElementById('checkout-button');
+
+            checkoutButton.addEventListener('click', function() {
+                console.log('Button clicked');
+                console.log('Stripe public key:', '{{ stripe_public_key }}');
+                checkoutButton.disabled = true;
+                
+                fetch('/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        product: 'premium_subscription'
+                    })
                 })
-            })
-            .then(function(response) {
-                console.log('Response received', response);
-                if (!response.ok) {
-                    return response.text().then(text => { throw new Error(text) });
-                }
-                return response.json();
-            })
-            .then(function(session) {
-                console.log('Session ID received', session.id);
-                return stripe.redirectToCheckout({ sessionId: session.id });
-            })
-            .catch(function(error) {
-                console.error('Error:', error);
-                alert('An error occurred: ' + error.message);
-            })
-            .finally(function() {
-                checkoutButton.disabled = false;
+                .then(function(response) {
+                    console.log('Response received', response);
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text) });
+                    }
+                    return response.json();
+                })
+                .then(function(session) {
+                    console.log('Session ID received', session.id);
+                    return stripe.redirectToCheckout({ sessionId: session.id });
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    alert('An error occurred: ' + error.message);
+                })
+                .finally(function() {
+                    checkoutButton.disabled = false;
+                });
             });
-        });
+        }
     </script>
 </body>
 </html>
