@@ -43,18 +43,27 @@
             max-width: 1600px;
             margin: 0 auto;
             padding: 20px;
+            height: calc(100vh - 60px); /* Adjust based on your header height */
         }
 
         .sidebar {
             width: 250px;
             flex-shrink: 0;
+            overflow-y: auto;
+            padding: 0 10px;
         }
 
         .main-content {
             flex-grow: 1;
-            max-width: calc(100% - 520px); /* Adjust based on sidebar widths */
+            max-width: calc(100% - 540px); /* Adjust based on sidebar widths + margins */
             margin: 0 20px;
-            overflow-x: hidden;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* Internet Explorer 10+ */
+        }
+
+        .main-content::-webkit-scrollbar {
+            display: none; /* WebKit */
         }
 
         .image-grid {
@@ -282,6 +291,7 @@
         imageBox.className = 'image-box fade-in';
         imageBox.style.animationDelay = `${index * 0.1}s`;
         imageBox.style.backgroundImage = `url('${url}')`;
+        imageBox.style.backgroundSize = 'cover';
 
         // Add click event to open popup
         imageBox.addEventListener('click', () => openPopup(url));
@@ -478,67 +488,6 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
                 styleButtons.style.display = 'flex';
                 colorSchemeButtons.style.display = 'flex';
             }
-        });
-
-        // Add this to your existing script
-        document.addEventListener('DOMContentLoaded', function() {
-            const editImageCheckbox = document.getElementById('editImageCheckbox');
-            const enhanceButton = document.getElementById('enhanceButton');
-            const generateButton = document.getElementById('generateButton');
-            const fileInput = document.getElementById('fileInput');
-
-            editImageCheckbox.addEventListener('change', function() {
-                if (this.checked) {
-                    enhanceButton.style.display = 'inline-block';
-                } else {
-                    enhanceButton.style.display = 'none';
-                }
-            });
-
-            enhanceButton.addEventListener('click', function() {
-                if (fileInput.files.length === 0) {
-                    alert('Please upload an image to enhance.');
-                    return;
-                }
-                performImageOperation('enhance');
-            });
-
-            function performImageOperation(operation) {
-                const formData = new FormData();
-                formData.append('operation', operation);
-                if (fileInput.files.length > 0) {
-                    formData.append('file', fileInput.files[0]);
-                }
-
-                // Disable buttons and show loading state
-                generateButton.disabled = true;
-                enhanceButton.disabled = true;
-                generateButton.textContent = 'Processing...';
-
-                axios.post('/transform', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                })
-                .then(response => {
-                    console.log('Response:', response.data);
-                    if (response.data.image_urls) {
-                        displayGeneratedImages(response.data.image_urls);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while processing the image. Please try again.');
-                })
-                .finally(() => {
-                    // Re-enable buttons and restore text
-                    generateButton.disabled = false;
-                    enhanceButton.disabled = false;
-                    generateButton.textContent = 'Generate';
-                });
-            }
-
-            // Make sure to integrate this with your existing displayGeneratedImages function
         });
     </script>
 </body>
