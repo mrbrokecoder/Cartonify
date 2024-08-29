@@ -72,14 +72,14 @@
                 }
                 return response.json();
             })
-            .then(function(order) {
+            .then(function(data) {
                 var options = {
                     "key": razorpayKeyId,
                     "amount": "500", // Amount is in paise
                     "currency": "INR",
-                    "name": "Your Company Name",
+                    "name": "Cartonify",
                     "description": "Premium Subscription",
-                    "order_id": order.order_id,
+                    "order_id": data.order_id,
                     "handler": function (response){
                         fetch('/premium-success', {
                             method: 'POST',

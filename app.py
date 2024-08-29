@@ -921,9 +921,9 @@ def premium_success():
     try:
         # Verify the payment signature
         params_dict = {
-            'razorpay_order_id': request.form.get('razorpay_order_id'),
-            'razorpay_payment_id': request.form.get('razorpay_payment_id'),
-            'razorpay_signature': request.form.get('razorpay_signature')
+            'razorpay_order_id': request.json.get('razorpay_order_id'),
+            'razorpay_payment_id': request.json.get('razorpay_payment_id'),
+            'razorpay_signature': request.json.get('razorpay_signature')
         }
         razorpay_client.utility.verify_payment_signature(params_dict)
         
@@ -941,10 +941,10 @@ def premium_success():
         conn.commit()
         cur.close()
         conn.close()
-        flash('You are now a premium user! Your subscription will last for 30 days.', 'success')
         return jsonify({'success': True})
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        app.logger.error(f"Payment verification failed: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 400
 
 # Add a background task to reset monthly quota
 def reset_monthly_quota():
