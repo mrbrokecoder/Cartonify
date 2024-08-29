@@ -90,6 +90,27 @@
             border-radius: 4px;
             overflow-x: auto;
         }
+        .subtab-container {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        .subtab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-right: 0.5rem;
+        }
+        .subtab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .subtab-content {
+            display: none;
+        }
+        .subtab-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -159,6 +180,71 @@ X-API-Key: YOUR_API_KEY
     ]
 }
                 </pre>
+                
+                <h3>Code Examples</h3>
+                <div class="subtab-container">
+                    <div class="subtab active" data-subtab="python">Python</div>
+                    <div class="subtab" data-subtab="nodejs">Node.js</div>
+                </div>
+                
+                <div id="python" class="subtab-content active">
+                    <pre>
+import requests
+import json
+
+api_key = "YOUR_API_KEY"
+url = "https://your-domain.com/api/transform"
+
+headers = {
+    "Content-Type": "application/json",
+    "X-API-Key": api_key
+}
+
+data = {
+    "prompt": "A beautiful sunset over the ocean",
+    "image_size": 512,
+    "style": "art style",
+    "color": "vibrant colors"
+}
+
+response = requests.post(url, headers=headers, data=json.dumps(data))
+
+if response.status_code == 200:
+    result = response.json()
+    print("Generated image URLs:", result["image_urls"])
+else:
+    print("Error:", response.status_code, response.text)
+                    </pre>
+                </div>
+                
+                <div id="nodejs" class="subtab-content">
+                    <pre>
+const axios = require('axios');
+
+const apiKey = 'YOUR_API_KEY';
+const url = 'https://your-domain.com/api/transform';
+
+const headers = {
+    'Content-Type': 'application/json',
+    'X-API-Key': apiKey
+};
+
+const data = {
+    prompt: 'A beautiful sunset over the ocean',
+    image_size: 512,
+    style: 'art style',
+    color: 'vibrant colors'
+};
+
+axios.post(url, data, { headers })
+    .then(response => {
+        console.log('Generated image URLs:', response.data.image_urls);
+    })
+    .catch(error => {
+        console.error('Error:', error.response ? error.response.status : error.message);
+    });
+                    </pre>
+                </div>
             </div>
         </div>
     </div>
@@ -169,6 +255,8 @@ X-API-Key: YOUR_API_KEY
         const apiKeyDisplay = document.getElementById('apiKeyDisplay');
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
+        const subtabs = document.querySelectorAll('.subtab');
+        const subtabContents = document.querySelectorAll('.subtab-content');
 
         generateApiKeyBtn.addEventListener('click', async () => {
             const response = await fetch('/generate_api_key', { method: 'POST' });
@@ -188,6 +276,15 @@ X-API-Key: YOUR_API_KEY
                 tabContents.forEach(c => c.classList.remove('active'));
                 tab.classList.add('active');
                 document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        subtabs.forEach(subtab => {
+            subtab.addEventListener('click', () => {
+                subtabs.forEach(t => t.classList.remove('active'));
+                subtabContents.forEach(c => c.classList.remove('active'));
+                subtab.classList.add('active');
+                document.getElementById(subtab.dataset.subtab).classList.add('active');
             });
         });
 
