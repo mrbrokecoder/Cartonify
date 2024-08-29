@@ -212,6 +212,17 @@ def init_db():
         ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
     """)
     
+    # Create api_usage table
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS api_usage (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            usage_date DATE NOT NULL,
+            count INTEGER NOT NULL DEFAULT 0,
+            UNIQUE (user_id, usage_date)
+        )
+    """)
+    
     conn.commit()
     cur.close()
     conn.close()
@@ -293,7 +304,109 @@ def index():
         remaining_credits = 5 - prompt_count
     
     return render_template('index.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
-# ... (rest of your Flask application) ...
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Fetch user's API key
+    cur.execute("SELECT api_key FROM users WHERE id = %s", (current_user.id,))
+    api_key = cur.fetchone()[0]
+    
+    # Fetch API usage
+    cur.execute("""
+        SELECT COUNT(*) FROM images 
+        WHERE user_id = %s AND created_at >= NOW() - INTERVAL '30 days'
+    """, (current_user.id,))
+    api_usage = cur.fetchone()[0]
+    
+    cur.close()
+    conn.close()
+    
+    return render_template('dashboard.html', api_key=api_key, api_usage=api_usage)
+
+@app.route('/generate_api_key', methods=['POST'])
+@login_required
+def generate_api_key():
+    new_api_key = secrets.token_urlsafe(32)
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET api_key = %s WHERE id = %s", (new_api_key, current_user.id))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({"api_key": new_api_key})
+
+@app.route('/revoke_api_key', methods=['POST'])
+@login_required
+def revoke_api_key():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET api_key = NULL WHERE id = %s", (current_user.id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({"message": "API key revoked successfully"})
+
+# Update the existing api_transform_image function to track usage
+@app.route('/api/transform', methods=['POST'])
+def api_transform_image():
+    api_key = request.headers.get('X-API-Key')
+    if not api_key:
+        return jsonify({"error": "API key is required"}), 401
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id FROM users WHERE api_key = %s", (api_key,))
+    user = cur.fetchone()
+
+    if not user:
+        cur.close()
+        conn.close()
+        return jsonify({"error": "Invalid API key"}), 401
+
+    user_id = user[0]
+
+    # ... (rest of the image generation logic)
+
+    # After successful image generation, update the usage count
+    cur.execute("""
+        INSERT INTO api_usage (user_id, usage_date, count)
+        VALUES (%s, CURRENT_DATE, 1)
+        ON CONFLICT (user_id, usage_date)
+        DO UPDATE SET count = api_usage.count + 1
+    """, (user_id,))
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    # ... (return the generated image URLs)
+
+# Add this new route to get API usage statistics
+@app.route('/api_usage_stats')
+@login_required
+def api_usage_stats():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Fetch daily API usage for the last 30 days
+    cur.execute("""
+        SELECT usage_date, count
+        FROM api_usage
+        WHERE user_id = %s AND usage_date >= CURRENT_DATE - INTERVAL '30 days'
+        ORDER BY usage_date
+    """, (current_user.id,))
+    
+    usage_stats = cur.fetchall()
+    
+    cur.close()
+    conn.close()
+    
+    return jsonify(usage_stats)
+
 @app.route('/check_login')
 def check_login():
     return jsonify({"logged_in": current_user.is_authenticated})
@@ -668,113 +781,6 @@ def api_management():
     cur.close()
     conn.close()
     return render_template('api_management.html', api_key=api_key)
-
-@app.route('/generate_api_key', methods=['POST'])
-@login_required
-def generate_api_key():
-    api_key = secrets.token_urlsafe(48)  # Generate a 64-character URL-safe API key
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("UPDATE users SET api_key = %s WHERE id = %s", (api_key, current_user.id))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return jsonify({"api_key": api_key})
-
-@app.route('/api/transform', methods=['POST'])
-def api_transform_image():
-    api_key = request.headers.get('X-API-Key')
-    if not api_key:
-        return jsonify({"error": "API key is required"}), 401
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT id FROM users WHERE api_key = %s", (api_key,))
-    user = cur.fetchone()
-    cur.close()
-    conn.close()
-
-    if not user:
-        return jsonify({"error": "Invalid API key"}), 401
-
-    # Use the existing transform_image logic, but with the API user's ID
-    user_id = user[0]
-    image_size = int(request.form.get('image_size', 512))
-    style = request.form.get('style', 'art style')
-    color = request.form.get('color', 'vibrant colors')
-    prompt = request.form.get('prompt', '')
-
-    input_data = {
-        "detect_resolution": image_size,
-        "image_resolution": image_size,
-        "return_width": image_size,
-        "return_height": image_size,
-        "prompt": f"{prompt}, {style}, {color}",
-        "num_samples": 1,
-        "num_inference_steps": 20,
-        "guidance_scale": 9,
-        "nsfw": True
-    }
-
-    if 'file' in request.files:
-        file = request.files['file']
-        if file and file.filename != '':
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
-
-            with open(filepath, "rb") as image_file:
-                encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
-            input_data["image"] = f"data:image/png;base64,{encoded_string}"
-
-            try:
-                os.remove(filepath)
-            except Exception as e:
-                app.logger.error(f"Error removing file: {str(e)}")
-
-    try:
-        image_urls = []
-        for _ in range(2):
-            output = replicate.run(
-                "black-forest-labs/flux-schnell",
-                input=input_data
-            )
-            app.logger.info(f"API Output: {output}")
-
-            if isinstance(output, str):
-                image_urls.append(output)
-            elif isinstance(output, list) and len(output) > 0:
-                image_urls.append(output[0])
-
-            if len(image_urls) == 4:
-                break
-
-            time.sleep(1)
-
-        image_urls = image_urls + [None] * (2 - len(image_urls))
-
-        # Save image information to the database
-        conn = get_db_connection()
-        cur = conn.cursor()
-        for url in image_urls:
-            if url:
-                cur.execute("""
-                    INSERT INTO images (user_id, url, prompt, style, color, created_at)
-                    VALUES (%s, %s, %s, %s, %s, %s)
-                """, (user_id, url, prompt, style, color, datetime.now()))
-        conn.commit()
-        cur.close()
-        conn.close()
-
-        return jsonify({
-            "image_urls": image_urls,
-            "generated_count": len([url for url in image_urls if url is not None])
-        })
-    except Exception as e:
-        app.logger.error(f"API Error: {str(e)}")
-        return jsonify({"error": str(e)}), 500
-
-    return jsonify({"error": "Image generation failed"}), 500
 
 @app.route('/premium')
 @login_required

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .api-key-section, .api-usage-section {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .api-key-display {
+            background-color: #e0e0e0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-bottom: 10px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        #apiUsageChart {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>API Dashboard</h1>
+        
+        <div class="api-key-section">
+            <h2>Your API Key</h2>
+            <div class="api-key-display" id="apiKeyDisplay">
+                {% if api_key %}
+                    {{ api_key }}
+                {% else %}
+                    No API key generated
+                {% endif %}
+            </div>
+            <div class="button-group">
+                <button id="generateApiKey">Generate New API Key</button>
+                <button id="revokeApiKey">Revoke API Key</button>
+            </div>
+        </div>
+        
+        <div class="api-usage-section">
+            <h2>API Usage</h2>
+            <p>Total API calls in the last 30 days: <span id="totalApiCalls">{{ api_usage }}</span></p>
+            <canvas id="apiUsageChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const generateApiKeyBtn = document.getElementById('generateApiKey');
+        const revokeApiKeyBtn = document.getElementById('revokeApiKey');
+        const apiKeyDisplay = document.getElementById('apiKeyDisplay');
+
+        generateApiKeyBtn.addEventListener('click', async () => {
+            const response = await fetch('/generate_api_key', { method: 'POST' });
+            const data = await response.json();
+            apiKeyDisplay.textContent = data.api_key;
+        });
+
+        revokeApiKeyBtn.addEventListener('click', async () => {
+            const response = await fetch('/revoke_api_key', { method: 'POST' });
+            const data = await response.json();
+            apiKeyDisplay.textContent = 'No API key generated';
+        });
+
+        // Fetch and display API usage statistics
+        async function fetchApiUsageStats() {
+            const response = await fetch('/api_usage_stats');
+            const data = await response.json();
+            
+            const dates = data.map(item => item[0]);
+            const counts = data.map(item => item[1]);
+
+            const ctx = document.getElementById('apiUsageChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'API Calls',
+                        data: counts,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of API Calls'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        fetchApiUsageStats();
+    </script>
+</body>
+</html>
