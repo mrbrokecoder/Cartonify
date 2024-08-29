@@ -46,6 +46,7 @@
             {% if current_user.is_authenticated and current_user.is_admin %}
                 <a href="{{ url_for('admin_dashboard') }}" class="admin-btn">Admin Dashboard</a>
             {% endif %}
+            <a href="{{ url_for('dashboard') }}" class="dashboard-btn">API Dashboard</a>
         </div>
     </div>
     <div class="content">
