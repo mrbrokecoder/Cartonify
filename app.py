@@ -307,14 +307,9 @@ def send_otp_email(email, otp):
     body = f'Your OTP for signup is: {otp}'
     msg.attach(MIMEText(body, 'plain'))
     
-    try:
-        with smtplib.SMTP_SSL(app.config['SMTP_SERVER'], app.config['SMTP_PORT']) as server:
-            server.login(app.config['SMTP_USERNAME'], app.config['SMTP_PASSWORD'])
-            server.send_message(msg)
-        app.logger.info(f"OTP email sent successfully to {email}")
-    except Exception as e:
-        app.logger.error(f"Error sending OTP email: {str(e)}")
-        raise
+    with smtplib.SMTP_SSL(app.config['SMTP_SERVER'], app.config['SMTP_PORT']) as server:
+        server.login(app.config['SMTP_USERNAME'], app.config['SMTP_PASSWORD'])
+        server.send_message(msg)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -326,11 +321,8 @@ def signup():
             # OTP verification step
             email = session.get('signup_email')
             otp = request.form['otp']
-            stored_otp = session.get('signup_otp')
             
-            app.logger.info(f"Received OTP: {otp}, Stored OTP: {stored_otp}")  # Debugging
-            
-            if otp != stored_otp:
+            if otp != session.get('signup_otp'):
                 flash('Invalid OTP')
                 return render_template('signup.html', email=email, show_otp=True)
             
@@ -338,25 +330,20 @@ def signup():
             password = session.get('signup_password')
             hashed_password = generate_password_hash(password)
             
-            try:
-                conn = get_db_connection()
-                cur = conn.cursor()
-                cur.execute("INSERT INTO users (email, password) VALUES (%s, %s)", (email, hashed_password))
-                conn.commit()
-                cur.close()
-                conn.close()
-                
-                # Clear session data
-                session.pop('signup_otp', None)
-                session.pop('signup_email', None)
-                session.pop('signup_password', None)
-                
-                flash('Account created successfully')
-                return redirect(url_for('login'))
-            except Exception as e:
-                app.logger.error(f"Error creating user: {str(e)}")
-                flash('An error occurred. Please try again.')
-                return redirect(url_for('signup'))
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("INSERT INTO users (email, password) VALUES (%s, %s)", (email, hashed_password))
+            conn.commit()
+            cur.close()
+            conn.close()
+            
+            # Clear session data
+            session.pop('signup_otp', None)
+            session.pop('signup_email', None)
+            session.pop('signup_password', None)
+            
+            flash('Account created successfully')
+            return redirect(url_for('login'))
         else:
             # Initial signup step
             email = request.form['email']
@@ -381,17 +368,10 @@ def signup():
             session['signup_email'] = email
             session['signup_password'] = password
             
-            app.logger.info(f"Generated OTP: {otp} for email: {email}")  # Debugging
-            
             # Send OTP via email
-            try:
-                send_otp_email(email, otp)
-                flash('OTP sent to your email. Please enter it to complete signup. Check Spam folder if not received.')
-            except Exception as e:
-                app.logger.error(f"Error sending OTP email: {str(e)}")
-                flash('Error sending OTP. Please try again.')
-                return redirect(url_for('signup'))
+            send_otp_email(email, otp)
             
+            flash('OTP sent to your email. Please enter it to complete signup. check Spam')
             return render_template('signup.html', email=email, show_otp=True)
     
     return render_template('signup.html', show_otp=False)

@@ -7,133 +7,76 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-        :root {
-            --primary-color: #4B0082;
-            --primary-hover: #3A006F;
-            --text-color: #333;
-            --bg-color: #f8f9fa;
-            --input-bg: #ffffff;
-            --shadow-color: rgba(75, 0, 130, 0.1);
-        }
-
-        body, html {
+        body {
             font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            color: var(--text-color);
-            background-color: var(--bg-color);
-        }
-
-        .container {
-            display: flex;
-            height: 100vh;
-        }
-
-        .image-side {
-            flex: 1;
-            background-image: url('https://image.cdn2.seaart.ai/2024-08-06/cqos1lle878c7390ijq0/424448c1ffbe710f1fe25eb2290bd7b9aeafc894_high.webp');
-            background-size: cover;
-            background-position: center;
-            position: relative;
-            overflow: hidden;
-            min-height: 100vh;
-        }
-
-        .image-side::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(75, 0, 130, 0.6), rgba(75, 0, 130, 0.3));
-        }
-
-        .signup-side {
-            flex: 1;
+            background: linear-gradient(135deg, #ff69b4 0%, #ff9ed2 100%);
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: var(--bg-color);
+            height: 100vh;
+            margin: 0;
+            color: #333;
         }
-
         .signup-container {
-            width: 80%;
-            max-width: 400px;
-            padding: 3rem;
-            background-color: var(--input-bg);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px var(--shadow-color);
-            transition: transform 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2rem 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            width: 320px;
+            transition: all 0.3s ease;
         }
-
         .signup-container:hover {
             transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
         }
-
         h2 {
             text-align: center;
-            color: var(--primary-color);
+            color: #4a4a4a;
             font-weight: 600;
-            margin: 0 0 2rem;
-            font-size: 2rem;
+            margin: 0 0 1.5rem;
         }
-
         form div {
             margin-bottom: 1.5rem;
         }
-
         label {
             display: block;
             margin-bottom: 0.5rem;
-            color: var(--text-color);
-            font-weight: 400;
-            font-size: 0.9rem;
+            color: #555;
+            font-weight: 300;
         }
-
         input {
             width: 100%;
             padding: 0.75rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            transition: border-color 0.3s ease;
             box-sizing: border-box;
-            font-size: 1rem;
         }
-
         input:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px var(--shadow-color);
+            border-color: #ff69b4;
         }
-
         button {
             width: 100%;
             padding: 0.75rem;
-            background: var(--primary-color);
+            background: linear-gradient(135deg, #ff69b4 0%, #ff9ed2 100%);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s ease;
-            margin-top: 1rem;
-            font-size: 1rem;
+            margin-top: 0.5rem;
         }
-
         button:hover {
-            background: var(--primary-hover);
+            opacity: 0.9;
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px var(--shadow-color);
         }
-
         .messages {
             list-style-type: none;
             padding: 0;
             margin: 0 0 1rem;
         }
-
         .messages li {
             color: #721c24;
             background-color: #f8d7da;
@@ -143,164 +86,57 @@
             margin-bottom: 0.5rem;
             font-size: 0.9rem;
         }
-
         .login-link {
             text-align: center;
             margin: 1.5rem 0 0;
             font-size: 0.9rem;
         }
-
         .login-link a {
-            color: var(--primary-color);
+            color: #ff69b4;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.3s ease;
         }
-
         .login-link a:hover {
-            color: var(--primary-hover);
             text-decoration: underline;
-        }
-
-        .otp-container {
-            display: none;
-            margin-top: 1rem;
-        }
-
-        .otp-container.visible {
-            display: block;
-        }
-
-        .request-otp-btn {
-            background: none;
-            border: none;
-            color: var(--primary-color);
-            cursor: pointer;
-            font-size: 0.9rem;
-            text-decoration: underline;
-            padding: 0;
-            margin-top: 0.5rem;
-        }
-
-        .request-otp-btn:hover {
-            color: var(--primary-hover);
-        }
-
-        button:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-        }
-
-        button:disabled:hover {
-            background: #cccccc;
-            transform: none;
-            box-shadow: none;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-            .image-side {
-                display: block;
-                height: 30vh;
-            }
-            .signup-side {
-                padding: 2rem 0;
-            }
-            .signup-container {
-                width: 90%;
-                padding: 2rem;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="image-side"></div>
-        <div class="signup-side">
-            <div class="signup-container">
-                <h2>Create Account</h2>
-                {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                        <ul class="messages">
-                        {% for message in messages %}
-                            <li>{{ message }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% endif %}
-                {% endwith %}
-                <form method="POST" id="signupForm">
-                    <div>
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div>
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
-                    </div>
-                    <div>
-                        <label for="confirm_password">Confirm Password</label>
-                        <input type="password" id="confirm_password" name="confirm_password" required>
-                    </div>
-                    <button type="button" id="requestOtpBtn" class="request-otp-btn">Request OTP</button>
-                    <div id="otpContainer" class="otp-container">
-                        <label for="otp">OTP</label>
-                        <input type="text" id="otp" name="otp" required>
-                    </div>
-                    <button type="submit" id="signupBtn" disabled>Sign Up</button>
-                </form>
-                <p class="login-link">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+    <div class="signup-container">
+        <h2>Create Account</h2>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="messages">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <form method="POST">
+            {% if not show_otp %}
+            <div>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
             </div>
-        </div>
+            <div>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Send OTP</button>
+            {% else %}
+            <div>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ email }}" readonly>
+            </div>
+            <div>
+                <label for="otp">Enter OTP</label>
+                <input type="text" id="otp" name="otp" required>
+            </div>
+            <button type="submit">Verify OTP</button>
+            {% endif %}
+        </form>
+        <p class="login-link">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const requestOtpBtn = document.getElementById('requestOtpBtn');
-            const otpContainer = document.getElementById('otpContainer');
-            const emailInput = document.getElementById('email');
-            const signupForm = document.getElementById('signupForm');
-            const signupBtn = document.getElementById('signupBtn');
-            const otpInput = document.getElementById('otp');
-
-            let otpSent = false;
-
-            requestOtpBtn.addEventListener('click', function() {
-                const email = emailInput.value;
-                if (email) {
-                    // Here you would typically send a request to your server to generate and send an OTP
-                    // For this example, we'll just show the OTP field
-                    otpContainer.classList.add('visible');
-                    requestOtpBtn.textContent = 'Resend OTP';
-                    alert('OTP sent to ' + email);
-                    otpSent = true;
-                } else {
-                    alert('Please enter your email first');
-                }
-            });
-
-            otpInput.addEventListener('input', function() {
-                if (otpSent && this.value.length === 6) { // Assuming OTP is 6 digits
-                    // Here you would typically verify the OTP with your server
-                    // For this example, we'll just enable the signup button
-                    signupBtn.disabled = false;
-                } else {
-                    signupBtn.disabled = true;
-                }
-            });
-
-            signupForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                if (otpSent && !signupBtn.disabled) {
-                    // Here you would typically submit the form to your server
-                    alert('Form submitted. OTP verified.');
-                    // signupForm.submit(); // Uncomment this line to actually submit the form
-                } else {
-                    alert('Please verify OTP before submitting.');
-                }
-            });
-        });
-    </script>
 </body>
 </html>
