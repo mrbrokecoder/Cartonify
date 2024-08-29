@@ -305,9 +305,9 @@ def index():
     
     return render_template('index.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
 
-@app.route('/dashboard')
+@app.route('/api_dashboard')
 @login_required
-def dashboard():
+def api_dashboard():
     conn = get_db_connection()
     cur = conn.cursor()
     
