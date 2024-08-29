@@ -94,6 +94,40 @@
             object-fit: cover;
             border-radius: 8px;
         }
+
+        .tab-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .tab-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .video-item {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .video-item video {
+            max-width: 100%;
+            height: auto;
+        }
     </style>
 </head>
 <body>
@@ -134,6 +168,7 @@
                 <a href="{{ url_for('admin_dashboard') }}" class="admin-btn">Admin Dashboard</a>
             {% endif %}
             <a href="{{ url_for('api_dashboard') }}" class="dashboard-btn">API Dashboard</a>
+            <button id="videoGenerationTab" class="tab-btn">Video Generation</button>
         </div>
     </div>
     <div class="content">
@@ -234,6 +269,14 @@
                 <input type="text" id="prompt" placeholder="Enter your prompt here">
                 <button id="generateButton">Generate</button>
             </div>
+        </div>
+        <div id="videoGenerationContent" class="tab-content" style="display: none;">
+            <div class="prompt-container">
+                <input type="text" id="videoPrompt" placeholder="Enter your prompt for video generation">
+                <button id="generateVideoButton">Generate Video</button>
+            </div>
+            <div id="videoLoadingIndicator" style="display: none;">Generating video... This may take a few minutes.</div>
+            <div id="videoContainer" class="video-container"></div>
         </div>
         <div class="sidebar right-sidebar">
             <div class="section">
@@ -489,6 +532,74 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
                 colorSchemeButtons.style.display = 'flex';
             }
         });
+
+        // Video Generation Tab Functionality
+        document.getElementById('videoGenerationTab').addEventListener('click', function() {
+            document.querySelector('.main-content').style.display = 'none';
+            document.getElementById('videoGenerationContent').style.display = 'block';
+        });
+
+        document.getElementById('generateVideoButton').addEventListener('click', function() {
+            const prompt = document.getElementById('videoPrompt').value;
+            if (!prompt) {
+                alert('Please enter a prompt');
+                return;
+            }
+
+            const loadingIndicator = document.getElementById('videoLoadingIndicator');
+            loadingIndicator.style.display = 'block';
+
+            axios.post('/generate_video', { prompt: prompt })
+                .then(response => {
+                    loadingIndicator.style.display = 'none';
+                    const videoUrl = response.data.video_url;
+                    const videoContainer = document.getElementById('videoContainer');
+                    const videoItem = document.createElement('div');
+                    videoItem.className = 'video-item';
+                    videoItem.innerHTML = `
+                        <video controls>
+                            <source src="${videoUrl}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <p>Prompt: ${prompt}</p>
+                    `;
+                    videoContainer.insertBefore(videoItem, videoContainer.firstChild);
+                })
+                .catch(error => {
+                    loadingIndicator.style.display = 'none';
+                    console.error('Error:', error);
+                    alert('An error occurred while generating the video. Please try again.');
+                });
+        });
+
+        // Load user's previously generated videos
+        function loadUserVideos() {
+            axios.get('/get_user_videos')
+                .then(response => {
+                    const videos = response.data;
+                    const videoContainer = document.getElementById('videoContainer');
+                    videoContainer.innerHTML = ''; // Clear existing videos
+                    videos.forEach(video => {
+                        const videoItem = document.createElement('div');
+                        videoItem.className = 'video-item';
+                        videoItem.innerHTML = `
+                            <video controls>
+                                <source src="${video.url}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <p>Prompt: ${video.prompt}</p>
+                            <p>Created: ${new Date(video.created_at).toLocaleString()}</p>
+                        `;
+                        videoContainer.appendChild(videoItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading videos:', error);
+                });
+        }
+
+        // Call loadUserVideos when the video generation tab is clicked
+        document.getElementById('videoGenerationTab').addEventListener('click', loadUserVideos);
     </script>
 </body>
 </html>

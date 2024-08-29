@@ -223,6 +223,17 @@ def init_db():
         )
     """)
     
+    # Create videos table
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS videos (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            url VARCHAR(255) NOT NULL,
+            prompt TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    
     conn.commit()
     cur.close()
     conn.close()
@@ -1205,6 +1216,60 @@ def get_user_details(user_id):
     except Exception as e:
         app.logger.error(f"Error fetching user details: {str(e)}")
         return jsonify({'error': f'Server error: {str(e)}'}), 500
+
+@app.route('/generate_video', methods=['POST'])
+@login_required
+def generate_video():
+    prompt = request.json.get('prompt')
+    if not prompt:
+        return jsonify({'error': 'No prompt provided'}), 400
+
+    try:
+        output = replicate.run(
+            "lucataco/animate-diff:beecf59c4aee8d81bf04f0381033dfa10dc16e845b4ae00d281e2fa377e48a9f",
+            input={
+                "prompt": prompt,
+                "num_frames": 16,
+                "num_inference_steps": 50,
+                "guidance_scale": 7.5
+            }
+        )
+        
+        video_url = output['output']
+        
+        # Save video information to the database
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO videos (user_id, url, prompt, created_at)
+            VALUES (%s, %s, %s, NOW())
+        """, (current_user.id, video_url, prompt))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return jsonify({"video_url": video_url})
+    except Exception as e:
+        app.logger.error(f"Video generation error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/get_user_videos')
+@login_required
+def get_user_videos():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT url, prompt, created_at FROM videos WHERE user_id = %s ORDER BY created_at DESC", (current_user.id,))
+    videos = cur.fetchall()
+    cur.close()
+    conn.close()
+    
+    return jsonify([
+        {
+            "url": video[0],
+            "prompt": video[1],
+            "created_at": video[2].isoformat()
+        } for video in videos
+    ])
 
 if __name__ == '__main__':
     with app.app_context():
