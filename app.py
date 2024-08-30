@@ -1350,7 +1350,12 @@ def enhance_prompt():
             }
         )
         
-        enhanced_prompt = output[0] if isinstance(output, list) else output
+        # Consume the generator and join the output
+        enhanced_prompt = ''.join(list(output))
+        
+        # Remove any leading/trailing whitespace and newlines
+        enhanced_prompt = enhanced_prompt.strip()
+        
         return jsonify({'enhanced_prompt': enhanced_prompt})
     except Exception as e:
         app.logger.error(f"Prompt enhancement error: {str(e)}")
