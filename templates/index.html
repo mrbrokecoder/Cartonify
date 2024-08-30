@@ -217,93 +217,6 @@
         .magic-wand-btn:hover {
             color: #0056b3;
         }
-
-        /* Smooth transitions for all interactive elements */
-        button, input, select, .image-box, .template-btn, .tab-btn, .dashboard-btn {
-            transition: all 0.3s ease;
-        }
-
-        /* Smoother hover effects */
-        .dashboard-btn:hover, .tab-btn:hover, .styled-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-
-        /* Refined image grid */
-        .image-grid, .previous-images-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            opacity: 1;
-            transition: opacity 0.3s ease;
-        }
-
-        /* Smooth fade-in for generated images */
-        .image-box {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.5s forwards;
-        }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Smoother loading indicator */
-        .skeleton-loading {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        /* Refined sidebar scrollbar */
-        .sidebar::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .sidebar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        /* Smooth dark mode transition */
-        body, .header, .sidebar, .main-content, .image-box, .template-btn {
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        /* Refined popup */
-        .popup-overlay {
-            backdrop-filter: blur(5px);
-            transition: opacity 0.3s ease;
-        }
-
-        .popup-content {
-            transform: scale(0.9);
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .popup-overlay.active .popup-content {
-            transform: scale(1);
-            opacity: 1;
-        }
     </style>
 </head>
 <body>
@@ -516,62 +429,75 @@
             }
         });
     
-        // Smooth image generation display
+        // Enhance the image generation with a staggered fade-in effect
         function displayGeneratedImages(imageUrls) {
-            const resultGrid = document.getElementById('resultGrid');
-            resultGrid.style.opacity = '0';
-            
-            setTimeout(() => {
-                resultGrid.innerHTML = '';
-                imageUrls.forEach((url, index) => {
-                    const imageBox = document.createElement('div');
-                    imageBox.className = 'image-box';
-                    imageBox.style.backgroundImage = `url('${url}')`;
-                    imageBox.style.animationDelay = `${index * 0.1}s`;
-                    
-                    // Add click event to open popup
-                    imageBox.addEventListener('click', () => openPopup(url));
+    const resultGrid = document.getElementById('resultGrid');
+    resultGrid.innerHTML = '';
+    
+    imageUrls.forEach((url, index) => {
+        const imageBox = document.createElement('div');
+        imageBox.className = 'image-box fade-in';
+        imageBox.style.animationDelay = `${index * 0.1}s`;
+        imageBox.style.backgroundImage = `url('${url}')`;
+        imageBox.style.backgroundSize = 'cover';
 
-                    const downloadButton = document.createElement('button');
-                    downloadButton.textContent = 'Download';
-                    downloadButton.onclick = (e) => {
-                        e.stopPropagation(); // Prevent opening popup when clicking download
-                        window.location.href = `/download?url=${encodeURIComponent(url)}`;
-                    };
-                    
-                    imageBox.appendChild(downloadButton);
-                    resultGrid.appendChild(imageBox);
-                });
-                resultGrid.style.opacity = '1';
-            }, 300);
-        }
+        // Add click event to open popup
+        imageBox.addEventListener('click', () => openPopup(url));
 
-        // Smooth popup opening
-        function openPopup(imageUrl) {
-            const popup = document.getElementById('imagePopup');
-            const popupContent = popup.querySelector('.popup-content');
-            popup.style.display = 'flex';
-            setTimeout(() => {
-                popup.classList.add('active');
-                popupContent.innerHTML = `<img src="${imageUrl}" alt="Full size image">`;
-            }, 50);
-        }
+        const downloadButton = document.createElement('button');
+        downloadButton.textContent = 'Download';
+        downloadButton.onclick = (e) => {
+            e.stopPropagation(); // Prevent opening popup when clicking download
+            window.location.href = `/download?url=${encodeURIComponent(url)}`;
+        };
+        
+        imageBox.appendChild(downloadButton);
+        resultGrid.appendChild(imageBox);
+    });
 
-        // Smooth popup closing
-        function closePopup() {
-            const popup = document.getElementById('imagePopup');
-            popup.classList.remove('active');
-            setTimeout(() => {
-                popup.style.display = 'none';
-            }, 300);
-        }
+    // Add the new images to the previous images grid
+    const previousImagesGrid = document.querySelector('.previous-images-grid');
+    imageUrls.forEach(url => {
+        const imageBox = document.createElement('div');
+        imageBox.className = 'previous-image-box fade-in';
+        
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = 'Generated image';
+        img.addEventListener('click', () => openPopup(url));
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'previous-image-info';
+        infoDiv.innerHTML = `
+            <p>Prompt: ${document.getElementById('prompt').value}</p>
+            <p>Style: ${selectedStyle}</p>
+            <p>Color: ${selectedColor}</p>
+            <p>Generated on: ${new Date().toLocaleString()}</p>
+        `;
+        
+        imageBox.appendChild(img);
+        imageBox.appendChild(infoDiv);
+        previousImagesGrid.prepend(imageBox);
+    });
+}
+function openPopup(imageUrl) {
+    const popup = document.getElementById('imagePopup');
+    const popupImage = document.getElementById('popupImage');
+    popupImage.src = imageUrl;
+    popup.style.display = 'flex';
+}
 
-        // Close popup when clicking outside the image
-        document.getElementById('imagePopup').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closePopup();
-            }
-        });
+function closePopup() {
+    const popup = document.getElementById('imagePopup');
+    popup.style.display = 'none';
+}
+
+// Close popup when clicking outside the image
+document.getElementById('imagePopup').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closePopup();
+    }
+});
 
         // Update the generate button click handler
         document.getElementById('generateButton').addEventListener('click', function() {
