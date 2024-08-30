@@ -1342,7 +1342,7 @@ def enhance_prompt():
         output = replicate.run(
             "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3",
             input={
-                "prompt": f"Enhance the following image generation prompt with more details and artistic descriptions:\n\nUser prompt: {basic_prompt}\n\nEnhanced prompt:",
+                "prompt": f"Enhance the following image generation prompt with more details and artistic descriptions. Provide only the enhanced prompt without any introductory text or explanations:\n\nUser prompt: {basic_prompt}\n\nEnhanced prompt:",
                 "max_new_tokens": 200,
                 "temperature": 0.7,
                 "top_p": 0.9,
@@ -1351,10 +1351,16 @@ def enhance_prompt():
         )
         
         # Consume the generator and join the output
-        enhanced_prompt = ''.join(list(output))
+        full_response = ''.join(list(output))
         
-        # Remove any leading/trailing whitespace and newlines
-        enhanced_prompt = enhanced_prompt.strip()
+        # Extract only the enhanced prompt part
+        enhanced_prompt = full_response.split("Enhanced prompt:")[-1].strip()
+        
+        # Remove any remaining quotation marks
+        enhanced_prompt = enhanced_prompt.strip('"')
+        
+        app.logger.debug(f"Full response: {full_response}")
+        app.logger.debug(f"Extracted enhanced prompt: {enhanced_prompt}")
         
         return jsonify({'enhanced_prompt': enhanced_prompt})
     except Exception as e:
