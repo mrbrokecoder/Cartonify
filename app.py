@@ -71,7 +71,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 class User(UserMixin):
-    def __init__(self, id, email, password, username=None, is_premium=False, prompt_count=0, subscription_start=None, monthly_quota=0, is_admin=False):
+    def __init__(self, id, email, password, username=None, is_premium=False, prompt_count=0, subscription_start=None, monthly_quota=0, is_admin=False, bio=None):
         self.id = id
         self.email = email
         self.password = password
@@ -81,6 +81,7 @@ class User(UserMixin):
         self.subscription_start = subscription_start
         self.monthly_quota = monthly_quota
         self.is_admin = is_admin
+        self.bio = bio
 
 @login_manager.user_loader
 def load_user(user_id):

@@ -4,12 +4,16 @@
 <h2>Profile Management</h2>
 <form method="POST">
     <div>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" value="{{ current_user.email }}" readonly>
-    </div>
-    <div>
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" value="{{ current_user.username or '' }}" required>
+    </div>
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="{{ current_user.email }}" required>
+    </div>
+    <div>
+        <label for="bio">Bio:</label>
+        <textarea id="bio" name="bio" rows="4">{{ current_user.bio or '' }}</textarea>
     </div>
     <button type="submit">Update Profile</button>
 </form>
@@ -25,4 +29,26 @@
     <p>Prompts used this month: {{ current_user.prompt_count }}</p>
     <a href="{{ url_for('premium') }}">Upgrade to Premium</a>
 {% endif %}
+
+<h3>Recent Activity</h3>
+<ul>
+{% for activity in recent_activity %}
+    <li>
+        {% if activity.type == 'image' %}
+            <img src="{{ activity.url }}" alt="Generated Image" style="width: 100px; height: 100px;">
+        {% else %}
+            <video width="100" height="100" controls>
+                <source src="{{ activity.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endif %}
+        <p>Prompt: {{ activity.prompt }}</p>
+        <p>Created: {{ activity.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    </li>
+{% endfor %}
+</ul>
+
+<h3>Account Management</h3>
+<a href="{{ url_for('change_password') }}">Change Password</a>
+<a href="{{ url_for('delete_account') }}">Delete Account</a>
 {% endblock %}
