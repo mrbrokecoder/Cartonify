@@ -242,6 +242,12 @@ def init_db():
         ADD COLUMN IF NOT EXISTS username VARCHAR(50) UNIQUE;
     """)
     
+    # Add bio column to users table
+    cur.execute("""
+        ALTER TABLE users 
+        ADD COLUMN IF NOT EXISTS bio TEXT;
+    """)
+    
     conn.commit()
     cur.close()
     conn.close()
@@ -1284,6 +1290,8 @@ def get_user_videos():
 def profile():
     if request.method == 'POST':
         username = request.form.get('username')
+        email = request.form.get('email')
+        bio = request.form.get('bio')
         
         conn = get_db_connection()
         cur = conn.cursor()
@@ -1293,8 +1301,12 @@ def profile():
         if cur.fetchone():
             flash('Username already taken', 'error')
         else:
-            # Update username
-            cur.execute("UPDATE users SET username = %s WHERE id = %s", (username, current_user.id))
+            # Update user profile
+            cur.execute("""
+                UPDATE users 
+                SET username = %s, email = %s, bio = %s 
+                WHERE id = %s
+            """, (username, email, bio, current_user.id))
             conn.commit()
             flash('Profile updated successfully', 'success')
         
@@ -1303,13 +1315,33 @@ def profile():
         
         # Update the current_user object
         current_user.username = username
+        current_user.email = email
+        current_user.bio = bio
         
     # Fetch user's subscription details
     subscription_end = None
     if current_user.is_premium and current_user.subscription_start:
         subscription_end = current_user.subscription_start + timedelta(days=30)
     
-    return render_template('profile.html', user=current_user, subscription_end=subscription_end)
+    # Fetch user's recent activity
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT 'image' as type, url, prompt, created_at 
+        FROM images 
+        WHERE user_id = %s
+        UNION ALL
+        SELECT 'video' as type, url, prompt, created_at 
+        FROM videos 
+        WHERE user_id = %s
+        ORDER BY created_at DESC
+        LIMIT 5
+    """, (current_user.id, current_user.id))
+    recent_activity = cur.fetchall()
+    cur.close()
+    conn.close()
+    
+    return render_template('profile.html', user=current_user, subscription_end=subscription_end, recent_activity=recent_activity)
 
 
 @app.route('/create-order', methods=['POST'])
@@ -1378,6 +1410,54 @@ Enhanced prompt:""",
     except Exception as e:
         app.logger.error(f"Prompt enhancement error: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+@app.route('/change_password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if request.method == 'POST':
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if not check_password_hash(current_user.password, current_password):
+            flash('Current password is incorrect', 'error')
+        elif new_password != confirm_password:
+            flash('New passwords do not match', 'error')
+        else:
+            hashed_password = generate_password_hash(new_password)
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("UPDATE users SET password = %s WHERE id = %s", (hashed_password, current_user.id))
+            conn.commit()
+            cur.close()
+            conn.close()
+            flash('Password updated successfully', 'success')
+            return redirect(url_for('profile'))
+    
+    return render_template('change_password.html')
+
+@app.route('/delete_account', methods=['GET', 'POST'])
+@login_required
+def delete_account():
+    if request.method == 'POST':
+        password = request.form.get('password')
+        
+        if check_password_hash(current_user.password, password):
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("DELETE FROM images WHERE user_id = %s", (current_user.id,))
+            cur.execute("DELETE FROM videos WHERE user_id = %s", (current_user.id,))
+            cur.execute("DELETE FROM users WHERE id = %s", (current_user.id,))
+            conn.commit()
+            cur.close()
+            conn.close()
+            logout_user()
+            flash('Your account has been deleted', 'success')
+            return redirect(url_for('home'))
+        else:
+            flash('Incorrect password', 'error')
+    
+    return render_template('delete_account.html')
 
 if __name__ == '__main__':
     with app.app_context():
