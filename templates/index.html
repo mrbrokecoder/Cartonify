@@ -356,7 +356,7 @@
         </div>
             <div class="prompt-container">
                 <input type="text" id="prompt" placeholder="Enter your prompt here">
-                <button id="magicWandBtn" class="magic-wand-btn"><i class="fas fa-magic"></i></button>
+                <button id="magicWandBtn" class="magic-wand-btn"><i class="fa-solid fa-wand-magic-sparkles"></i></i></button>
                 <button id="generateButton">Generate</button>
             </div>
         </div>
@@ -757,14 +757,14 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
                 promptInput.value = data.enhanced_prompt;
                 // Re-enable the button and restore icon
                 this.disabled = false;
-                this.innerHTML = '<i class="fas fa-magic"></i>';
+                this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Failed to enhance the prompt. Please try again.');
                 // Re-enable the button and restore icon
                 this.disabled = false;
-                this.innerHTML = '<i class="fas fa-magic"></i>';
+                this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
             });
         });
     </script>
