@@ -136,7 +136,7 @@
         .right-sidebar {
             display: flex;
             flex-direction: column;
-            width: 300px;
+            width: 248px;
         }
 
         .right-sidebar .section {
@@ -197,6 +197,25 @@
 
         .prompt-templates::-webkit-scrollbar-thumb:hover {
             background: #555;
+        }
+
+        .prompt-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .magic-wand-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: #007bff;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+
+        .magic-wand-btn:hover {
+            color: #0056b3;
         }
     </style>
 </head>
@@ -337,6 +356,7 @@
         </div>
             <div class="prompt-container">
                 <input type="text" id="prompt" placeholder="Enter your prompt here">
+                <button id="magicWandBtn" class="magic-wand-btn"><i class="fas fa-magic"></i></button>
                 <button id="generateButton">Generate</button>
             </div>
         </div>
@@ -705,6 +725,46 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
                 }
                 
                 promptInput.focus();
+            });
+        });
+
+        document.getElementById('magicWandBtn').addEventListener('click', function() {
+            const promptInput = document.getElementById('prompt');
+            const basicPrompt = promptInput.value.trim();
+            
+            if (basicPrompt === '') {
+                alert('Please enter a basic prompt first.');
+                return;
+            }
+
+            // Disable the button and show loading state
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            // Make an API call to enhance the prompt
+            fetch('/enhance_prompt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt: basicPrompt }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                promptInput.value = data.enhanced_prompt;
+                // Re-enable the button and restore icon
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-magic"></i>';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to enhance the prompt. Please try again.');
+                // Re-enable the button and restore icon
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-magic"></i>';
             });
         });
     </script>

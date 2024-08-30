@@ -1329,6 +1329,32 @@ def create_order():
         return jsonify({'order_id': order['id']})
     except Exception as e:
         return jsonify(error=str(e)), 403
+    
+@app.route('/enhance_prompt', methods=['POST'])
+@login_required
+def enhance_prompt():
+    basic_prompt = request.json.get('prompt')
+    
+    if not basic_prompt:
+        return jsonify({'error': 'No prompt provided'}), 400
+
+    try:
+        output = replicate.run(
+            "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3",
+            input={
+                "prompt": f"Enhance the following image generation prompt with more details and artistic descriptions:\n\nUser prompt: {basic_prompt}\n\nEnhanced prompt:",
+                "max_new_tokens": 200,
+                "temperature": 0.7,
+                "top_p": 0.9,
+                "repetition_penalty": 1
+            }
+        )
+        
+        enhanced_prompt = output[0] if isinstance(output, list) else output
+        return jsonify({'enhanced_prompt': enhanced_prompt})
+    except Exception as e:
+        app.logger.error(f"Prompt enhancement error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     with app.app_context():
