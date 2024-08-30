@@ -1342,8 +1342,21 @@ def enhance_prompt():
         output = replicate.run(
             "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3",
             input={
-                "prompt": f"Enhance the following image generation prompt with more details, focusing on visual elements, style, and artistic techniques. Keep it concise and avoid storytelling. Format it similar to this example: 'Cybercore Aesthetic, a woman sitting on a counter in a neon lit bar with neon signs and neon lights behind her and a neon sign behind her, cyberpunk style, cyberpunk art, cinema 4d, cinematic angle, cinematic lighting, best quality, masterpiece'\n\nUser prompt: {basic_prompt}\n\nEnhanced prompt:",
-                "max_new_tokens": 200,
+                "prompt": f"""Enhance the following image generation prompt. Follow these rules strictly:
+1. Start with a concise theme or style description.
+2. Describe the main subject and its immediate surroundings.
+3. Add key visual elements and details.
+4. Include artistic style, rendering technique, or inspiration.
+5. End with 'best quality, masterpiece'.
+6. Keep it under 50 words total.
+7. Do not use storytelling or explanatory language.
+
+Example: 'Cybercore Aesthetic, a woman sitting on a counter in a neon lit bar with neon signs and neon lights behind her and a neon sign behind her, cyberpunk style, cyberpunk art, cinema 4d, cinematic angle, cinematic lighting, best quality, masterpiece'
+
+User prompt: {basic_prompt}
+
+Enhanced prompt:""",
+                "max_new_tokens": 100,
                 "temperature": 0.7,
                 "top_p": 0.9,
                 "repetition_penalty": 1
@@ -1354,13 +1367,12 @@ def enhance_prompt():
         full_response = ''.join(list(output))
         
         # Extract only the enhanced prompt part
-        enhanced_prompt = full_response.split("Enhanced prompt:")[-1].strip()
+        enhanced_prompt = full_response.strip()
         
-        # Remove any remaining quotation marks
+        # Remove any quotation marks
         enhanced_prompt = enhanced_prompt.strip('"')
         
-        app.logger.debug(f"Full response: {full_response}")
-        app.logger.debug(f"Extracted enhanced prompt: {enhanced_prompt}")
+        app.logger.debug(f"Enhanced prompt: {enhanced_prompt}")
         
         return jsonify({'enhanced_prompt': enhanced_prompt})
     except Exception as e:
