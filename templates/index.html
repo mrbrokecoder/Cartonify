@@ -136,6 +136,7 @@
         .right-sidebar {
             display: flex;
             flex-direction: column;
+            width: 300px;
         }
 
         .right-sidebar .section {
@@ -145,22 +146,29 @@
         .prompt-templates {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
         }
 
         .template-btn {
             text-align: left;
-            padding: 8px 12px;
+            padding: 12px 15px;
             background-color: #f0f0f0;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
             font-size: 0.9em;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .template-btn:hover {
             background-color: #e0e0e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
         .dark-mode .template-btn {
@@ -171,6 +179,24 @@
 
         .dark-mode .template-btn:hover {
             background-color: #3a3a3a;
+        }
+
+        .prompt-templates::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .prompt-templates::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .prompt-templates::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .prompt-templates::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
     </style>
 </head>
@@ -341,15 +367,18 @@
                 </div>
             </div>
 
-            <!-- New Prompt Templates section -->
+            <!-- Expanded Prompt Templates section -->
             <div class="section">
                 <h3 class="section-title">Prompt Templates</h3>
                 <div class="prompt-templates">
-                    <button class="styled-button template-btn" data-template="A {adjective} {noun} in the style of {artist}">Artistic Style</button>
-                    <button class="styled-button template-btn" data-template="A futuristic cityscape with {element1} and {element2}">Futuristic City</button>
-                    <button class="styled-button template-btn" data-template="A magical {creature} in a {location} surrounded by {element}">Fantasy Scene</button>
-                    <button class="styled-button template-btn" data-template="An abstract representation of {concept} using {color1} and {color2}">Abstract Concept</button>
-                    <button class="styled-button template-btn" data-template="A {time-period} inspired {object} with {feature}">Historical Object</button>
+                    <button class="styled-button template-btn" data-template="A hyper-realistic portrait of a {profession} from the {historical era}, wearing intricate {material} clothing with {cultural} influences, set against a backdrop of {location}, illuminated by {light source}">Historical Portrait</button>
+                    <button class="styled-button template-btn" data-template="An ethereal landscape featuring floating {objects} above a sea of {element}, with {celestial body} visible in the {time of day} sky, rendered in the style of {artist or art movement}">Surreal Landscape</button>
+                    <button class="styled-button template-btn" data-template="A futuristic {vehicle or structure} designed for {purpose}, incorporating bio-luminescent {organism} and powered by {energy source}, set in a {type of environment} on {planet or location}">Sci-Fi Concept</button>
+                    <button class="styled-button template-btn" data-template="An intricate mandala representing the concept of {abstract idea}, using symbols from {culture or mythology}, dominated by shades of {color 1} and {color 2}, with subtle accents of {color 3}">Symbolic Mandala</button>
+                    <button class="styled-button template-btn" data-template="A whimsical scene depicting a {magical creature} hosting a tea party for {unlikely guests} in a {fantastical location}, with {unexpected objects} floating in the air, painted in the style of {children's book illustrator}">Fantastical Tea Party</button>
+                    <button class="styled-button template-btn" data-template="An avant-garde fashion design inspired by {natural phenomenon}, featuring a dress made of {unconventional material}, adorned with {organic elements}, modeled by a figure with {unique physical characteristic}">Conceptual Fashion</button>
+                    <button class="styled-button template-btn" data-template="A detailed cross-section of a {fictional machine or organism}, revealing intricate {mechanical or biological} systems, annotated with {script or language}, in the style of a {century} scientific illustration">Imaginary Anatomy</button>
+                    <button class="styled-button template-btn" data-template="A dystopian cityscape where {nature element} has reclaimed {urban structures}, inhabited by {mutated species}, with remnants of {past civilization} visible in the background, under a sky filled with {atmospheric phenomenon}">Post-Apocalyptic World</button>
                 </div>
             </div>
         </div>
