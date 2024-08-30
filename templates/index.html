@@ -132,6 +132,46 @@
             max-width: 100%;
             height: auto;
         }
+
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-sidebar .section {
+            margin-bottom: 20px;
+        }
+
+        .prompt-templates {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .template-btn {
+            text-align: left;
+            padding: 8px 12px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .template-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .dark-mode .template-btn {
+            background-color: #2a2a2a;
+            border-color: #444;
+            color: #fff;
+        }
+
+        .dark-mode .template-btn:hover {
+            background-color: #3a3a3a;
+        }
     </style>
 </head>
 <body>
@@ -298,6 +338,18 @@
                     {% else %}
                         <p>No recent images found.</p>
                     {% endif %}
+                </div>
+            </div>
+
+            <!-- New Prompt Templates section -->
+            <div class="section">
+                <h3 class="section-title">Prompt Templates</h3>
+                <div class="prompt-templates">
+                    <button class="styled-button template-btn" data-template="A {adjective} {noun} in the style of {artist}">Artistic Style</button>
+                    <button class="styled-button template-btn" data-template="A futuristic cityscape with {element1} and {element2}">Futuristic City</button>
+                    <button class="styled-button template-btn" data-template="A magical {creature} in a {location} surrounded by {element}">Fantasy Scene</button>
+                    <button class="styled-button template-btn" data-template="An abstract representation of {concept} using {color1} and {color2}">Abstract Concept</button>
+                    <button class="styled-button template-btn" data-template="A {time-period} inspired {object} with {feature}">Historical Object</button>
                 </div>
             </div>
         </div>
@@ -604,6 +656,28 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
 
         // Call loadUserVideos when the video generation tab is clicked
         document.getElementById('videoGenerationTab').addEventListener('click', loadUserVideos);
+
+        // Prompt template functionality
+        document.querySelectorAll('.template-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const template = this.dataset.template;
+                const promptInput = document.getElementById('prompt');
+                promptInput.value = template;
+                
+                // Highlight the placeholders
+                const placeholders = template.match(/\{([^}]+)\}/g);
+                if (placeholders) {
+                    let start = 0;
+                    placeholders.forEach(placeholder => {
+                        const index = template.indexOf(placeholder, start);
+                        promptInput.setSelectionRange(index, index + placeholder.length);
+                        start = index + placeholder.length;
+                    });
+                }
+                
+                promptInput.focus();
+            });
+        });
     </script>
 </body>
 </html>
