@@ -1342,7 +1342,7 @@ def enhance_prompt():
         output = replicate.run(
             "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3",
             input={
-                "prompt": f"Enhance the following image generation prompt with more details and artistic descriptions. Provide only the enhanced prompt without any introductory text or explanations:\n\nUser prompt: {basic_prompt}\n\nEnhanced prompt:",
+                "prompt": f"Enhance the following image generation prompt with more details, focusing on visual elements, style, and artistic techniques. Keep it concise and avoid storytelling. Format it similar to this example: 'Cybercore Aesthetic, a woman sitting on a counter in a neon lit bar with neon signs and neon lights behind her and a neon sign behind her, cyberpunk style, cyberpunk art, cinema 4d, cinematic angle, cinematic lighting, best quality, masterpiece'\n\nUser prompt: {basic_prompt}\n\nEnhanced prompt:",
                 "max_new_tokens": 200,
                 "temperature": 0.7,
                 "top_p": 0.9,
