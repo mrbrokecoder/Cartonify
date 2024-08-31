@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AI Art Generator | Mobile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#4a90e2">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icon-192x192.png') }}">
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -174,6 +177,27 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        #installPrompt {
+            display: none;
+            position: fixed;
+            bottom: 70px;
+            left: 10px;
+            right: 10px;
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        #installPrompt button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -301,6 +325,11 @@
             <div>Profile</div>
         </a>
     </nav>
+
+    <div id="installPrompt">
+        <p>Install AI Art Generator for a better experience!</p>
+        <button id="installBtn">Install</button>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
@@ -453,6 +482,48 @@
 
         // Initial check on page load
         checkLoginStatus();
+
+        // PWA installation
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installPrompt.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                }
+                deferredPrompt = null;
+            }
+            installPrompt.style.display = 'none';
+        });
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+
+        // Check if the app is in standalone mode (installed)
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            console.log('App is running in standalone mode');
+            // You can add specific behavior for when the app is installed
+        }
     </script>
 </body>
 </html>
