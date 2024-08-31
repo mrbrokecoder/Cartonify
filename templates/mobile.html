@@ -3,75 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard: Revolutionary AI Art Generator | Mobile Version</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>AI Art Generator | Mobile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+        }
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f0f0f0;
+            background-color: var(--background-color);
+            color: var(--text-color);
         }
         .container {
-            padding: 10px;
+            padding: 15px;
         }
         .header {
-            background-color: #007bff;
+            background-color: var(--primary-color);
             color: white;
-            padding: 10px;
+            padding: 15px;
             text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .credits-info {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .premium-badge {
+            background-color: gold;
+            color: black;
+            padding: 3px 8px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .logout-btn {
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            border: 1px solid white;
+            border-radius: 5px;
         }
         .prompt-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             margin-bottom: 20px;
         }
         .prompt-container input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
         }
         .prompt-container button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
+            padding: 12px;
+            background-color: var(--primary-color);
             color: white;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
         }
         .image-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
         }
         .image-box {
             aspect-ratio: 1 / 1;
             background-size: cover;
             background-position: center;
             border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .section {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .section-title {
-            font-size: 18px;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        .styled-select {
+            width: 100%;
+            padding: 10px;
             margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
         }
         .style-buttons, .color-scheme-buttons {
             display: flex;
             flex-wrap: wrap;
-            gap: 5px;
+            gap: 10px;
         }
         .style-buttons button, .color-scheme-buttons button {
-            flex: 0 0 calc(50% - 5px);
+            flex: 1 0 calc(50% - 5px);
             padding: 10px;
             background-color: #f0f0f0;
             border: 1px solid #ddd;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 14px;
+        }
+        .style-buttons button.active, .color-scheme-buttons button.active {
+            background-color: var(--primary-color);
+            color: white;
         }
         .recent-images-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: 10px;
+        }
+        .recent-image-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .template-btn {
             width: 100%;
@@ -79,8 +145,48 @@
             margin-bottom: 10px;
             background-color: #f0f0f0;
             border: 1px solid #ddd;
+            border-radius: 5px;
             cursor: pointer;
             text-align: left;
+            font-size: 14px;
+        }
+        .upload-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        #uploadedImage {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .edit-image-option {
+            margin-top: 10px;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -101,8 +207,13 @@
     <div class="container">
         <div class="prompt-container">
             <input type="text" id="prompt" placeholder="Enter your prompt here">
-            <button id="magicWandBtn"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+            <button id="magicWandBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Enhance Prompt</button>
             <button id="generateButton">Generate</button>
+        </div>
+
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>Generating your image...</p>
         </div>
 
         <div class="section">
@@ -119,11 +230,6 @@
                 <option value="1024">Extra Large Square (1024x1024)</option>
                 <option value="512x768">Portrait (512x768)</option>
                 <option value="768x512">Landscape (768x512)</option>
-            </select>
-            <select id="image_quality" class="styled-select">
-                <option value="standard">Standard Quality</option>
-                <option value="high">High Quality</option>
-                <option value="best">Best Quality</option>
             </select>
         </div>
 
@@ -152,10 +258,10 @@
         <div class="section">
             <h2 class="section-title">Reference Image</h2>
             <input type="file" id="fileInput" accept="image/*" style="display: none;">
-            <button class="styled-button upload-btn" onclick="document.getElementById('fileInput').click()">
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
                 <i class="fas fa-upload"></i> Upload Image
             </button>
-            <div class="reference-image" id="uploadedImage"></div>
+            <div id="uploadedImage"></div>
             <div class="edit-image-option">
                 <input type="checkbox" id="editImageCheckbox">
                 <label for="editImageCheckbox">Edit/Enhance Uploaded Image</label>
@@ -183,19 +289,15 @@
                 <button class="template-btn" data-template="A hyper-realistic portrait of a {profession} from the {historical era}, wearing intricate {material} clothing with {cultural} influences, set against a backdrop of {location}, illuminated by {light source}">Historical Portrait</button>
                 <button class="template-btn" data-template="An ethereal landscape featuring floating {objects} above a sea of {element}, with {celestial body} visible in the {time of day} sky, rendered in the style of {artist or art movement}">Surreal Landscape</button>
                 <button class="template-btn" data-template="A futuristic {vehicle or structure} designed for {purpose}, incorporating bio-luminescent {organism} and powered by {energy source}, set in a {type of environment} on {planet or location}">Sci-Fi Concept</button>
-                <!-- Add more template buttons as needed -->
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        // Include all the JavaScript from your main index.html file here
-        // Make sure to adjust any DOM queries to match the new mobile layout
-        // For example:
-
         let selectedStyle = 'art style';
         let selectedColor = 'vibrant colors';
+        let editImage = false;
 
         document.querySelectorAll('.style-buttons button').forEach(button => {
             button.addEventListener('click', function() {
@@ -205,13 +307,131 @@
             });
         });
 
-        // Add more event listeners and functionality as needed
-
-        document.getElementById('generateButton').addEventListener('click', function() {
-            // Your image generation logic here
+        document.querySelectorAll('.color-scheme-buttons button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelector('.color-scheme-buttons button.active').classList.remove('active');
+                this.classList.add('active');
+                selectedColor = this.dataset.color;
+            });
         });
 
-        // Include all other necessary JavaScript for functionality
+        document.getElementById('editImageCheckbox').addEventListener('change', function() {
+            editImage = this.checked;
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('uploadedImage').innerHTML = `<img src="${e.target.result}" alt="Uploaded image" style="max-width: 100%; height: auto;">`;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.querySelectorAll('.template-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.getElementById('prompt').value = this.dataset.template;
+            });
+        });
+
+        document.getElementById('magicWandBtn').addEventListener('click', function() {
+            const prompt = document.getElementById('prompt').value;
+            if (prompt) {
+                axios.post('/enhance_prompt', { prompt: prompt })
+                    .then(response => {
+                        document.getElementById('prompt').value = response.data.enhanced_prompt;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to enhance prompt. Please try again.');
+                    });
+            } else {
+                alert('Please enter a prompt to enhance.');
+            }
+        });
+
+        document.getElementById('generateButton').addEventListener('click', function() {
+            const prompt = document.getElementById('prompt').value;
+            const imageSize = document.getElementById('image_size').value;
+            const fileInput = document.getElementById('fileInput');
+            
+            if (!prompt) {
+                alert('Please enter a prompt.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('prompt', prompt);
+            formData.append('image_size', imageSize);
+            formData.append('style', selectedStyle);
+            formData.append('color', selectedColor);
+            formData.append('edit_image', editImage);
+
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            }
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('generateButton').disabled = true;
+
+            axios.post('/transform', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            .then(response => {
+                const resultGrid = document.getElementById('resultGrid');
+                resultGrid.innerHTML = '';
+                response.data.image_urls.forEach(url => {
+                    if (url) {
+                        const imgBox = document.createElement('div');
+                        imgBox.className = 'image-box';
+                        imgBox.style.backgroundImage = `url(${url})`;
+                        resultGrid.appendChild(imgBox);
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to generate image. Please try again.');
+            })
+            .finally(() => {
+                document.getElementById('generateButton').disabled = false;
+            });
+        });
+
+        document.querySelectorAll('.recent-image-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const imageUrl = this.dataset.url;
+                const resultGrid = document.getElementById('resultGrid');
+                resultGrid.innerHTML = '';
+                const imgBox = document.createElement('div');
+                imgBox.className = 'image-box';
+                imgBox.style.backgroundImage = `url(${imageUrl})`;
+                resultGrid.appendChild(imgBox);
+            });
+        });
+
+        // Function to check login status
+        function checkLoginStatus() {
+            axios.get('/check_login')
+                .then(response => {
+                    if (!response.data.logged_in) {
+                        window.location.href = '/login';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking login status:', error);
+                });
+        }
+
+        // Check login status every 5 minutes
+        setInterval(checkLoginStatus, 300000);
+
+        // Initial check on page load
+        checkLoginStatus();
     </script>
 </body>
 </html>
