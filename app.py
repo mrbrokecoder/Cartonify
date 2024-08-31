@@ -52,7 +52,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
 app.config['SESSION_TYPE'] = 'filesystem'
 
 # Redis Configuration
-app.config['REDIS_URL'] = os.getenv('REDIS_URL')
+app.config['REDIS_URL'] = os.getenv('REDIS_URL', 'redis://127.0.0.1:4000')
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True

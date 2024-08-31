@@ -263,6 +263,73 @@
         .magic-wand-btn:hover {
             color: #0056b3;
         }
+
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                order: 0;
+            }
+
+            .main-content {
+                max-width: 100%;
+                order: 1;
+            }
+
+            .right-sidebar {
+                width: 100%;
+                order: 2;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 10px;
+            }
+
+            .image-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .prompt-container {
+                flex-direction: column;
+            }
+
+            .prompt-container input {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .prompt-container button {
+                width: 100%;
+            }
+
+            .style-buttons, .color-scheme-buttons {
+                flex-wrap: wrap;
+            }
+
+            .style-buttons button, .color-scheme-buttons button {
+                flex: 1 0 40%;
+                margin: 5px;
+            }
+
+            .recent-images-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+
+            .prompt-templates {
+                max-height: none;
+            }
+        }
     </style>
 </head>
 <body>

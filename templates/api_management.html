@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Key Management</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+        <!-- Twitter Card tags -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="Image Garden: AI-Powered Art Creation">
+        <meta name="twitter:description" content="Transform your ideas into stunning visuals with our AI art generator. Create unique digital art in seconds. Join the AI art revolution today!">
+        <meta name="twitter:image" content="https://raw.githubusercontent.com/mrbrokecoder/ChatCat/main/ComfyUI_Generate_1_image%20(2).png">
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -47,6 +53,7 @@
             margin-bottom: 30px;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     
@@ -131,6 +138,11 @@ result = response.json()
 print(result)</code></pre>
     </div>
 
+    <div class="section">
+        <h2>API Usage</h2>
+        <canvas id="apiUsageChart"></canvas>
+    </div>
+
     <script>
     document.getElementById('generate-api-key').addEventListener('click', function() {
         if (confirm('Generating a new API key will invalidate your existing key. Are you sure?')) {
@@ -141,6 +153,33 @@ print(result)</code></pre>
                 });
         }
     });
+
+    // Fetch API usage data and create chart
+    fetch('/api_usage_data')
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById('apiUsageChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'API Calls',
+                        data: data.values,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
     </script>
 </body>
 </html>
