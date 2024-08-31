@@ -560,6 +560,45 @@
             }
         });
 
+        // Image expand and download functionality
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('expandedImage');
+        const closeBtn = document.getElementsByClassName('close')[0];
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        function expandImage(imgUrl) {
+            modal.style.display = 'block';
+            modalImg.src = imgUrl;
+            downloadBtn.onclick = () => downloadImage(imgUrl);
+        }
+
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        function downloadImage(imgUrl) {
+            const link = document.createElement('a');
+            link.href = imgUrl;
+            link.download = 'ai_generated_image.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Function to attach click events to image boxes
+        function attachImageClickEvents() {
+            document.querySelectorAll('.image-box').forEach(box => {
+                box.onclick = function() {
+                    const imgUrl = this.style.backgroundImage.slice(4, -1).replace(/"/g, "");
+                    expandImage(imgUrl);
+                };
+            });
+        }
+
+        // Attach click events to existing images on page load
+        attachImageClickEvents();
+
+        // Modify the image generation part
         document.getElementById('generateButton').addEventListener('click', function() {
             const prompt = document.getElementById('prompt').value;
             const imageSize = document.getElementById('image_size').value;
@@ -597,10 +636,11 @@
                         const imgBox = document.createElement('div');
                         imgBox.className = 'image-box';
                         imgBox.style.backgroundImage = `url(${url})`;
-                        imgBox.onclick = () => expandImage(url);
                         resultGrid.appendChild(imgBox);
                     }
                 });
+                // Attach click events to newly generated images
+                attachImageClickEvents();
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -611,6 +651,13 @@
                 document.getElementById('generateButton').disabled = false;
             });
         });
+
+        // Close the modal when clicking outside the image
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
 
         // PWA installation
         let deferredPrompt;
@@ -706,38 +753,6 @@
                 }, 2000);
             });
         }
-
-        // Image expand and download functionality
-        const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('expandedImage');
-        const closeBtn = document.getElementsByClassName('close')[0];
-        const downloadBtn = document.getElementById('downloadBtn');
-
-        function expandImage(imgUrl) {
-            modal.style.display = 'block';
-            modalImg.src = imgUrl;
-            downloadBtn.onclick = () => downloadImage(imgUrl);
-        }
-
-        closeBtn.onclick = function() {
-            modal.style.display = 'none';
-        }
-
-        function downloadImage(imgUrl) {
-            const link = document.createElement('a');
-            link.href = imgUrl;
-            link.download = 'ai_generated_image.png';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // Add click event to recent images as well
-        document.querySelectorAll('.image-box').forEach(box => {
-            box.addEventListener('click', function() {
-                expandImage(this.dataset.url);
-            });
-        });
     </script>
 </body>
 
