@@ -322,11 +322,7 @@ def index():
     else:
         remaining_credits = 5 - prompt_count
     
-    user_agent = request.user_agent.string.lower()
-    if 'mobile' in user_agent or 'android' in user_agent or 'iphone' in user_agent or 'ipad' in user_agent:
-        return render_template('mobile.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
-    else:
-        return render_template('index.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
+    return render_template('index.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
 
 @app.route('/api_dashboard')
 @login_required
