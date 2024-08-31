@@ -2,10 +2,10 @@
     "name": "AI Art Generator",
     "short_name": "AI Art",
     "description": "Generate amazing art with AI",
-    "start_url": "/",
+    "start_url": "/login",
     "display": "standalone",
     "background_color": "#ffffff",
-    "theme_color": "#4a90e2",
+    "theme_color": "Indigo",
     "icons": [
       {
         "src": "/static/images/icon-192x192.png",
