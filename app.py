@@ -263,7 +263,7 @@ def manifest():
 
 @app.route('/service-worker.js')
 def service_worker():
-    return send_from_directory('', 'service-worker.js')
+    return send_from_directory('.', 'service-worker.js')
 
 @app.template_filter('custom_datetime')
 def custom_datetime(value):
