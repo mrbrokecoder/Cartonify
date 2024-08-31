@@ -6,39 +6,44 @@
     <title>AI Art Generator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    <meta name="theme-color" content="#4a90e2">
+    <meta name="theme-color" content="#6366F1">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icon-192x192.png') }}">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+        
         :root {
-            --primary-color: Indigo;
-            --secondary-color: #f5a623;
-            --background-color: #f0f4f8;
-            --text-color: #333;
-            --card-bg: #ffffff;
+            --primary-color: #6366F1;
+            --primary-light: #818CF8;
+            --secondary-color: #10B981;
+            --background-color: #F3F4F6;
+            --text-color: #1F2937;
+            --card-bg: #FFFFFF;
             --border-radius: 12px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--background-color);
             color: var(--text-color);
-            padding-bottom: 60px; /* Space for bottom navbar */
+            padding-bottom: 70px;
+            overflow-x: hidden;
         }
         .container {
-            padding: 15px;
-            max-width: 600px;
+            padding: 20px;
+            max-width: 100%;
             margin: 0 auto;
         }
         .header {
             background-color: var(--primary-color);
             color: white;
-            padding: 15px;
+            padding: 20px;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--box-shadow);
         }
         .header h1 {
             margin: 0;
@@ -48,52 +53,70 @@
         .prompt-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 15px;
+            margin-bottom: 30px;
         }
-        .prompt-container input {
-            padding: 15px;
+        .prompt-input {
+            display: flex;
+            align-items: center;
+            background-color: var(--card-bg);
+            border-radius: 25px;
+            padding: 5px;
+            box-shadow: var(--box-shadow);
+        }
+        .prompt-input input {
+            flex-grow: 1;
             border: none;
-            border-radius: var(--border-radius);
+            padding: 15px;
             font-size: 16px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: transparent;
+            font-family: 'Poppins', sans-serif;
         }
-        .prompt-container button {
+        .prompt-input button {
+            background: none;
+            border: none;
+            padding: 10px;
+            font-size: 20px;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        .generate-btn {
             padding: 15px;
             background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
+            border-radius: 25px;
             font-size: 16px;
             font-weight: 600;
+            box-shadow: var(--box-shadow);
             transition: background-color 0.3s ease;
         }
-        .prompt-container button:hover {
-            background-color: #3a7bc8;
+        .generate-btn:hover {
+            background-color: var(--primary-light);
         }
         .image-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
+            margin-bottom: 30px;
         }
         .image-box {
             aspect-ratio: 1 / 1;
             background-size: cover;
             background-position: center;
             border-radius: var(--border-radius);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: var(--box-shadow);
             transition: transform 0.3s ease;
         }
         .image-box:hover {
             transform: scale(1.05);
         }
         .section {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             background-color: var(--card-bg);
             padding: 20px;
             border-radius: var(--border-radius);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: var(--box-shadow);
         }
         .section-title {
             font-size: 1.2em;
@@ -103,32 +126,34 @@
         }
         .styled-select {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            border: 1px solid #e0e0e0;
+            padding: 15px;
+            border: 1px solid var(--primary-light);
             border-radius: var(--border-radius);
             font-size: 16px;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%236366F1' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 10px center;
+            box-shadow: var(--box-shadow);
+            font-family: 'Poppins', sans-serif;
         }
-        .style-buttons, .color-scheme-buttons {
+        .toggle-group {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+            background-color: #EEF2FF;
+            border-radius: 25px;
+            overflow: hidden;
+            margin-bottom: 15px;
         }
-        .style-buttons button, .color-scheme-buttons button {
-            flex: 1 0 calc(50% - 5px);
+        .toggle-group button {
+            flex: 1;
             padding: 12px;
-            background-color: #f0f0f0;
             border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
+            background: none;
             font-size: 14px;
             transition: background-color 0.3s ease, color 0.3s ease;
+            font-family: 'Poppins', sans-serif;
         }
-        .style-buttons button.active, .color-scheme-buttons button.active {
+        .toggle-group button.active {
             background-color: var(--primary-color);
             color: white;
         }
@@ -148,6 +173,12 @@
             color: var(--text-color);
             text-decoration: none;
             font-size: 0.8em;
+            opacity: 0.7;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+        .nav-item.active {
+            opacity: 1;
+            color: var(--primary-color);
         }
         .nav-item i {
             font-size: 1.5em;
@@ -165,7 +196,7 @@
             margin-top: 20px;
         }
         .spinner {
-            border: 4px solid rgba(0,0,0,0.1);
+            border: 4px solid rgba(99, 102, 241, 0.1);
             border-top: 4px solid var(--primary-color);
             border-radius: 50%;
             width: 40px;
@@ -177,61 +208,83 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        #installPrompt {
-            display: none;
-            position: fixed;
-            bottom: 70px;
-            left: 10px;
-            right: 10px;
-            background-color: var(--card-bg);
+        .upload-btn {
+            display: block;
+            width: 100%;
             padding: 15px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-        }
-        #installPrompt button {
-            background-color: var(--primary-color);
+            background-color: var(--secondary-color);
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
+            border-radius: 25px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            box-shadow: var(--box-shadow);
+            transition: background-color 0.3s ease;
+        }
+        .upload-btn:hover {
+            background-color: #0EA5E9;
+        }
+        .edit-image-option {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+        .edit-image-option input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .template-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #EEF2FF;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            text-align: left;
+            margin-bottom: 10px;
+            box-shadow: var(--box-shadow);
+            transition: background-color 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+        .template-btn:hover {
+            background-color: #E0E7FF;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>AI Art Generator</h1>
+        <img src="https://raw.githubusercontent.com/mrbrokecoder/ChatCat/main/ComfyUI_Generate_1_image%20(2).png" alt="AI Art Generator Logo" style="max-width: 100%; height: auto;">
     </div>
 
     <div class="container">
         <div id="home" class="tab-content active">
             <div class="prompt-container">
-                <input type="text" id="prompt" placeholder="Enter your prompt here">
-                <button id="magicWandBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Enhance Prompt</button>
-                <button id="generateButton">Generate</button>
+                <div class="prompt-input">
+                    <input type="text" id="prompt" placeholder="Describe your imagination...">
+                    <button id="magicWandBtn"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                </div>
+                <button class="generate-btn" id="generateButton">Create Magic</button>
             </div>
 
             <div id="loading">
                 <div class="spinner"></div>
-                <p>Generating your image...</p>
+                <p>Crafting your masterpiece...</p>
             </div>
 
             <div class="section">
-                <h2 class="section-title">Generated Images</h2>
+                <h2 class="section-title">Your Creations</h2>
                 <div class="image-grid" id="resultGrid"></div>
             </div>
 
             <div class="section">
-                <h2 class="section-title">Recent Images</h2>
+                <h2 class="section-title">Recent Inspirations</h2>
                 <div class="image-grid" id="recentImagesGrid">
                     {% if images %}
-                        {% for image in images[:6] %}
+                        {% for image in images[:4] %}
                             <div class="image-box" style="background-image: url('{{ image[0] }}')" data-url="{{ image[0] }}"></div>
                         {% endfor %}
                     {% else %}
-                        <p>No recent images found.</p>
+                        <p>No recent images found. Start creating!</p>
                     {% endif %}
                 </div>
             </div>
@@ -239,97 +292,87 @@
 
         <div id="settings" class="tab-content">
             <div class="section">
-                <h2 class="section-title">Image Settings</h2>
+                <h2 class="section-title">Canvas Size</h2>
                 <select id="image_size" class="styled-select">
-                    <option value="256">Small Square (256x256)</option>
-                    <option value="512">Medium Square (512x512)</option>
-                    <option value="768">Large Square (768x768)</option>
-                    <option value="1024">Extra Large Square (1024x1024)</option>
+                    <option value="256">Pocket (256x256)</option>
+                    <option value="512">Classic (512x512)</option>
+                    <option value="768">Large (768x768)</option>
                     <option value="512x768">Portrait (512x768)</option>
                     <option value="768x512">Landscape (768x512)</option>
                 </select>
             </div>
 
             <div class="section">
-                <h2 class="section-title">Style</h2>
-                <div class="style-buttons">
-                    <button class="styled-button active" data-style="art style">Art</button>
-                    <button class="styled-button" data-style="photo realistic">Photo</button>
-                    <button class="styled-button" data-style="cartoon">Cartoon</button>
-                    <button class="styled-button" data-style="logo">Logo</button>
-                    <button class="styled-button" data-style="water">Water</button>
-                    <button class="styled-button" data-style="banner">Banner</button>
+                <h2 class="section-title">Art Style</h2>
+                <div class="toggle-group">
+                    <button class="active" data-style="art style">Artistic</button>
+                    <button data-style="photo realistic">Realistic</button>
+                    <button data-style="cartoon">Cartoon</button>
+                    <button data-style="logo">Logo</button>
                 </div>
             </div>
 
             <div class="section">
-                <h2 class="section-title">Color Scheme</h2>
-                <div class="color-scheme-buttons">
-                    <button class="styled-button active" data-color="vibrant">Vibrant</button>
-                    <button class="styled-button" data-color="pastel">Pastel</button>
-                    <button class="styled-button" data-color="monochrome">Monochrome</button>
-                    <button class="styled-button" data-color="earthy">Earthy</button>
+                <h2 class="section-title">Color Palette</h2>
+                <div class="toggle-group">
+                    <button class="active" data-color="vibrant">Vibrant</button>
+                    <button data-color="pastel">Pastel</button>
+                    <button data-color="monochrome">Mono</button>
+                    <button data-color="earthy">Earthy</button>
                 </div>
             </div>
 
             <div class="section">
-                <h2 class="section-title">Reference Image</h2>
+                <h2 class="section-title">Inspiration Image</h2>
                 <input type="file" id="fileInput" accept="image/*" style="display: none;">
-                <button class="styled-button upload-btn" onclick="document.getElementById('fileInput').click()">
-                    <i class="fas fa-upload"></i> Upload Image
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-upload"></i> Upload Inspiration
                 </button>
                 <div id="uploadedImage"></div>
                 <div class="edit-image-option">
                     <input type="checkbox" id="editImageCheckbox">
-                    <label for="editImageCheckbox">Edit/Enhance Uploaded Image</label>
+                    <label for="editImageCheckbox">Enhance Uploaded Image</label>
                 </div>
             </div>
 
             <div class="section">
-                <h2 class="section-title">Prompt Templates</h2>
-                <div class="prompt-templates">
-                    <button class="template-btn" data-template="A hyper-realistic portrait of a {profession} from the {historical era}, wearing intricate {material} clothing with {cultural} influences, set against a backdrop of {location}, illuminated by {light source}">Historical Portrait</button>
-                    <button class="template-btn" data-template="An ethereal landscape featuring floating {objects} above a sea of {element}, with {celestial body} visible in the {time of day} sky, rendered in the style of {artist or art movement}">Surreal Landscape</button>
-                    <button class="template-btn" data-template="A futuristic {vehicle or structure} designed for {purpose}, incorporating bio-luminescent {organism} and powered by {energy source}, set in a {type of environment} on {planet or location}">Sci-Fi Concept</button>
-                </div>
+                <h2 class="section-title">Prompt Ideas</h2>
+                <button class="template-btn" data-template="A hyper-realistic portrait of a {profession} from the {historical era}">Historical Figure</button>
+                <button class="template-btn" data-template="An ethereal landscape featuring floating {objects} above a sea of {element}">Dreamscape</button>
+                <button class="template-btn" data-template="A futuristic {vehicle or structure} designed for {purpose}">Future Tech</button>
             </div>
         </div>
 
         <div id="profile" class="tab-content">
             <div class="section">
-                <h2 class="section-title">User Profile</h2>
+                <h2 class="section-title">Your Creative Journey</h2>
                 <div class="credits-info">
                     {% if current_user.is_premium %}
-                        <p>Premium: {{ remaining_credits }} / 1600 credits</p>
+                        <p>Premium: {{ remaining_credits }} / 1600 creations left</p>
                     {% else %}
-                        <p>Free: {{ remaining_credits }} / 5 credits</p>
-                        <a href="{{ url_for('premium') }}" class="styled-button">Buy Premium</a>
+                        <p>Free: {{ remaining_credits }} / 5 creations left</p>
+                        <button class="generate-btn">Unlock Premium</button>
                     {% endif %}
                 </div>
-                <a href="{{ url_for('logout') }}" class="styled-button">Logout</a>
+                <button class="upload-btn">Sign Out</button>
             </div>
         </div>
     </div>
 
     <nav class="bottom-navbar">
         <a href="#home" class="nav-item active" data-tab="home">
-            <i class="fas fa-home"></i>
-            <div>Home</div>
+            <i class="fas fa-paint-brush"></i>
+            <div>Create</div>
         </a>
         <a href="#settings" class="nav-item" data-tab="settings">
-            <i class="fas fa-cog"></i>
-            <div>Settings</div>
+            <i class="fas fa-sliders-h"></i>
+            <div>Adjust</div>
         </a>
         <a href="#profile" class="nav-item" data-tab="profile">
-            <i class="fas fa-user"></i>
+            <i class="fas fa-user-artist"></i>
             <div>Profile</div>
         </a>
     </nav>
-
-    <div id="installPrompt">
-        <p>Install AI Art Generator for a better experience!</p>
-        <button id="installBtn">Install</button>
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
