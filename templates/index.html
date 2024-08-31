@@ -268,66 +268,102 @@
         @media (max-width: 768px) {
             .content {
                 flex-direction: column;
+                padding: 10px;
             }
 
-            .sidebar {
+            .sidebar, .main-content, .right-sidebar {
                 width: 100%;
-                order: 0;
-            }
-
-            .main-content {
-                max-width: 100%;
-                order: 1;
-            }
-
-            .right-sidebar {
-                width: 100%;
-                order: 2;
+                margin: 0;
+                padding: 10px 0;
             }
 
             .header {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: center;
+                padding: 10px;
             }
 
             .header-actions {
                 width: 100%;
-                justify-content: space-between;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
                 margin-top: 10px;
             }
 
+            .credits-info, .dark-mode-toggle, .logout-btn, .admin-btn, .dashboard-btn {
+                margin: 5px 0;
+            }
+
             .image-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 10px;
+            }
+
+            .image-box {
+                aspect-ratio: 1 / 1;
             }
 
             .prompt-container {
                 flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
             }
 
-            .prompt-container input {
+            .prompt-container input, .prompt-container button {
                 width: 100%;
-                margin-bottom: 10px;
-            }
-
-            .prompt-container button {
-                width: 100%;
+                margin: 0;
             }
 
             .style-buttons, .color-scheme-buttons {
                 flex-wrap: wrap;
+                justify-content: center;
+                gap: 5px;
             }
 
             .style-buttons button, .color-scheme-buttons button {
-                flex: 1 0 40%;
-                margin: 5px;
+                flex: 0 0 calc(50% - 5px);
+                margin: 0;
             }
 
             .recent-images-grid {
-                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+                gap: 10px;
             }
 
             .prompt-templates {
                 max-height: none;
+                overflow-y: visible;
+            }
+
+            .template-btn {
+                margin-bottom: 10px;
+            }
+
+            .section {
+                margin-bottom: 20px;
+            }
+
+            .section-title {
+                text-align: center;
+            }
+
+            .select-wrapper, .upload-buttons {
+                width: 100%;
+            }
+
+            .styled-select, .styled-button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .toggle-container {
+                justify-content: center;
+            }
+
+            .previous-images-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 10px;
             }
         }
     </style>
@@ -373,6 +409,39 @@
         </div>
     </div>
     <div class="content">
+        <div class="main-content">
+            <div class="prompt-container">
+                <input type="text" id="prompt" placeholder="Enter your prompt here">
+                <button id="magicWandBtn" class="magic-wand-btn"><i class="fa-solid fa-wand-magic-sparkles"></i></i></button>
+                <button id="generateButton">Generate</button>
+            </div>
+            <div class="image-grid" id="resultGrid">
+                <div class="image-box"></div>
+                <div class="image-box"></div>
+            </div>
+             <!-- Add the new section for previously generated images -->
+        <div class="previous-images">
+            <h2>Your Previously Generated Images</h2>
+            <div class="previous-images-grid">
+                {% if images %}
+                {% for image in images %}
+                    <div class="previous-image-box">
+                        <img src="{{ image[0] }}" alt="{{ image[1] }}" loading="lazy">
+                        <div class="previous-image-info">
+                            <p>Prompt: {{ image[1] }}</p>
+                            <p>Style: {{ image[2] }}</p>
+                            <p>Color: {{ image[3] }}</p>
+                            <p>Created at: {{ image[4] | custom_datetime }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No images found.</p>
+            {% endif %}
+            </div>
+        </div>
+        </div>
+        
         <div class="sidebar left-sidebar">
             <div class="section">
                 <h3 class="section-title">Image Settings</h3>
@@ -395,7 +464,7 @@
                 </div>
             </div>
             <div class="section">
-                <h3 class="section-title">Style</h3>
+                <h3 class="section-title">Style and Color</h3>
                 <div class="style-buttons">
                     <button class="styled-button active" data-style="art style">Art</button>
                     <button class="styled-button" data-style="photo realistic">Photo</button>
@@ -404,9 +473,6 @@
                     <button class="styled-button" data-style="water">Water</button>
                     <button class="styled-button" data-style="banner">Banner</button>
                 </div>
-            </div>
-            <div class="section">
-                <h3 class="section-title">Color Scheme</h3>
                 <div class="color-scheme-buttons">
                     <button class="styled-button active" data-color="vibrant">Vibrant</button>
                     <button class="styled-button" data-color="pastel">Pastel</button>
@@ -440,46 +506,7 @@
                 </div>
             </div>
         </div>
-        <div class="main-content">
-            <div class="image-grid" id="resultGrid">
-                <div class="image-box"></div>
-                <div class="image-box"></div>
-            </div>
-             <!-- Add the new section for previously generated images -->
-        <div class="previous-images">
-            <h2>Your Previously Generated Images</h2>
-            <div class="previous-images-grid">
-                {% if images %}
-                {% for image in images %}
-                    <div class="previous-image-box">
-                        <img src="{{ image[0] }}" alt="{{ image[1] }}" loading="lazy">
-                        <div class="previous-image-info">
-                            <p>Prompt: {{ image[1] }}</p>
-                            <p>Style: {{ image[2] }}</p>
-                            <p>Color: {{ image[3] }}</p>
-                            <p>Created at: {{ image[4] | custom_datetime }}</p>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No images found.</p>
-            {% endif %}
-            </div>
-        </div>
-            <div class="prompt-container">
-                <input type="text" id="prompt" placeholder="Enter your prompt here">
-                <button id="magicWandBtn" class="magic-wand-btn"><i class="fa-solid fa-wand-magic-sparkles"></i></i></button>
-                <button id="generateButton">Generate</button>
-            </div>
-        </div>
-        <div id="videoGenerationContent" class="tab-content" style="display: none;">
-            <div class="prompt-container">
-                <input type="text" id="videoPrompt" placeholder="Enter your prompt for video generation">
-                <button id="generateVideoButton">Generate Video</button>
-            </div>
-            <div id="videoLoadingIndicator" style="display: none;">Generating video... This may take a few minutes.</div>
-            <div id="videoContainer" class="video-container"></div>
-        </div>
+        
         <div class="sidebar right-sidebar">
             <div class="section">
                 <h3 class="section-title">Recent Images</h3>
