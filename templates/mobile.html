@@ -354,7 +354,7 @@
                         <button class="generate-btn">Unlock Premium</button>
                     {% endif %}
                 </div>
-                <button class="upload-btn">Sign Out</button>
+                <button id="signOutBtn" class="upload-btn">Sign Out</button>
             </div>
         </div>
     </div>
@@ -555,6 +555,22 @@
 
         // Initial check on page load
         checkLoginStatus();
+
+        // Add this near the end of the script section
+        document.getElementById('signOutBtn').addEventListener('click', function() {
+            axios.post('/logout')
+                .then(response => {
+                    if (response.data.success) {
+                        window.location.href = '/login';
+                    } else {
+                        alert('Failed to sign out. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error signing out:', error);
+                    alert('An error occurred while signing out. Please try again.');
+                });
+        });
     </script>
 </body>
 
