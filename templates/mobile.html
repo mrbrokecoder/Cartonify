@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AI Art Generator | Mobile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
@@ -20,6 +20,7 @@
             padding: 0;
             background-color: var(--background-color);
             color: var(--text-color);
+            padding-bottom: 60px; /* Space for bottom navbar */
         }
         .container {
             padding: 15px;
@@ -40,32 +41,6 @@
             margin: 0;
             font-size: 1.5em;
             font-weight: 600;
-        }
-        .credits-info {
-            margin-top: 10px;
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-        .premium-badge {
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 3px 8px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-left: 10px;
-            font-size: 0.8em;
-            text-transform: uppercase;
-        }
-        .logout-btn {
-            color: white;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 10px;
-            padding: 5px 10px;
-            border: 1px solid rgba(255,255,255,0.5);
-            border-radius: 20px;
-            font-size: 0.9em;
         }
         .prompt-container {
             display: flex;
@@ -154,65 +129,32 @@
             background-color: var(--primary-color);
             color: white;
         }
-        .recent-images-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
-        }
-        .recent-image-item img {
-            width: 100%;
-            height: auto;
-            border-radius: var(--border-radius);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-        }
-        .recent-image-item img:hover {
-            transform: scale(1.05);
-        }
-        .template-btn {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            background-color: #f0f0f0;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            text-align: left;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
-        }
-        .template-btn:hover {
-            background-color: #e0e0e0;
-        }
-        .upload-btn {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 10px;
-            transition: background-color 0.3s ease;
-        }
-        .upload-btn:hover {
-            background-color: #e69100;
-        }
-        #uploadedImage {
-            max-width: 100%;
-            height: auto;
-            margin-top: 10px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .edit-image-option {
-            margin-top: 10px;
+        .bottom-navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
             display: flex;
-            align-items: center;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
         }
-        .edit-image-option input[type="checkbox"] {
-            margin-right: 10px;
+        .nav-item {
+            text-align: center;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.8em;
+        }
+        .nav-item i {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
         }
         #loading {
             display: none;
@@ -237,111 +179,145 @@
 <body>
     <div class="header">
         <h1>AI Art Generator</h1>
-        <div class="credits-info">
-            {% if current_user.is_premium %}
-                <span>Premium: {{ remaining_credits }} / 1600 credits</span>
-            {% else %}
-                <span>Free: {{ remaining_credits }} / 5 credits</span>
-                <a href="{{ url_for('premium') }}" class="premium-badge">Buy Premium</a>
-            {% endif %}
-        </div>
-        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
     </div>
 
     <div class="container">
-        <div class="prompt-container">
-            <input type="text" id="prompt" placeholder="Enter your prompt here">
-            <button id="magicWandBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Enhance Prompt</button>
-            <button id="generateButton">Generate</button>
-        </div>
+        <div id="home" class="tab-content active">
+            <div class="prompt-container">
+                <input type="text" id="prompt" placeholder="Enter your prompt here">
+                <button id="magicWandBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Enhance Prompt</button>
+                <button id="generateButton">Generate</button>
+            </div>
 
-        <div id="loading">
-            <div class="spinner"></div>
-            <p>Generating your image...</p>
-        </div>
+            <div id="loading">
+                <div class="spinner"></div>
+                <p>Generating your image...</p>
+            </div>
 
-        <div class="section">
-            <h2 class="section-title">Generated Images</h2>
-            <div class="image-grid" id="resultGrid"></div>
-        </div>
+            <div class="section">
+                <h2 class="section-title">Generated Images</h2>
+                <div class="image-grid" id="resultGrid"></div>
+            </div>
 
-        <div class="section">
-            <h2 class="section-title">Image Settings</h2>
-            <select id="image_size" class="styled-select">
-                <option value="256">Small Square (256x256)</option>
-                <option value="512">Medium Square (512x512)</option>
-                <option value="768">Large Square (768x768)</option>
-                <option value="1024">Extra Large Square (1024x1024)</option>
-                <option value="512x768">Portrait (512x768)</option>
-                <option value="768x512">Landscape (768x512)</option>
-            </select>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">Style</h2>
-            <div class="style-buttons">
-                <button class="styled-button active" data-style="art style">Art</button>
-                <button class="styled-button" data-style="photo realistic">Photo</button>
-                <button class="styled-button" data-style="cartoon">Cartoon</button>
-                <button class="styled-button" data-style="logo">Logo</button>
-                <button class="styled-button" data-style="water">Water</button>
-                <button class="styled-button" data-style="banner">Banner</button>
+            <div class="section">
+                <h2 class="section-title">Recent Images</h2>
+                <div class="image-grid" id="recentImagesGrid">
+                    {% if images %}
+                        {% for image in images[:6] %}
+                            <div class="image-box" style="background-image: url('{{ image[0] }}')" data-url="{{ image[0] }}"></div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No recent images found.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
-        <div class="section">
-            <h2 class="section-title">Color Scheme</h2>
-            <div class="color-scheme-buttons">
-                <button class="styled-button active" data-color="vibrant">Vibrant</button>
-                <button class="styled-button" data-color="pastel">Pastel</button>
-                <button class="styled-button" data-color="monochrome">Monochrome</button>
-                <button class="styled-button" data-color="earthy">Earthy</button>
+        <div id="settings" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">Image Settings</h2>
+                <select id="image_size" class="styled-select">
+                    <option value="256">Small Square (256x256)</option>
+                    <option value="512">Medium Square (512x512)</option>
+                    <option value="768">Large Square (768x768)</option>
+                    <option value="1024">Extra Large Square (1024x1024)</option>
+                    <option value="512x768">Portrait (512x768)</option>
+                    <option value="768x512">Landscape (768x512)</option>
+                </select>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Style</h2>
+                <div class="style-buttons">
+                    <button class="styled-button active" data-style="art style">Art</button>
+                    <button class="styled-button" data-style="photo realistic">Photo</button>
+                    <button class="styled-button" data-style="cartoon">Cartoon</button>
+                    <button class="styled-button" data-style="logo">Logo</button>
+                    <button class="styled-button" data-style="water">Water</button>
+                    <button class="styled-button" data-style="banner">Banner</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Color Scheme</h2>
+                <div class="color-scheme-buttons">
+                    <button class="styled-button active" data-color="vibrant">Vibrant</button>
+                    <button class="styled-button" data-color="pastel">Pastel</button>
+                    <button class="styled-button" data-color="monochrome">Monochrome</button>
+                    <button class="styled-button" data-color="earthy">Earthy</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Reference Image</h2>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                <button class="styled-button upload-btn" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-upload"></i> Upload Image
+                </button>
+                <div id="uploadedImage"></div>
+                <div class="edit-image-option">
+                    <input type="checkbox" id="editImageCheckbox">
+                    <label for="editImageCheckbox">Edit/Enhance Uploaded Image</label>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Prompt Templates</h2>
+                <div class="prompt-templates">
+                    <button class="template-btn" data-template="A hyper-realistic portrait of a {profession} from the {historical era}, wearing intricate {material} clothing with {cultural} influences, set against a backdrop of {location}, illuminated by {light source}">Historical Portrait</button>
+                    <button class="template-btn" data-template="An ethereal landscape featuring floating {objects} above a sea of {element}, with {celestial body} visible in the {time of day} sky, rendered in the style of {artist or art movement}">Surreal Landscape</button>
+                    <button class="template-btn" data-template="A futuristic {vehicle or structure} designed for {purpose}, incorporating bio-luminescent {organism} and powered by {energy source}, set in a {type of environment} on {planet or location}">Sci-Fi Concept</button>
+                </div>
             </div>
         </div>
 
-        <div class="section">
-            <h2 class="section-title">Reference Image</h2>
-            <input type="file" id="fileInput" accept="image/*" style="display: none;">
-            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
-                <i class="fas fa-upload"></i> Upload Image
-            </button>
-            <div id="uploadedImage"></div>
-            <div class="edit-image-option">
-                <input type="checkbox" id="editImageCheckbox">
-                <label for="editImageCheckbox">Edit/Enhance Uploaded Image</label>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">Recent Images</h2>
-            <div class="recent-images-grid">
-                {% if images %}
-                    {% for image in images[:6] %}
-                        <div class="recent-image-item" data-url="{{ image[0] }}">
-                            <img src="{{ image[0] }}" alt="Recent image" loading="lazy">
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <p>No recent images found.</p>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">Prompt Templates</h2>
-            <div class="prompt-templates">
-                <button class="template-btn" data-template="A hyper-realistic portrait of a {profession} from the {historical era}, wearing intricate {material} clothing with {cultural} influences, set against a backdrop of {location}, illuminated by {light source}">Historical Portrait</button>
-                <button class="template-btn" data-template="An ethereal landscape featuring floating {objects} above a sea of {element}, with {celestial body} visible in the {time of day} sky, rendered in the style of {artist or art movement}">Surreal Landscape</button>
-                <button class="template-btn" data-template="A futuristic {vehicle or structure} designed for {purpose}, incorporating bio-luminescent {organism} and powered by {energy source}, set in a {type of environment} on {planet or location}">Sci-Fi Concept</button>
+        <div id="profile" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">User Profile</h2>
+                <div class="credits-info">
+                    {% if current_user.is_premium %}
+                        <p>Premium: {{ remaining_credits }} / 1600 credits</p>
+                    {% else %}
+                        <p>Free: {{ remaining_credits }} / 5 credits</p>
+                        <a href="{{ url_for('premium') }}" class="styled-button">Buy Premium</a>
+                    {% endif %}
+                </div>
+                <a href="{{ url_for('logout') }}" class="styled-button">Logout</a>
             </div>
         </div>
     </div>
+
+    <nav class="bottom-navbar">
+        <a href="#home" class="nav-item active" data-tab="home">
+            <i class="fas fa-home"></i>
+            <div>Home</div>
+        </a>
+        <a href="#settings" class="nav-item" data-tab="settings">
+            <i class="fas fa-cog"></i>
+            <div>Settings</div>
+        </a>
+        <a href="#profile" class="nav-item" data-tab="profile">
+            <i class="fas fa-user"></i>
+            <div>Profile</div>
+        </a>
+    </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         let selectedStyle = 'art style';
         let selectedColor = 'vibrant colors';
         let editImage = false;
+
+        // Tab switching
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.getElementById(this.dataset.tab).classList.add('active');
+            });
+        });
 
         document.querySelectorAll('.style-buttons button').forEach(button => {
             button.addEventListener('click', function() {
@@ -442,6 +418,7 @@
                 alert('Failed to generate image. Please try again.');
             })
             .finally(() => {
+                document.getElementById('loading').style.display = 'none';
                 document.getElementById('generateButton').disabled = false;
             });
         });
