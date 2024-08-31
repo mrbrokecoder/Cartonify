@@ -257,6 +257,361 @@ def safe_get(data, index, default=None):
         return data[index] if index < len(data) else default
     return default
 
+@app.template_filter('custom_datetime')
+def custom_datetime(value):
+    if isinstance(value, str):
+        try:
+            return datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f')
+        except ValueError:
+            try:
+                return datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                return value
+    return value
+
+@app.route('/')
+def home():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    # Fetch the most recent generated images with all necessary information
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT url, prompt, style, color, created_at 
+        FROM images 
+        ORDER BY created_at DESC 
+        LIMIT 12
+    """)
+    images = [
+        {
+            'url': row[0],
+            'prompt': row[1],
+            'style': row[2],
+            'color': row[3],
+            'created_at': row[4]
+        } for row in cur.fetchall()
+    ]
+    cur.close()
+    conn.close()
+    
+    return render_template('home.html', images=images)
+
+# Update the login manager to use the new home page
+login_manager.login_view = 'home'
+
+@app.route('/dashboard')
+@login_required
+def index():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT url, prompt, style, color, created_at FROM images WHERE user_id = %s ORDER BY created_at DESC", (current_user.id,))
+    images = cur.fetchall()
+    
+    # Get user's premium status and remaining credits
+    cur.execute("SELECT is_premium, prompt_count, monthly_quota FROM users WHERE id = %s", (current_user.id,))
+    user_data = cur.fetchone()
+    is_premium, prompt_count, monthly_quota = user_data
+    
+    cur.close()
+    conn.close()
+    
+    # Calculate remaining credits
+    if is_premium:
+        remaining_credits = monthly_quota
+    else:
+        remaining_credits = 5 - prompt_count
+    
+    user_agent = request.user_agent.string.lower()
+    if 'mobile' in user_agent or 'android' in user_agent or 'iphone' in user_agent or 'ipad' in user_agent:
+        return render_template('mobile.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
+    else:
+        return render_template('index.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
+
+@app.route('/api_dashboard')
+@login_required
+def api_dashboard():
+    if not current_user.is_authenticated:
+        flash('Please log in to access the API dashboard.', 'warning')
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Fetch user's API key
+    cur.execute("SELECT api_key FROM users WHERE id = %s", (current_user.id,))
+    api_key = cur.fetchone()[0]
+    
+    # Fetch API usage
+    cur.execute("""
+        SELECT COUNT(*) FROM images 
+        WHERE user_id = %s AND created_at >= NOW() - INTERVAL '30 days'
+    """, (current_user.id,))
+    api_usage = cur.fetchone()[0]
+    
+    cur.close()
+    conn.close()
+    
+    return render_template('dashboard.html', api_key=api_key, api_usage=api_usage)
+
+@app.route('/generate_api_key', methods=['POST'])
+@login_required
+def generate_api_key():
+    new_api_key = secrets.token_urlsafe(32)
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET api_key = %s WHERE id = %s", (new_api_key, current_user.id))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({"api_key": new_api_key})
+
+@app.route('/revoke_api_key', methods=['POST'])
+@login_required
+def revoke_api_key():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET api_key = NULL WHERE id = %s", (current_user.id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({"message": "API key revoked successfully"})
+
+# Update the existing api_transform_image function to track usage
+@app.route('/api/transform', methods=['POST'])
+def api_transform_image():
+    api_key = request.headers.get('X-API-Key')
+    if not api_key:
+        return jsonify({"error": "API key is required"}), 401
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id FROM users WHERE api_key = %s", (api_key,))
+    user = cur.fetchone()
+
+    if not user:
+        cur.close()
+        conn.close()
+        return jsonify({"error": "Invalid API key"}), 401
+
+    user_id = user[0]
+
+    # Get request data
+    data = request.json
+    prompt = data.get('prompt')
+    image_size = data.get('image_size', 512)
+    style = data.get('style', 'art style')
+    color = data.get('color', 'vibrant colors')
+
+    if not prompt:
+        return jsonify({'error': 'No prompt provided'}), 400
+
+    # Prepare input data for the image generation model
+    input_data = {
+        "detect_resolution": image_size,
+        "image_resolution": image_size,
+        "return_width": image_size,
+        "return_height": image_size,
+        "prompt": f"{prompt}, {style}, {color}",
+        "num_samples": 1,
+        "num_inference_steps": 20,
+        "guidance_scale": 9,
+        "nsfw": True
+    }
+
+    try:
+        # Use the image generation model (replace with your actual model)
+        output = replicate.run(
+            "stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf",
+            input=input_data
+        )
+
+        # Process the output
+        image_urls = output if isinstance(output, list) else [output]
+
+        # Save image information to the database
+        for url in image_urls:
+            cur.execute("""
+                INSERT INTO images (user_id, url, prompt, style, color, created_at)
+                VALUES (%s, %s, %s, %s, %s, NOW())
+            """, (user_id, url, prompt, style, color))
+
+        conn.commit()
+
+        # Update API usage count
+        cur.execute("""
+            INSERT INTO api_usage (user_id, usage_date, count)
+            VALUES (%s, CURRENT_DATE, 1)
+            ON CONFLICT (user_id, usage_date)
+            DO UPDATE SET count = api_usage.count + 1
+        """, (user_id,))
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
+        return jsonify({"image_urls": image_urls})
+
+    except Exception as e:
+        cur.close()
+        conn.close()
+        return jsonify({"error": str(e)}), 500
+
+    # ... (return the generated image URLs)
+
+# Add this new route to get API usage statistics
+@app.route('/api_usage_stats')
+@login_required
+def api_usage_stats():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Fetch daily API usage for the last 30 days
+    cur.execute("""
+        SELECT usage_date, count
+        FROM api_usage
+        WHERE user_id = %s AND usage_date >= CURRENT_DATE - INTERVAL '30 days'
+        ORDER BY usage_date
+    """, (current_user.id,))
+    
+    usage_stats = cur.fetchall()
+    
+    cur.close()
+    conn.close()
+    
+    return jsonify(usage_stats)
+
+@app.route('/check_login')
+def check_login():
+    return jsonify({"logged_in": current_user.is_authenticated})
+
+def send_otp_email(email, otp):
+    msg = MIMEMultipart()
+    msg['From'] = app.config['SMTP_USERNAME']
+    msg['To'] = email
+    msg['Subject'] = 'Your OTP for signup'
+    
+    body = f'Your OTP for signup is: {otp}'
+    msg.attach(MIMEText(body, 'plain'))
+    
+    with smtplib.SMTP_SSL(app.config['SMTP_SERVER'], app.config['SMTP_PORT']) as server:
+        server.login(app.config['SMTP_USERNAME'], app.config['SMTP_PASSWORD'])
+        server.send_message(msg)
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        if 'otp' in request.form:
+            # OTP verification step
+            email = session.get('signup_email')
+            otp = request.form['otp']
+            
+            if otp != session.get('signup_otp'):
+                flash('Invalid OTP')
+                return render_template('signup.html', email=email, show_otp=True)
+            
+            # OTP is valid, create the user
+            password = session.get('signup_password')
+            hashed_password = generate_password_hash(password)
+            
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("INSERT INTO users (email, password) VALUES (%s, %s)", (email, hashed_password))
+            conn.commit()
+            cur.close()
+            conn.close()
+            
+            # Clear session data
+            session.pop('signup_otp', None)
+            session.pop('signup_email', None)
+            session.pop('signup_password', None)
+            
+            flash('Account created successfully')
+            return redirect(url_for('login'))
+        else:
+            # Initial signup step
+            email = request.form['email']
+            password = request.form['password']
+            
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM users WHERE email = %s", (email,))
+            if cur.fetchone():
+                flash('Email already exists')
+                cur.close()
+                conn.close()
+                return redirect(url_for('signup'))
+            cur.close()
+            conn.close()
+            
+            # Generate OTP
+            otp = str(random.randint(100000, 999999))
+            
+            # Store OTP and user details in session
+            session['signup_otp'] = otp
+            session['signup_email'] = email
+            session['signup_password'] = password
+            
+            # Send OTP via email
+            send_otp_email(email, otp)
+            
+            flash('OTP sent to your email. Please enter it to complete signup. check Spam')
+            return render_template('signup.html', email=email, show_otp=True)
+    
+    return render_template('signup.html', show_otp=False)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users WHERE email = %s", (email,))
+        user = cur.fetchone()
+        cur.close()
+        conn.close()
+        if user and check_password_hash(user[2], password):
+            user_obj = User(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8])
+            login_user(user_obj)
+            return redirect(url_for('index'))
+        flash('Invalid email or password')
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out successfully.', 'info')
+    return redirect(url_for('login'))
+
+def check_user_quota(user):
+    if not user.is_premium:
+        return user.prompt_count < 5
+    else:
+        # Check if the subscription has expired
+        if user.subscription_start and datetime.now() - user.subscription_start > timedelta(days=30):
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("""
+                UPDATE users 
+                SET is_premium = FALSE, 
+                    subscription_start = NULL, 
+                    monthly_quota = 0 
+                WHERE id = %s
+            """, (user.id,))
+            conn.commit()
+            cur.close()
+            conn.close()
+            return False
+        return user.monthly_quota > 0
+    
 @app.route('/manifest.json')
 def manifest():
     return send_from_directory('static', 'manifest.json')
@@ -264,977 +619,6 @@ def manifest():
 @app.route('/service-worker.js')
 def service_worker():
     return send_from_directory('.', 'service-worker.js')
-
-@app.template_filter('custom_datetime')
-def custom_datetime(value):
-    if isinstance(value, str):
-        try:
-            return datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f')
-        except ValueError:
-            try:
-                return datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
-            except ValueError:
-                return value
-    return value
-
-@app.route('/')
-def home():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    
-    # Fetch the most recent generated images with all necessary information
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT url, prompt, style, color, created_at 
-        FROM images 
-        ORDER BY created_at DESC 
-        LIMIT 12
-    """)
-    images = [
-        {
-            'url': row[0],
-            'prompt': row[1],
-            'style': row[2],
-            'color': row[3],
-            'created_at': row[4]
-        } for row in cur.fetchall()
-    ]
-    cur.close()
-    conn.close()
-    
-    return render_template('home.html', images=images)
-
-# Update the login manager to use the new home page
-login_manager.login_view = 'home'
-
-@app.route('/dashboard')
-@login_required
-def index():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT url, prompt, style, color, created_at FROM images WHERE user_id = %s ORDER BY created_at DESC", (current_user.id,))
-    images = cur.fetchall()
-    
-    # Get user's premium status and remaining credits
-    cur.execute("SELECT is_premium, prompt_count, monthly_quota FROM users WHERE id = %s", (current_user.id,))
-    user_data = cur.fetchone()
-    is_premium, prompt_count, monthly_quota = user_data
-    
-    cur.close()
-    conn.close()
-    
-    # Calculate remaining credits
-    if is_premium:
-        remaining_credits = monthly_quota
-    else:
-        remaining_credits = 5 - prompt_count
-    
-    user_agent = request.user_agent.string.lower()
-    if 'mobile' in user_agent or 'android' in user_agent or 'iphone' in user_agent or 'ipad' in user_agent:
-        return render_template('mobile.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
-    else:
-        return render_template('index.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
-
-@app.route('/api_dashboard')
-@login_required
-def api_dashboard():
-    if not current_user.is_authenticated:
-        flash('Please log in to access the API dashboard.', 'warning')
-        return redirect(url_for('login'))
-    
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
-    # Fetch user's API key
-    cur.execute("SELECT api_key FROM users WHERE id = %s", (current_user.id,))
-    api_key = cur.fetchone()[0]
-    
-    # Fetch API usage
-    cur.execute("""
-        SELECT COUNT(*) FROM images 
-        WHERE user_id = %s AND created_at >= NOW() - INTERVAL '30 days'
-    """, (current_user.id,))
-    api_usage = cur.fetchone()[0]
-    
-    cur.close()
-    conn.close()
-    
-    return render_template('dashboard.html', api_key=api_key, api_usage=api_usage)
-
-@app.route('/generate_api_key', methods=['POST'])
-@login_required
-def generate_api_key():
-    new_api_key = secrets.token_urlsafe(32)
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("UPDATE users SET api_key = %s WHERE id = %s", (new_api_key, current_user.id))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return jsonify({"api_key": new_api_key})
-
-@app.route('/revoke_api_key', methods=['POST'])
-@login_required
-def revoke_api_key():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("UPDATE users SET api_key = NULL WHERE id = %s", (current_user.id,))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return jsonify({"message": "API key revoked successfully"})
-
-# Update the existing api_transform_image function to track usage
-@app.route('/api/transform', methods=['POST'])
-def api_transform_image():
-    api_key = request.headers.get('X-API-Key')
-    if not api_key:
-        return jsonify({"error": "API key is required"}), 401
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT id FROM users WHERE api_key = %s", (api_key,))
-    user = cur.fetchone()
-
-    if not user:
-        cur.close()
-        conn.close()
-        return jsonify({"error": "Invalid API key"}), 401
-
-    user_id = user[0]
-
-    # Get request data
-    data = request.json
-    prompt = data.get('prompt')
-    image_size = data.get('image_size', 512)
-    style = data.get('style', 'art style')
-    color = data.get('color', 'vibrant colors')
-
-    if not prompt:
-        return jsonify({'error': 'No prompt provided'}), 400
-
-    # Prepare input data for the image generation model
-    input_data = {
-        "detect_resolution": image_size,
-        "image_resolution": image_size,
-        "return_width": image_size,
-        "return_height": image_size,
-        "prompt": f"{prompt}, {style}, {color}",
-        "num_samples": 1,
-        "num_inference_steps": 20,
-        "guidance_scale": 9,
-        "nsfw": True
-    }
-
-    try:
-        # Use the image generation model (replace with your actual model)
-        output = replicate.run(
-            "stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf",
-            input=input_data
-        )
-
-        # Process the output
-        image_urls = output if isinstance(output, list) else [output]
-
-        # Save image information to the database
-        for url in image_urls:
-            cur.execute("""
-                INSERT INTO images (user_id, url, prompt, style, color, created_at)
-                VALUES (%s, %s, %s, %s, %s, NOW())
-            """, (user_id, url, prompt, style, color))
-
-        conn.commit()
-
-        # Update API usage count
-        cur.execute("""
-            INSERT INTO api_usage (user_id, usage_date, count)
-            VALUES (%s, CURRENT_DATE, 1)
-            ON CONFLICT (user_id, usage_date)
-            DO UPDATE SET count = api_usage.count + 1
-        """, (user_id,))
-        conn.commit()
-
-        cur.close()
-        conn.close()
-
-        return jsonify({"image_urls": image_urls})
-
-    except Exception as e:
-        cur.close()
-        conn.close()
-        return jsonify({"error": str(e)}), 500
-
-    # ... (return the generated image URLs)
-
-# Add this new route to get API usage statistics
-@app.route('/api_usage_stats')
-@login_required
-def api_usage_stats():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
-    # Fetch daily API usage for the last 30 days
-    cur.execute("""
-        SELECT usage_date, count
-        FROM api_usage
-        WHERE user_id = %s AND usage_date >= CURRENT_DATE - INTERVAL '30 days'
-        ORDER BY usage_date
-    """, (current_user.id,))
-    
-    usage_stats = cur.fetchall()
-    
-    cur.close()
-    conn.close()
-    
-    return jsonify(usage_stats)
-
-@app.route('/check_login')
-def check_login():
-    return jsonify({"logged_in": current_user.is_authenticated})
-
-def send_otp_email(email, otp):
-    msg = MIMEMultipart()
-    msg['From'] = app.config['SMTP_USERNAME']
-    msg['To'] = email
-    msg['Subject'] = 'Your OTP for signup'
-    
-    body = f'Your OTP for signup is: {otp}'
-    msg.attach(MIMEText(body, 'plain'))
-    
-    with smtplib.SMTP_SSL(app.config['SMTP_SERVER'], app.config['SMTP_PORT']) as server:
-        server.login(app.config['SMTP_USERNAME'], app.config['SMTP_PASSWORD'])
-        server.send_message(msg)
-
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    
-    if request.method == 'POST':
-        if 'otp' in request.form:
-            # OTP verification step
-            email = session.get('signup_email')
-            otp = request.form['otp']
-            
-            if otp != session.get('signup_otp'):
-                flash('Invalid OTP')
-                return render_template('signup.html', email=email, show_otp=True)
-            
-            # OTP is valid, create the user
-            password = session.get('signup_password')
-            hashed_password = generate_password_hash(password)
-            
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute("INSERT INTO users (email, password) VALUES (%s, %s)", (email, hashed_password))
-            conn.commit()
-            cur.close()
-            conn.close()
-            
-            # Clear session data
-            session.pop('signup_otp', None)
-            session.pop('signup_email', None)
-            session.pop('signup_password', None)
-            
-            flash('Account created successfully')
-            return redirect(url_for('login'))
-        else:
-            # Initial signup step
-            email = request.form['email']
-            password = request.form['password']
-            
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute("SELECT * FROM users WHERE email = %s", (email,))
-            if cur.fetchone():
-                flash('Email already exists')
-                cur.close()
-                conn.close()
-                return redirect(url_for('signup'))
-            cur.close()
-            conn.close()
-            
-            # Generate OTP
-            otp = str(random.randint(100000, 999999))
-            
-            # Store OTP and user details in session
-            session['signup_otp'] = otp
-            session['signup_email'] = email
-            session['signup_password'] = password
-            
-            # Send OTP via email
-            send_otp_email(email, otp)
-            
-            flash('OTP sent to your email. Please enter it to complete signup. check Spam')
-            return render_template('signup.html', email=email, show_otp=True)
-    
-    return render_template('signup.html', show_otp=False)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE email = %s", (email,))
-        user = cur.fetchone()
-        cur.close()
-        conn.close()
-        if user and check_password_hash(user[2], password):
-            user_obj = User(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8])
-            login_user(user_obj)
-            return redirect(url_for('index'))
-        flash('Invalid email or password')
-    return render_template('login.html')
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    flash('You have been logged out successfully.', 'info')
-    return redirect(url_for('login'))
-
-def check_user_quota(user):
-    if not user.is_premium:
-        return user.prompt_count < 5
-    else:
-        # Check if the subscription has expired
-        if user.subscription_start and datetime.now() - user.subscription_start > timedelta(days=30):
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute("""
-                UPDATE users 
-                SET is_premium = FALSE, 
-                    subscription_start = NULL, 
-                    monthly_quota = 0 
-                WHERE id = %s
-            """, (user.id,))
-            conn.commit()
-            cur.close()
-            conn.close()
-            return False
-        return user.monthly_quota > 0
-
-@app.route('/transform', methods=['POST'])
-@login_required
-from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash, session
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-import os
-import replicate
-from dotenv import load_dotenv
-from werkzeug.utils import secure_filename
-import base64
-import requests
-from io import BytesIO
-import time
-import psycopg2
-from psycopg2 import sql
-from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
-import secrets  # Add this import at the top of the file
-import razorpay
-from apscheduler.schedulers.background import BackgroundScheduler
-import atexit
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-import random
-import redis
-from flask_session import Session
-from flask import send_from_directory
-
-
-load_dotenv()
-
-from dotenv import load_dotenv
-import os
-
-load_dotenv()  # This loads the variables from .env
-
-app = Flask(__name__, static_folder='static')
-app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER')
-app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_CONTENT_LENGTH'))  # 16MB max upload size
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
-app.config['RAZORPAY_KEY_ID'] = os.getenv('RAZORPAY_KEY_ID')
-app.config['RAZORPAY_KEY_SECRET'] = os.getenv('RAZORPAY_KEY_SECRET')
-razorpay_client = razorpay.Client(auth=(app.config['RAZORPAY_KEY_ID'], app.config['RAZORPAY_KEY_SECRET']))
-app.config['SESSION_TYPE'] = 'filesystem'
-
-# Add these configurations
-app.config['SMTP_SERVER'] = os.getenv('SMTP_SERVER')
-app.config['SMTP_PORT'] = int(os.getenv('SMTP_PORT'))
-app.config['SMTP_USERNAME'] = os.getenv('SMTP_USERNAME')
-app.config['SMTP_PASSWORD'] = os.getenv('SMTP_PASSWORD')
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
-app.config['SESSION_TYPE'] = 'filesystem'
-
-# Redis Configuration
-app.config['REDIS_URL'] = os.getenv('REDIS_URL', 'redis://127.0.0.1:4000')
-app.config['SESSION_TYPE'] = 'redis'
-app.config['SESSION_PERMANENT'] = False
-app.config['SESSION_USE_SIGNER'] = True
-app.config['SESSION_REDIS'] = redis.from_url(app.config['REDIS_URL'])
-
-# Initialize Redis
-redis_client = redis.from_url(app.config['REDIS_URL'])
-
-# Initialize Flask-Session
-Session(app)
-
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
-
-class User(UserMixin):
-    def __init__(self, id, email, password, username=None, is_premium=False, prompt_count=0, subscription_start=None, monthly_quota=0, is_admin=False):
-        self.id = id
-        self.email = email
-        self.password = password
-        self.username = username
-        self.is_premium = is_premium
-        self.prompt_count = prompt_count
-        self.subscription_start = subscription_start
-        self.monthly_quota = monthly_quota
-        self.is_admin = is_admin
-
-@login_manager.user_loader
-def load_user(user_id):
-    user_key = f'user:{user_id}'
-    user_data = redis_client.hgetall(user_key)
-    
-    if user_data:
-        return User(
-            int(user_data[b'id']),
-            user_data[b'email'].decode('utf-8'),
-            user_data[b'password'].decode('utf-8'),
-            user_data.get(b'username', b'').decode('utf-8') or None,
-            bool(int(user_data[b'is_premium'])),
-            int(user_data[b'prompt_count']),
-            datetime.fromisoformat(user_data[b'subscription_start'].decode('utf-8')) if user_data[b'subscription_start'] else None,
-            int(user_data[b'monthly_quota']),
-            bool(int(user_data.get(b'is_admin', b'0')))
-        )
-    
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT id, email, password, username, COALESCE(is_premium, FALSE) as is_premium, COALESCE(prompt_count, 0) as prompt_count, subscription_start, monthly_quota, COALESCE(is_admin, FALSE) as is_admin FROM users WHERE id = %s", (user_id,))
-    user = cur.fetchone()
-    cur.close()
-    conn.close()
-    
-    if user:
-        # Cache user data in Redis
-        redis_client.hmset(user_key, {
-            'id': user[0],
-            'email': user[1],
-            'password': user[2],
-            'username': user[3] or '',
-            'is_premium': int(user[4]),
-            'prompt_count': user[5],
-            'subscription_start': user[6].isoformat() if user[6] else '',
-            'monthly_quota': user[7],
-            'is_admin': int(user[8])
-        })
-        redis_client.expire(user_key, 3600)  # Cache for 1 hour
-        
-        return User(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8])
-    return None
-
-def get_db_connection():
-    conn = psycopg2.connect(app.config['DATABASE_URL'])
-    return conn
-
-def init_db():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
-    # Create users table if it doesn't exist
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
-            email VARCHAR(120) UNIQUE NOT NULL,
-            password VARCHAR(255) NOT NULL
-        )
-    """)
-    
-    # Add is_premium column if it doesn't exist
-    cur.execute("""
-        DO $$
-        BEGIN
-            IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                           WHERE table_name='users' AND column_name='is_premium') THEN
-                ALTER TABLE users ADD COLUMN is_premium BOOLEAN DEFAULT FALSE;
-            END IF;
-        END $$;
-    """)
-    
-    # Add prompt_count column if it doesn't exist
-    cur.execute("""
-        DO $$
-        BEGIN
-            IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                           WHERE table_name='users' AND column_name='prompt_count') THEN
-                ALTER TABLE users ADD COLUMN prompt_count INTEGER DEFAULT 0;
-            END IF;
-        END $$;
-    """)
-    
-    # Create images table with all necessary columns
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS images (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER REFERENCES users(id),
-            url VARCHAR(255) NOT NULL,
-            prompt TEXT,
-            style VARCHAR(255),
-            color VARCHAR(255),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    
-    # Add columns if they don't exist
-    columns_to_add = [
-        ('user_id', 'INTEGER REFERENCES users(id)'),
-        ('prompt', 'TEXT'),
-        ('style', 'VARCHAR(255)'),
-        ('color', 'VARCHAR(255)'),
-        ('created_at', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
-    ]
-    
-    for column_name, column_type in columns_to_add:
-        cur.execute(f"""
-            DO $$
-            BEGIN
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                               WHERE table_name='images' AND column_name='{column_name}') THEN
-                    ALTER TABLE images ADD COLUMN {column_name} {column_type};
-                END IF;
-            END $$;
-        """)
-    
-    # Add api_key column to users table
-    cur.execute("""
-        ALTER TABLE users ADD COLUMN IF NOT EXISTS api_key VARCHAR(64) UNIQUE;
-    """)
-    
-    # Add subscription_start and monthly_quota columns
-    cur.execute("""
-        ALTER TABLE users 
-        ADD COLUMN IF NOT EXISTS subscription_start TIMESTAMP,
-        ADD COLUMN IF NOT EXISTS monthly_quota INTEGER DEFAULT 0;
-    """)
-    
-    # Add is_admin column to users table
-    cur.execute("""
-        ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
-    """)
-    
-    # Create api_usage table
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS api_usage (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER REFERENCES users(id),
-            usage_date DATE NOT NULL,
-            count INTEGER NOT NULL DEFAULT 0,
-            UNIQUE (user_id, usage_date)
-        )
-    """)
-    
-    # Create videos table
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS videos (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER REFERENCES users(id),
-            url VARCHAR(255) NOT NULL,
-            prompt TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    
-    # Add username column to users table
-    cur.execute("""
-        ALTER TABLE users 
-        ADD COLUMN IF NOT EXISTS username VARCHAR(50) UNIQUE;
-    """)
-    
-    conn.commit()
-    cur.close()
-    conn.close()
-
-
-with app.app_context():
-    init_db()
-
-def safe_get(data, index, default=None):
-    if isinstance(data, dict):
-        return data.get(index, default)
-    elif isinstance(data, (list, tuple)):
-        return data[index] if index < len(data) else default
-    return default
-
-@app.template_filter('custom_datetime')
-def custom_datetime(value):
-    if isinstance(value, str):
-        try:
-            return datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f')
-        except ValueError:
-            try:
-                return datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
-            except ValueError:
-                return value
-    return value
-
-@app.route('/')
-def home():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    
-    # Fetch the most recent generated images with all necessary information
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT url, prompt, style, color, created_at 
-        FROM images 
-        ORDER BY created_at DESC 
-        LIMIT 12
-    """)
-    images = [
-        {
-            'url': row[0],
-            'prompt': row[1],
-            'style': row[2],
-            'color': row[3],
-            'created_at': row[4]
-        } for row in cur.fetchall()
-    ]
-    cur.close()
-    conn.close()
-    
-    return render_template('home.html', images=images)
-
-# Update the login manager to use the new home page
-login_manager.login_view = 'home'
-
-@app.route('/dashboard')
-@login_required
-def index():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT url, prompt, style, color, created_at FROM images WHERE user_id = %s ORDER BY created_at DESC", (current_user.id,))
-    images = cur.fetchall()
-    
-    # Get user's premium status and remaining credits
-    cur.execute("SELECT is_premium, prompt_count, monthly_quota FROM users WHERE id = %s", (current_user.id,))
-    user_data = cur.fetchone()
-    is_premium, prompt_count, monthly_quota = user_data
-    
-    cur.close()
-    conn.close()
-    
-    # Calculate remaining credits
-    if is_premium:
-        remaining_credits = monthly_quota
-    else:
-        remaining_credits = 5 - prompt_count
-    
-    user_agent = request.user_agent.string.lower()
-    if 'mobile' in user_agent or 'android' in user_agent or 'iphone' in user_agent or 'ipad' in user_agent:
-        return render_template('mobile.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
-    else:
-        return render_template('index.html', images=images, safe_get=safe_get, remaining_credits=remaining_credits, is_premium=is_premium)
-
-@app.route('/api_dashboard')
-@login_required
-def api_dashboard():
-    if not current_user.is_authenticated:
-        flash('Please log in to access the API dashboard.', 'warning')
-        return redirect(url_for('login'))
-    
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
-    # Fetch user's API key
-    cur.execute("SELECT api_key FROM users WHERE id = %s", (current_user.id,))
-    api_key = cur.fetchone()[0]
-    
-    # Fetch API usage
-    cur.execute("""
-        SELECT COUNT(*) FROM images 
-        WHERE user_id = %s AND created_at >= NOW() - INTERVAL '30 days'
-    """, (current_user.id,))
-    api_usage = cur.fetchone()[0]
-    
-    cur.close()
-    conn.close()
-    
-    return render_template('dashboard.html', api_key=api_key, api_usage=api_usage)
-
-@app.route('/generate_api_key', methods=['POST'])
-@login_required
-def generate_api_key():
-    new_api_key = secrets.token_urlsafe(32)
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("UPDATE users SET api_key = %s WHERE id = %s", (new_api_key, current_user.id))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return jsonify({"api_key": new_api_key})
-
-@app.route('/revoke_api_key', methods=['POST'])
-@login_required
-def revoke_api_key():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("UPDATE users SET api_key = NULL WHERE id = %s", (current_user.id,))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return jsonify({"message": "API key revoked successfully"})
-
-# Update the existing api_transform_image function to track usage
-@app.route('/api/transform', methods=['POST'])
-def api_transform_image():
-    api_key = request.headers.get('X-API-Key')
-    if not api_key:
-        return jsonify({"error": "API key is required"}), 401
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT id FROM users WHERE api_key = %s", (api_key,))
-    user = cur.fetchone()
-
-    if not user:
-        cur.close()
-        conn.close()
-        return jsonify({"error": "Invalid API key"}), 401
-
-    user_id = user[0]
-
-    # Get request data
-    data = request.json
-    prompt = data.get('prompt')
-    image_size = data.get('image_size', 512)
-    style = data.get('style', 'art style')
-    color = data.get('color', 'vibrant colors')
-
-    if not prompt:
-        return jsonify({'error': 'No prompt provided'}), 400
-
-    # Prepare input data for the image generation model
-    input_data = {
-        "detect_resolution": image_size,
-        "image_resolution": image_size,
-        "return_width": image_size,
-        "return_height": image_size,
-        "prompt": f"{prompt}, {style}, {color}",
-        "num_samples": 1,
-        "num_inference_steps": 20,
-        "guidance_scale": 9,
-        "nsfw": True
-    }
-
-    try:
-        # Use the image generation model (replace with your actual model)
-        output = replicate.run(
-            "stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf",
-            input=input_data
-        )
-
-        # Process the output
-        image_urls = output if isinstance(output, list) else [output]
-
-        # Save image information to the database
-        for url in image_urls:
-            cur.execute("""
-                INSERT INTO images (user_id, url, prompt, style, color, created_at)
-                VALUES (%s, %s, %s, %s, %s, NOW())
-            """, (user_id, url, prompt, style, color))
-
-        conn.commit()
-
-        # Update API usage count
-        cur.execute("""
-            INSERT INTO api_usage (user_id, usage_date, count)
-            VALUES (%s, CURRENT_DATE, 1)
-            ON CONFLICT (user_id, usage_date)
-            DO UPDATE SET count = api_usage.count + 1
-        """, (user_id,))
-        conn.commit()
-
-        cur.close()
-        conn.close()
-
-        return jsonify({"image_urls": image_urls})
-
-    except Exception as e:
-        cur.close()
-        conn.close()
-        return jsonify({"error": str(e)}), 500
-
-    # ... (return the generated image URLs)
-
-# Add this new route to get API usage statistics
-@app.route('/api_usage_stats')
-@login_required
-def api_usage_stats():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
-    # Fetch daily API usage for the last 30 days
-    cur.execute("""
-        SELECT usage_date, count
-        FROM api_usage
-        WHERE user_id = %s AND usage_date >= CURRENT_DATE - INTERVAL '30 days'
-        ORDER BY usage_date
-    """, (current_user.id,))
-    
-    usage_stats = cur.fetchall()
-    
-    cur.close()
-    conn.close()
-    
-    return jsonify(usage_stats)
-
-@app.route('/check_login')
-def check_login():
-    return jsonify({"logged_in": current_user.is_authenticated})
-
-def send_otp_email(email, otp):
-    msg = MIMEMultipart()
-    msg['From'] = app.config['SMTP_USERNAME']
-    msg['To'] = email
-    msg['Subject'] = 'Your OTP for signup'
-    
-    body = f'Your OTP for signup is: {otp}'
-    msg.attach(MIMEText(body, 'plain'))
-    
-    with smtplib.SMTP_SSL(app.config['SMTP_SERVER'], app.config['SMTP_PORT']) as server:
-        server.login(app.config['SMTP_USERNAME'], app.config['SMTP_PASSWORD'])
-        server.send_message(msg)
-
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    
-    if request.method == 'POST':
-        if 'otp' in request.form:
-            # OTP verification step
-            email = session.get('signup_email')
-            otp = request.form['otp']
-            
-            if otp != session.get('signup_otp'):
-                flash('Invalid OTP')
-                return render_template('signup.html', email=email, show_otp=True)
-            
-            # OTP is valid, create the user
-            password = session.get('signup_password')
-            hashed_password = generate_password_hash(password)
-            
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute("INSERT INTO users (email, password) VALUES (%s, %s)", (email, hashed_password))
-            conn.commit()
-            cur.close()
-            conn.close()
-            
-            # Clear session data
-            session.pop('signup_otp', None)
-            session.pop('signup_email', None)
-            session.pop('signup_password', None)
-            
-            flash('Account created successfully')
-            return redirect(url_for('login'))
-        else:
-            # Initial signup step
-            email = request.form['email']
-            password = request.form['password']
-            
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute("SELECT * FROM users WHERE email = %s", (email,))
-            if cur.fetchone():
-                flash('Email already exists')
-                cur.close()
-                conn.close()
-                return redirect(url_for('signup'))
-            cur.close()
-            conn.close()
-            
-            # Generate OTP
-            otp = str(random.randint(100000, 999999))
-            
-            # Store OTP and user details in session
-            session['signup_otp'] = otp
-            session['signup_email'] = email
-            session['signup_password'] = password
-            
-            # Send OTP via email
-            send_otp_email(email, otp)
-            
-            flash('OTP sent to your email. Please enter it to complete signup. check Spam')
-            return render_template('signup.html', email=email, show_otp=True)
-    
-    return render_template('signup.html', show_otp=False)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE email = %s", (email,))
-        user = cur.fetchone()
-        cur.close()
-        conn.close()
-        if user and check_password_hash(user[2], password):
-            user_obj = User(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8])
-            login_user(user_obj)
-            return redirect(url_for('index'))
-        flash('Invalid email or password')
-    return render_template('login.html')
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    flash('You have been logged out successfully.', 'info')
-    return redirect(url_for('login'))
-
-def check_user_quota(user):
-    if not user.is_premium:
-        return user.prompt_count < 5
-    else:
-        # Check if the subscription has expired
-        if user.subscription_start and datetime.now() - user.subscription_start > timedelta(days=30):
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute("""
-                UPDATE users 
-                SET is_premium = FALSE, 
-                    subscription_start = NULL, 
-                    monthly_quota = 0 
-                WHERE id = %s
-            """, (user.id,))
-            conn.commit()
-            cur.close()
-            conn.close()
-            return False
-        return user.monthly_quota > 0
 
 @app.route('/transform', methods=['POST'])
 @login_required
