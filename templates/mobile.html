@@ -288,7 +288,7 @@
 <body>
     <div class="header">
         <img src="https://raw.githubusercontent.com/mrbrokecoder/ChatCat/main/ComfyUI_Generate_1_image%20(2).png" alt="AI Art Generator Logo" class="header-logo">
-        <h1 class="header-title">AI Art Generator</h1>
+        <h1 class="header-title"></h1>
     </div>
 
     <div class="container">
@@ -305,9 +305,9 @@
                 <button class="generate-btn" id="generateButton">Create Magic</button>
             </div>
 
-            <div id="loading">
-                <div class="spinner"></div>
-                <p>Crafting your masterpiece...</p>
+            <div id="generateLoader" class="loader">
+                <div class="loader-spinner"></div>
+                <div class="loader-text">Crafting your masterpiece...</div>
             </div>
 
             <div class="section">
@@ -394,10 +394,18 @@
                         <p>Premium: {{ remaining_credits }} / 1600 creations left</p>
                     {% else %}
                         <p>Free: {{ remaining_credits }} / 5 creations left</p>
-                        <button class="generate-btn">Unlock Premium</button>
+                        <button id="premiumBtn" class="generate-btn">Unlock Premium</button>
                     {% endif %}
                 </div>
+                <div id="premiumLoader" class="loader">
+                    <div class="loader-spinner"></div>
+                    <div class="loader-text">Upgrading to premium...</div>
+                </div>
                 <button id="signOutBtn" class="upload-btn">Sign Out</button>
+                <div id="signOutLoader" class="loader">
+                    <div class="loader-spinner"></div>
+                    <div class="loader-text">Signing out...</div>
+                </div>
             </div>
         </div>
     </div>
@@ -514,7 +522,7 @@
                 formData.append('file', fileInput.files[0]);
             }
 
-            document.getElementById('loading').style.display = 'block';
+            document.getElementById('generateLoader').style.display = 'block';
             document.getElementById('generateButton').disabled = true;
 
             axios.post('/transform', formData, {
@@ -539,7 +547,7 @@
                 alert('Failed to generate image. Please try again.');
             })
             .finally(() => {
-                document.getElementById('loading').style.display = 'none';
+                document.getElementById('generateLoader').style.display = 'none';
                 document.getElementById('generateButton').disabled = false;
             });
         });
@@ -607,6 +615,7 @@
 
         // Add this near the end of the script section
         document.getElementById('signOutBtn').addEventListener('click', function() {
+            document.getElementById('signOutLoader').style.display = 'block';
             axios.post('/logout')
                 .then(response => {
                     if (response.data.success) {
@@ -618,8 +627,25 @@
                 .catch(error => {
                     console.error('Error signing out:', error);
                     alert('An error occurred while signing out. Please try again.');
+                })
+                .finally(() => {
+                    document.getElementById('signOutLoader').style.display = 'none';
                 });
         });
+
+        // Add this for the premium button
+        const premiumBtn = document.getElementById('premiumBtn');
+        if (premiumBtn) {
+            premiumBtn.addEventListener('click', function() {
+                document.getElementById('premiumLoader').style.display = 'block';
+                // Here you would typically make an API call to upgrade the user
+                // For now, we'll just simulate a delay
+                setTimeout(() => {
+                    document.getElementById('premiumLoader').style.display = 'none';
+                    window.location.href = '/premium';
+                }, 2000);
+            });
+        }
     </script>
 </body>
 
