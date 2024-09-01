@@ -6,25 +6,25 @@ services:
     startCommand: "gunicorn app:app"
     envVars:
       - key: SECRET_KEY
-        fromRender: true
+        fromSecret: SECRET_KEY
       - key: DATABASE_URL
-        fromRender: true
+        fromSecret: DATABASE_URL
       - key: REDIS_URL
-        fromRender: true
+        fromSecret: REDIS_URL
       - key: REPLICATE_API_TOKEN
-        fromRender: true
+        fromSecret: REPLICATE_API_TOKEN
       - key: RAZORPAY_KEY_ID
-        fromRender: true
+        fromSecret: RAZORPAY_KEY_ID
       - key: RAZORPAY_KEY_SECRET
-        fromRender: true
+        fromSecret: RAZORPAY_KEY_SECRET
       - key: SMTP_SERVER
-        fromRender: true
+        fromSecret: SMTP_SERVER
       - key: SMTP_PORT
-        fromRender: true
+        fromSecret: SMTP_PORT
       - key: SMTP_USERNAME
-        fromRender: true
+        fromSecret: SMTP_USERNAME
       - key: SMTP_PASSWORD
-        fromRender: true
+        fromSecret: SMTP_PASSWORD
     autoDeploy: true
 
 databases:
