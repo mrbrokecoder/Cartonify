@@ -37,7 +37,7 @@ databases:
   - name: image-garden-db
     databaseName: image_garden_db
     user: image_garden_user
-    region:Oregon
+    region: Oregon
 
 redis:
   - name: image-garden-redis
