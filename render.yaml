@@ -32,7 +32,3 @@ databases:
     databaseName: image_garden_db
     user: image_garden_user
     region: oregon
-
-redis:
-  - name: image-garden-redis
-    region: oregon
