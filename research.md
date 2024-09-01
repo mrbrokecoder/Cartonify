@@ -1,7 +1,35 @@
 # Detailed Report on Flask Web Application
 
+<div align="center">
+  <img src="https://raw.githubusercontent.com/mrbrokecoder/ChatCat/main/ComfyUI_Generate_1_image%20(2).png" alt="Image Garden Logo" width="120" height="120" style="border-radius: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+  <h1 style="font-size: 2.5em; color: #2c3e50; margin-top: 20px;">Image Garden</h1>
+  <p style="font-size: 1.2em; color: #34495e; font-style: italic;">Cultivate Your Visual Imagination</p>
+  <hr style="width: 50%; border: 1px solid #3498db; margin: 20px auto;">
+  <p style="font-size: 1em; color: #7f8c8d;">Created by <strong>Team Indicus</strong></p>
+  <p style="font-size: 0.9em; color: #95a5a6;">
+    Creators: <span style="color: #2980b9;">Adarsh Gupta</span> & <span style="color: #2980b9;">Prajjawal Sah</span>
+  </p>
+  <img src="https://raw.githubusercontent.com/mrbrokecoder/Cartonify/main/code_report/screenshot.png" alt="Application Screenshot" style="max-width: 100%; height: auto; margin-top: 20px;">
+</div>
+
+
 ## Introduction
 This report provides an in-depth analysis of a Flask web application designed to facilitate the generation and management of images and videos based on user prompts. The application leverages a robust technology stack to ensure security, performance, and user experience.
+
+Flask, a micro web framework written in Python, serves as the backbone of this application. Known for its simplicity and flexibility, Flask allows for rapid development and prototyping, making it an ideal choice for building web applications. The application is designed to handle complex tasks such as user authentication, content generation, and API management, all while maintaining a high level of security and performance.
+
+The application architecture is modular, with distinct components for user management, image and video generation, database operations, payment integration, and administrative functions. Each component is designed to be scalable and maintainable, ensuring that the application can grow and adapt to changing requirements.
+
+To provide a seamless user experience, the application integrates with several external services, including Replicate for AI-driven content generation and Razorpay for secure payment processing. Additionally, Redis is used for caching and session management, enhancing the application's performance and responsiveness.
+
+Security is a top priority in this application. User passwords are securely hashed using Werkzeug, and OTP verification is implemented during signup to ensure that only legitimate users can create accounts. Rate limiting is enforced using Redis to prevent abuse and ensure fair usage of the application's resources.
+
+The application also includes a comprehensive administrative dashboard, allowing administrators to manage user accounts, monitor API usage, and oversee content generation. This ensures that the application remains efficient and compliant with usage policies.
+
+In terms of deployment, the application is containerized using Docker, making it easy to deploy and scale across different environments. Continuous Integration/Continuous Deployment (CI/CD) is set up using GitHub Actions, ensuring that updates can be deployed quickly and reliably.
+
+Overall, this report aims to provide a detailed overview of the application's architecture, features, and technology stack, highlighting the key components and their interactions. The following sections will delve deeper into each aspect of the application, providing insights into its design and implementation.
+
 
 
 ## Application Architecture Mindmap
@@ -13,10 +41,24 @@ The following mind map illustrates the overall architecture and key components o
 This mind map provides a comprehensive overview of the application's structure, highlighting the main modules, services, and their interconnections. It serves as a visual guide to understanding the complex ecosystem of the Flask web application.
 
 
-## Technology Stack
+## Sequence Diagram
 
+To better understand the flow of operations within the application, particularly for the image generation process, we have created a sequence diagram:
 
-## Application Flow
+![Sequence Diagram](https://raw.githubusercontent.com/mrbrokecoder/Cartonify/main/code_report/siquance%20diagram.png)
+
+This sequence diagram illustrates the step-by-step process of how a user interacts with the application to generate an image, including:
+
+1. User authentication
+2. Prompt submission
+3. Quota checking
+4. Interaction with the Replicate API for image generation
+5. Storing the generated image
+6. Returning the result to the user
+
+The diagram provides a clear visual representation of the application's workflow, highlighting the interactions between different components and services. This helps in understanding the system's behavior and can be valuable for both development and debugging purposes.
+
+## Application Structure
 
 The following flowchart illustrates the high-level flow of the application:
 
@@ -24,6 +66,51 @@ The following flowchart illustrates the high-level flow of the application:
 
 This flowchart provides a visual representation of the main processes and user interactions within the application, from user authentication to image generation and management.
 
+### Configuration and Initialization
+- **Environment Variables**: The application uses environment variables loaded via `python-dotenv` for configuration settings, ensuring that sensitive information is not hard-coded into the application.
+- **Flask App Initialization**: The Flask app is initialized with specific configurations such as the secret key, upload folder, maximum content length, and database URLs.
+- **Database Initialization**: The application includes functions to initialize the PostgreSQL database with necessary tables and columns for users, images, videos, and API usage.
+
+### User Authentication
+- **User Model**: A `User` class is defined to represent user profiles, including attributes like email, password, username, and subscription details.
+- **Login Manager**: The `LoginManager` from Flask-Login is used to manage user sessions, handling tasks like loading users and managing login views.
+- **OTP Verification**: During signup, users receive an OTP via email for verification, enhancing the security of the account creation process.
+
+### Image and Video Generation
+- **Prompt-Based Generation**: Users can generate images and videos by submitting text prompts. The application uses Replicate's AI models to process these prompts and generate corresponding content.
+- **Enhancement and Editing**: Features are provided for enhancing user prompts and editing generated images, improving the quality and relevance of the generated content.
+- **Quota Management**: Users have quotas for generating content, with premium users enjoying higher limits and additional features.
+
+### API Management
+- **API Keys**: Users can generate and revoke API keys for programmatic access to the application's features.
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/mrbrokecoder/Cartonify/main/code_report/api.png" alt="API Management Diagram">
+</div>
+
+
+- **Usage Statistics**: Users can view their API usage statistics, helping them monitor their activity and plan their usage.
+
+### Premium Features
+- **Subscription Management**: Users can subscribe to premium features using Razorpay, gaining access to higher generation quotas and other benefits.
+- **Quota Reset**: Premium users have their quotas reset monthly, ensuring a consistent experience throughout their subscription period.
+
+### Administrative Functions
+- **User Management**: Admins have access to manage user details, including promoting users to admin roles and adjusting user quotas.
+- **Content Management**: Admins can view user-generated content and manage user quotas, ensuring that the application remains efficient and compliant with usage policies.
+
+## Security and Performance
+- **Password Hashing**: User passwords are securely hashed using `werkzeug.security`, preventing plain-text storage of sensitive information.
+- **Rate Limiting**: Rate limiting is implemented using Redis to prevent abuse and ensure fair usage of the application's resources.
+- **Environment Variables**: Sensitive information is stored in environment variables and accessed securely, reducing the risk of exposure.
+
+## Deployment and Maintenance
+- **Database Initialization**: The database is initialized with necessary tables and columns at startup, ensuring that the application has the required structure to function correctly.
+- **Background Scheduler**: The application uses a background scheduler for periodic tasks like quota resets, managed by APScheduler.
+- **Logging**: The application includes logging for debugging and error tracking, providing a way to monitor and diagnose issues during runtime.
+
+
+## Technology Stack
 
 
 ### Backend Framework
@@ -74,44 +161,25 @@ This schema provides a visual representation of the database structure, showing 
 - **Gunicorn**: A Python WSGI HTTP Server for UNIX. Gunicorn is often used for deploying Flask applications in production environments due to its robustness and performance.
 - **Nginx**: A high-performance web server that can also be used as a reverse proxy, load balancer, mail proxy, and HTTP cache. Nginx is commonly used in conjunction with Gunicorn to serve Flask applications, providing additional layers of security and performance optimization.
 
-## Application Structure
 
-### Configuration and Initialization
-- **Environment Variables**: The application uses environment variables loaded via `python-dotenv` for configuration settings, ensuring that sensitive information is not hard-coded into the application.
-- **Flask App Initialization**: The Flask app is initialized with specific configurations such as the secret key, upload folder, maximum content length, and database URLs.
-- **Database Initialization**: The application includes functions to initialize the PostgreSQL database with necessary tables and columns for users, images, videos, and API usage.
+### Admin Dashboard
 
-### User Authentication
-- **User Model**: A `User` class is defined to represent user profiles, including attributes like email, password, username, and subscription details.
-- **Login Manager**: The `LoginManager` from Flask-Login is used to manage user sessions, handling tasks like loading users and managing login views.
-- **OTP Verification**: During signup, users receive an OTP via email for verification, enhancing the security of the account creation process.
+The admin dashboard provides a comprehensive overview of the application's performance and user activities. It offers various metrics and management tools to help administrators monitor and control the system effectively.
 
-### Image and Video Generation
-- **Prompt-Based Generation**: Users can generate images and videos by submitting text prompts. The application uses Replicate's AI models to process these prompts and generate corresponding content.
-- **Enhancement and Editing**: Features are provided for enhancing user prompts and editing generated images, improving the quality and relevance of the generated content.
-- **Quota Management**: Users have quotas for generating content, with premium users enjoying higher limits and additional features.
+![Admin Dashboard](https://raw.githubusercontent.com/mrbrokecoder/Cartonify/main/code_report/dashboard.png)
 
-### API Management
-- **API Keys**: Users can generate and revoke API keys for programmatic access to the application's features.
-- **Usage Statistics**: Users can view their API usage statistics, helping them monitor their activity and plan their usage.
+This dashboard includes features such as:
+- User statistics and growth trends
+- API usage metrics
+- Revenue analytics
+- System health monitoring
+- User management tools
+- Content moderation capabilities
 
-### Premium Features
-- **Subscription Management**: Users can subscribe to premium features using Razorpay, gaining access to higher generation quotas and other benefits.
-- **Quota Reset**: Premium users have their quotas reset monthly, ensuring a consistent experience throughout their subscription period.
+The admin dashboard is designed to be intuitive and responsive, allowing administrators to quickly access important information and take necessary actions to maintain the smooth operation of the application.
 
-### Administrative Functions
-- **User Management**: Admins have access to manage user details, including promoting users to admin roles and adjusting user quotas.
-- **Content Management**: Admins can view user-generated content and manage user quotas, ensuring that the application remains efficient and compliant with usage policies.
 
-## Security and Performance
-- **Password Hashing**: User passwords are securely hashed using `werkzeug.security`, preventing plain-text storage of sensitive information.
-- **Rate Limiting**: Rate limiting is implemented using Redis to prevent abuse and ensure fair usage of the application's resources.
-- **Environment Variables**: Sensitive information is stored in environment variables and accessed securely, reducing the risk of exposure.
 
-## Deployment and Maintenance
-- **Database Initialization**: The database is initialized with necessary tables and columns at startup, ensuring that the application has the required structure to function correctly.
-- **Background Scheduler**: The application uses a background scheduler for periodic tasks like quota resets, managed by APScheduler.
-- **Logging**: The application includes logging for debugging and error tracking, providing a way to monitor and diagnose issues during runtime.
 
 # Docker and GitHub Integration Instructions for Flask Web Application
 
