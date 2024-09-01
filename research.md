@@ -3,7 +3,28 @@
 ## Introduction
 This report provides an in-depth analysis of a Flask web application designed to facilitate the generation and management of images and videos based on user prompts. The application leverages a robust technology stack to ensure security, performance, and user experience.
 
+
+## Application Architecture Mindmap
+
+The following mind map illustrates the overall architecture and key components of the application:
+
+![Application Architecture Mind Map](https://raw.githubusercontent.com/mrbrokecoder/Cartonify/main/code_report/mindmap.png)
+
+This mind map provides a comprehensive overview of the application's structure, highlighting the main modules, services, and their interconnections. It serves as a visual guide to understanding the complex ecosystem of the Flask web application.
+
+
 ## Technology Stack
+
+
+## Application Flow
+
+The following flowchart illustrates the high-level flow of the application:
+
+![Application Flowchart](https://raw.githubusercontent.com/mrbrokecoder/Cartonify/main/code_report/flowchart.png)
+
+This flowchart provides a visual representation of the main processes and user interactions within the application, from user authentication to image generation and management.
+
+
 
 ### Backend Framework
 - **Flask**: A micro web framework written in Python. Flask is known for its simplicity, flexibility, and lightweight nature, making it ideal for rapid development and prototyping. It follows the WSGI (Web Server Gateway Interface) standard and is designed to be easily extensible.
@@ -11,6 +32,16 @@ This report provides an in-depth analysis of a Flask web application designed to
 ### Database
 - **PostgreSQL**: A powerful, open-source object-relational database system. PostgreSQL is renowned for its reliability, robustness, and performance. It supports advanced features like complex queries, foreign keys, triggers, and views, making it suitable for handling complex data structures. In this application, PostgreSQL is used to store user profiles, generated images, videos, and API usage data.
 - **Redis**: An in-memory data structure store used as a database, cache, and message broker. Redis is particularly useful for its speed and ability to handle high-volume, low-latency data access requirements. In this application, Redis is used for caching user data and managing session information, ensuring fast data retrieval and session persistence.
+
+### Database Schema
+
+The following diagram illustrates the database schema used in the application:
+
+![Database Schema](https://raw.githubusercontent.com/mrbrokecoder/Cartonify/main/code_report/Screenshot%202024-09-01%20094913.png)
+
+This schema provides a visual representation of the database structure, showing the relationships between different tables and the key attributes stored for users, images, videos, and API usage.
+
+
 
 ### Authentication and Session Management
 - **Flask-Login**: A Flask extension that provides user session management. It handles the common tasks of logging users in and out and managing their sessions. Flask-Login is integrated with Flask's built-in session management to provide a secure and seamless authentication process.
