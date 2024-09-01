@@ -25,20 +25,14 @@ services:
         fromRender: true
       - key: SMTP_PASSWORD
         fromRender: true
-    healthCheck:
-      path: /
-      timeout: 30
-      interval: 60
-      successThreshold: 2
-      failureThreshold: 3
     autoDeploy: true
 
 databases:
   - name: image-garden-db
     databaseName: image_garden_db
     user: image_garden_user
-    region: Oregon
+    region: oregon
 
 redis:
   - name: image-garden-redis
-    region: Oregon
+    region: oregon
