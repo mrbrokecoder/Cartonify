@@ -486,15 +486,12 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
                 const promptInput = document.getElementById('prompt');
                 promptInput.value = template;
                 
-                // Highlight the placeholders
+                // Highlight the first placeholder
                 const placeholders = template.match(/\{([^}]+)\}/g);
-                if (placeholders) {
-                    let start = 0;
-                    placeholders.forEach(placeholder => {
-                        const index = template.indexOf(placeholder, start);
-                        promptInput.setSelectionRange(index, index + placeholder.length);
-                        start = index + placeholder.length;
-                    });
+                if (placeholders && placeholders.length > 0) {
+                    const firstPlaceholder = placeholders[0];
+                    const index = template.indexOf(firstPlaceholder);
+                    promptInput.setSelectionRange(index, index + firstPlaceholder.length);
                 }
                 
                 promptInput.focus();
