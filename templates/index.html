@@ -43,7 +43,14 @@
         <div class="main-content">
             <div class="prompt-container">
                 <input type="text" id="prompt" placeholder="Enter your prompt here">
-                <button id="magicWandBtn" class="magic-wand-btn"><i class="fa-solid fa-wand-magic-sparkles"></i></i></button>
+                <button id="magicWandBtn" class="magic-wand-btn"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                <select id="promptTemplate" class="styled-select">
+                    <option value="">Select a template</option>
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                    <option value="abstract">Abstract Art</option>
+                    <option value="character">Character Design</option>
+                </select>
                 <button id="generateButton">Generate</button>
             </div>
             <div class="image-grid" id="resultGrid">
@@ -157,21 +164,6 @@
                     {% else %}
                         <p>No recent images found.</p>
                     {% endif %}
-                </div>
-            </div>
-
-            <!-- Expanded Prompt Templates section -->
-            <div class="section">
-                <h3 class="section-title">Prompt Templates</h3>
-                <div class="prompt-templates">
-                    <button class="styled-button template-btn" data-template="A hyper-realistic portrait of a {profession} from the {historical era}, wearing intricate {material} clothing with {cultural} influences, set against a backdrop of {location}, illuminated by {light source}">Historical Portrait</button>
-                    <button class="styled-button template-btn" data-template="An ethereal landscape featuring floating {objects} above a sea of {element}, with {celestial body} visible in the {time of day} sky, rendered in the style of {artist or art movement}">Surreal Landscape</button>
-                    <button class="styled-button template-btn" data-template="A futuristic {vehicle or structure} designed for {purpose}, incorporating bio-luminescent {organism} and powered by {energy source}, set in a {type of environment} on {planet or location}">Sci-Fi Concept</button>
-                    <button class="styled-button template-btn" data-template="An intricate mandala representing the concept of {abstract idea}, using symbols from {culture or mythology}, dominated by shades of {color 1} and {color 2}, with subtle accents of {color 3}">Symbolic Mandala</button>
-                    <button class="styled-button template-btn" data-template="A whimsical scene depicting a {magical creature} hosting a tea party for {unlikely guests} in a {fantastical location}, with {unexpected objects} floating in the air, painted in the style of {children's book illustrator}">Fantastical Tea Party</button>
-                    <button class="styled-button template-btn" data-template="An avant-garde fashion design inspired by {natural phenomenon}, featuring a dress made of {unconventional material}, adorned with {organic elements}, modeled by a figure with {unique physical characteristic}">Conceptual Fashion</button>
-                    <button class="styled-button template-btn" data-template="A detailed cross-section of a {fictional machine or organism}, revealing intricate {mechanical or biological} systems, annotated with {script or language}, in the style of a {century} scientific illustration">Imaginary Anatomy</button>
-                    <button class="styled-button template-btn" data-template="A dystopian cityscape where {nature element} has reclaimed {urban structures}, inhabited by {mutated species}, with remnants of {past civilization} visible in the background, under a sky filled with {atmospheric phenomenon}">Post-Apocalyptic World</button>
                 </div>
             </div>
         </div>
@@ -479,42 +471,7 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
         // Call loadUserVideos when the video generation tab is clicked
         document.getElementById('videoGenerationTab').addEventListener('click', loadUserVideos);
 
-        // Prompt template functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM fully loaded and parsed');
-            const templateButtons = document.querySelectorAll('.template-btn');
-            console.log('Number of template buttons found:', templateButtons.length);
-
-            templateButtons.forEach(button => {
-                button.addEventListener('click', function(event) {
-                    console.log('Template button clicked:', this.textContent);
-                    event.preventDefault();
-                    const template = this.getAttribute('data-template');
-                    console.log('Template:', template);
-                    const promptInput = document.getElementById('prompt');
-                    
-                    if (promptInput) {
-                        promptInput.value = template;
-                        console.log('Prompt input value set');
-
-                        // Highlight the first placeholder
-                        const placeholders = template.match(/\{([^}]+)\}/g);
-                        if (placeholders && placeholders.length > 0) {
-                            const firstPlaceholder = placeholders[0];
-                            const index = template.indexOf(firstPlaceholder);
-                            promptInput.setSelectionRange(index, index + firstPlaceholder.length);
-                            console.log('First placeholder highlighted');
-                        }
-
-                        promptInput.focus();
-                        console.log('Prompt input focused');
-                    } else {
-                        console.error('Prompt input element not found');
-                    }
-                });
-            });
-        });
-
+        // New Prompt Template Functionality
         document.getElementById('magicWandBtn').addEventListener('click', function() {
             const promptInput = document.getElementById('prompt');
             const basicPrompt = promptInput.value.trim();
@@ -553,6 +510,21 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
                 this.disabled = false;
                 this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
             });
+        });
+
+        // Add this new code for prompt templates
+        const promptTemplates = {
+            portrait: "A portrait of [subject], [style] style, [lighting] lighting, [background]",
+            landscape: "A [time of day] landscape of [location], [weather], [style] style",
+            abstract: "An abstract [style] artwork featuring [elements], with [colors] color scheme",
+            character: "A character design of a [profession/role] in a [genre] setting, [pose/action], [distinctive feature]"
+        };
+
+        document.getElementById('promptTemplate').addEventListener('change', function() {
+            const selectedTemplate = this.value;
+            if (selectedTemplate && promptTemplates[selectedTemplate]) {
+                document.getElementById('prompt').value = promptTemplates[selectedTemplate];
+            }
         });
     </script>
 </body>
