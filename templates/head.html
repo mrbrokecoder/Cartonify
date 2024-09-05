@@ -366,5 +366,41 @@
                 gap: 10px;
             }
         }
+        
+.prompt-template-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.prompt-template-buttons .template-btn {
+    width: 100%;
+    text-align: left;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 0.9em;
+    line-height: 1.2;
+    white-space: normal;
+    height: auto;
+}
+
+.prompt-template-buttons .template-btn:hover {
+    background-color: #e0e0e0;
+}
+
+/* Adjust this if you're using dark mode */
+.dark-mode .prompt-template-buttons .template-btn {
+    background-color: #2a2a2a;
+    color: #ffffff;
+}
+
+.dark-mode .prompt-template-buttons .template-btn:hover {
+    background-color: #3a3a3a;
+}
+
     </style>
 </head>

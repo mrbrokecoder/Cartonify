@@ -43,7 +43,7 @@
         <div class="main-content">
             <div class="prompt-container">
                 <input type="text" id="prompt" placeholder="Enter your prompt here">
-                <button id="magicWandBtn" class="magic-wand-btn"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                <button id="magicWandBtn" class="magic-wand-btn"><i class="fa-solid fa-wand-magic-sparkles"></i></i></button>
                 <button id="generateButton">Generate</button>
             </div>
             <div class="image-grid" id="resultGrid">
@@ -139,16 +139,6 @@
                     <label for="editImageCheckbox">Edit/Enhance Uploaded Image</label>
                 </div>
             </div>
-            <div class="section">
-                <h3 class="section-title">Prompt Templates</h3>
-                <div class="prompt-template-buttons">
-                    <button class="styled-button template-btn" data-template="A portrait of {subject}, {style} style, {lighting} lighting, {background}">Portrait</button>
-                    <button class="styled-button template-btn" data-template="A {time of day} landscape of {location}, {weather}, {style} style">Landscape</button>
-                    <button class="styled-button template-btn" data-template="An abstract {style} artwork featuring {elements}, with {colors} color scheme">Abstract Art</button>
-                    <button class="styled-button template-btn" data-template="A character design of a {profession/role} in a {genre} setting, {pose/action}, {distinctive feature}">Character Design</button>
-                    <button class="styled-button template-btn" data-template="A detailed cross-section of a {fictional machine or organism}, revealing intricate {mechanical or biological} systems, annotated with {script or language}, in the style of a {century} scientific illustration">Imaginary Anatomy</button>
-                </div>
-            </div>
         </div>
         
         <div class="sidebar right-sidebar">
@@ -167,6 +157,21 @@
                     {% else %}
                         <p>No recent images found.</p>
                     {% endif %}
+                </div>
+            </div>
+
+            <!-- Expanded Prompt Templates section -->
+            <div class="section">
+                <h3 class="section-title">Prompt Templates</h3>
+                <div class="prompt-templates">
+                    <button class="styled-button template-btn" data-template="A hyper-realistic portrait of a {profession} from the {historical era}, wearing intricate {material} clothing with {cultural} influences, set against a backdrop of {location}, illuminated by {light source}">Historical Portrait</button>
+                    <button class="styled-button template-btn" data-template="An ethereal landscape featuring floating {objects} above a sea of {element}, with {celestial body} visible in the {time of day} sky, rendered in the style of {artist or art movement}">Surreal Landscape</button>
+                    <button class="styled-button template-btn" data-template="A futuristic {vehicle or structure} designed for {purpose}, incorporating bio-luminescent {organism} and powered by {energy source}, set in a {type of environment} on {planet or location}">Sci-Fi Concept</button>
+                    <button class="styled-button template-btn" data-template="An intricate mandala representing the concept of {abstract idea}, using symbols from {culture or mythology}, dominated by shades of {color 1} and {color 2}, with subtle accents of {color 3}">Symbolic Mandala</button>
+                    <button class="styled-button template-btn" data-template="A whimsical scene depicting a {magical creature} hosting a tea party for {unlikely guests} in a {fantastical location}, with {unexpected objects} floating in the air, painted in the style of {children's book illustrator}">Fantastical Tea Party</button>
+                    <button class="styled-button template-btn" data-template="An avant-garde fashion design inspired by {natural phenomenon}, featuring a dress made of {unconventional material}, adorned with {organic elements}, modeled by a figure with {unique physical characteristic}">Conceptual Fashion</button>
+                    <button class="styled-button template-btn" data-template="A detailed cross-section of a {fictional machine or organism}, revealing intricate {mechanical or biological} systems, annotated with {script or language}, in the style of a {century} scientific illustration">Imaginary Anatomy</button>
+                    <button class="styled-button template-btn" data-template="A dystopian cityscape where {nature element} has reclaimed {urban structures}, inhabited by {mutated species}, with remnants of {past civilization} visible in the background, under a sky filled with {atmospheric phenomenon}">Post-Apocalyptic World</button>
                 </div>
             </div>
         </div>
@@ -475,6 +480,32 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
         document.getElementById('videoGenerationTab').addEventListener('click', loadUserVideos);
 
         // New Prompt Template Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const templateButtons = document.querySelectorAll('.template-btn');
+            const promptInput = document.getElementById('prompt');
+
+            if (promptInput) {
+                templateButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const template = this.getAttribute('data-template');
+                        promptInput.value = template;
+                        promptInput.focus();
+
+                        // Highlight the first placeholder
+                        const placeholders = template.match(/\{([^}]+)\}/g);
+                        if (placeholders && placeholders.length > 0) {
+                            const firstPlaceholder = placeholders[0];
+                            const start = template.indexOf(firstPlaceholder);
+                            const end = start + firstPlaceholder.length;
+                            promptInput.setSelectionRange(start, end);
+                        }
+                    });
+                });
+            } else {
+                console.error('Prompt input element not found');
+            }
+        });
+
         document.getElementById('magicWandBtn').addEventListener('click', function() {
             const promptInput = document.getElementById('prompt');
             const basicPrompt = promptInput.value.trim();
@@ -512,13 +543,6 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
                 // Re-enable the button and restore icon
                 this.disabled = false;
                 this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
-            });
-        });
-
-        document.querySelectorAll('.prompt-template-buttons .template-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const template = this.dataset.template;
-                document.getElementById('prompt').value = template;
             });
         });
     </script>
