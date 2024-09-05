@@ -44,13 +44,6 @@
             <div class="prompt-container">
                 <input type="text" id="prompt" placeholder="Enter your prompt here">
                 <button id="magicWandBtn" class="magic-wand-btn"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
-                <select id="promptTemplate" class="styled-select">
-                    <option value="">Select a template</option>
-                    <option value="portrait">Portrait</option>
-                    <option value="landscape">Landscape</option>
-                    <option value="abstract">Abstract Art</option>
-                    <option value="character">Character Design</option>
-                </select>
                 <button id="generateButton">Generate</button>
             </div>
             <div class="image-grid" id="resultGrid">
@@ -144,6 +137,16 @@
                 <div class="edit-image-option">
                     <input type="checkbox" id="editImageCheckbox">
                     <label for="editImageCheckbox">Edit/Enhance Uploaded Image</label>
+                </div>
+            </div>
+            <div class="section">
+                <h3 class="section-title">Prompt Templates</h3>
+                <div class="prompt-template-buttons">
+                    <button class="styled-button template-btn" data-template="A portrait of {subject}, {style} style, {lighting} lighting, {background}">Portrait</button>
+                    <button class="styled-button template-btn" data-template="A {time of day} landscape of {location}, {weather}, {style} style">Landscape</button>
+                    <button class="styled-button template-btn" data-template="An abstract {style} artwork featuring {elements}, with {colors} color scheme">Abstract Art</button>
+                    <button class="styled-button template-btn" data-template="A character design of a {profession/role} in a {genre} setting, {pose/action}, {distinctive feature}">Character Design</button>
+                    <button class="styled-button template-btn" data-template="A detailed cross-section of a {fictional machine or organism}, revealing intricate {mechanical or biological} systems, annotated with {script or language}, in the style of a {century} scientific illustration">Imaginary Anatomy</button>
                 </div>
             </div>
         </div>
@@ -512,19 +515,11 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
             });
         });
 
-        // Add this new code for prompt templates
-        const promptTemplates = {
-            portrait: "A portrait of [subject], [style] style, [lighting] lighting, [background]",
-            landscape: "A [time of day] landscape of [location], [weather], [style] style",
-            abstract: "An abstract [style] artwork featuring [elements], with [colors] color scheme",
-            character: "A character design of a [profession/role] in a [genre] setting, [pose/action], [distinctive feature]"
-        };
-
-        document.getElementById('promptTemplate').addEventListener('change', function() {
-            const selectedTemplate = this.value;
-            if (selectedTemplate && promptTemplates[selectedTemplate]) {
-                document.getElementById('prompt').value = promptTemplates[selectedTemplate];
-            }
+        document.querySelectorAll('.prompt-template-buttons .template-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const template = this.dataset.template;
+                document.getElementById('prompt').value = template;
+            });
         });
     </script>
 </body>
