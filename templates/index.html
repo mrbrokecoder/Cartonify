@@ -1,373 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard: Revolutionary AI Art Generator | Create Stunning Visuals Instantly</title>
-    <meta name="description" content="Transform your ideas into breathtaking art with Image Garden's AI-powered image generator. Create professional-quality visuals in seconds. Free trial available. Join thousands of satisfied artists and designers today!">
-    <meta property="og:title" content="Image Garden: #1 AI Art Generator | Create Stunning Visuals in Seconds">
-    <meta property="og:description" content="Revolutionize your creative process with Image Garden. Generate museum-quality AI art effortlessly. From concept to masterpiece instantly. Experience the future of digital art creation. Try it free now!">
-    <meta property="og:image" content="https://raw.githubusercontent.com/mrbrokecoder/ChatCat/main/ComfyUI_Generate_1_image%20(2).png">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.imagegarden.com">
-    <meta name="keywords" content="AI art generator, image generation, digital art creator, AI artist tool, neural art, deep learning art, generative art, AI creativity, digital illustration, artificial intelligence art, machine learning art, AI image creator, automated art generation, best AI art tool 2023, free AI art generator">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <meta name="author" content="Image Garden">
-    <link rel="canonical" href="https://www.imagegarden.com">
-    <link rel="icon" href="https://raw.githubusercontent.com/mrbrokecoder/ChatCat/main/ComfyUI_Generate_1_image%20(2).png" type="image/png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Image Garden",
-      "description": "Revolutionary AI-powered image generator for creating stunning digital art and transforming ideas into visual masterpieces in seconds",
-      "url": "https://www.imagegarden.com",
-      "applicationCategory": "MultimediaApplication",
-      "operatingSystem": "Web",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "ratingCount": "1024"
-      },
-      "featureList": [
-        "State-of-the-art AI image generation",
-        "Intuitive user interface",
-        "High-resolution output",
-        "Multiple art styles and customization options",
-        "Rapid generation speed",
-        "Free trial available"
-      ]
-    }
-    </script>
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Image Garden: AI-Powered Art Creation">
-    <meta name="twitter:description" content="Transform your ideas into stunning visuals with our AI art generator. Create unique digital art in seconds.">
-    <meta name="twitter:image" content="https://raw.githubusercontent.com/mrbrokecoder/ChatCat/main/ComfyUI_Generate_1_image%20(2).png">
-    <style>
-        .header {
-            background-color: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .dashboard-btn {
-            background-color: #007bff;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
-
-        .dashboard-btn:hover {
-            background-color: #0056b3;
-        }
-
-        .content {
-            display: flex;
-            justify-content: space-between;
-            max-width: 100%;
-            padding: 2px;
-            min-height: calc(100vh - 60px);
-        }
-
-        .sidebar {
-            width: 250px;
-            flex-shrink: 0;
-            overflow-y: auto;
-            padding: 0 10px;
-            background-color: #f8f9fa;
-        }
-
-        .left-sidebar {
-            order: -1;
-        }
-
-        .right-sidebar {
-            order: 1;
-        }
-
-        .main-content {
-            flex-grow: 1;
-            max-width: calc(100% - 520px);
-            margin: 0 10px;
-            overflow-y: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .image-box {
-            aspect-ratio: 1 / 1;
-            background-size: cover;
-            background-position: center;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 100%;
-            height: auto;
-        }
-
-        .previous-images-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .previous-image-box img {
-            width: 100%;
-            height: auto;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-
-        .tab-btn {
-            background-color: #007bff;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-            cursor: pointer;
-        }
-
-        .tab-btn:hover {
-            background-color: #0056b3;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .video-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-        .video-item {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .video-item video {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .right-sidebar {
-            display: flex;
-            flex-direction: column;
-            width: 248px;
-        }
-
-        .right-sidebar .section {
-            margin-bottom: 20px;
-        }
-
-        .prompt-templates {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 500px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-
-        .template-btn {
-            text-align: left;
-            padding: 12px 15px;
-            background-color: #f0f0f0;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9em;
-            line-height: 1.4;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .template-btn:hover {
-            background-color: #e0e0e0;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-
-        .dark-mode .template-btn {
-            background-color: #2a2a2a;
-            border-color: #444;
-            color: #fff;
-        }
-
-        .dark-mode .template-btn:hover {
-            background-color: #3a3a3a;
-        }
-
-        .prompt-templates::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .prompt-templates::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .prompt-templates::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-
-        .prompt-templates::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        .prompt-container {
-            display: flex;
-            align-items: center;
-        }
-
-        .magic-wand-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2em;
-            color: #007bff;
-            margin: 0 10px;
-            transition: color 0.3s ease;
-        }
-
-        .magic-wand-btn:hover {
-            color: #0056b3;
-        }
-
-        /* Mobile-specific styles */
-        @media (max-width: 768px) {
-            .content {
-                flex-direction: column;
-                padding: 10px;
-            }
-
-            .sidebar, .main-content, .right-sidebar {
-                width: 100%;
-                margin: 0;
-                padding: 10px 0;
-            }
-
-            .header {
-                flex-direction: column;
-                align-items: center;
-                padding: 10px;
-            }
-
-            .header-actions {
-                width: 100%;
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-                margin-top: 10px;
-            }
-
-            .credits-info, .dark-mode-toggle, .logout-btn, .admin-btn, .dashboard-btn {
-                margin: 5px 0;
-            }
-
-            .image-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                gap: 10px;
-            }
-
-            .image-box {
-                aspect-ratio: 1 / 1;
-            }
-
-            .prompt-container {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-            }
-
-            .prompt-container input, .prompt-container button {
-                width: 100%;
-                margin: 0;
-            }
-
-            .style-buttons, .color-scheme-buttons {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 5px;
-            }
-
-            .style-buttons button, .color-scheme-buttons button {
-                flex: 0 0 calc(50% - 5px);
-                margin: 0;
-            }
-
-            .recent-images-grid {
-                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-                gap: 10px;
-            }
-
-            .prompt-templates {
-                max-height: none;
-                overflow-y: visible;
-            }
-
-            .template-btn {
-                margin-bottom: 10px;
-            }
-
-            .section {
-                margin-bottom: 20px;
-            }
-
-            .section-title {
-                text-align: center;
-            }
-
-            .select-wrapper, .upload-buttons {
-                width: 100%;
-            }
-
-            .styled-select, .styled-button {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-
-            .toggle-container {
-                justify-content: center;
-            }
-
-            .previous-images-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                gap: 10px;
-            }
-        }
-    </style>
-</head>
+{% include 'head.html' %}
 <body>
     <div class="popup-overlay" id="imagePopup">
         <div class="popup-content">
@@ -848,67 +479,67 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
         // Call loadUserVideos when the video generation tab is clicked
         document.getElementById('videoGenerationTab').addEventListener('click', loadUserVideos);
 
-// Prompt template functionality
-document.querySelectorAll('.template-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        const template = this.dataset.template;
-        const promptInput = document.getElementById('prompt');
-        promptInput.value = template;
-        
-        // Highlight the placeholders
-        const placeholders = template.match(/\{([^}]+)\}/g);
-        if (placeholders) {
-            let start = 0;
-            placeholders.forEach(placeholder => {
-                const index = template.indexOf(placeholder, start);
-                promptInput.setSelectionRange(index, index + placeholder.length);
-                start = index + placeholder.length;
+        // Prompt template functionality
+        document.querySelectorAll('.template-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const template = this.dataset.template;
+                const promptInput = document.getElementById('prompt');
+                promptInput.value = template;
+                
+                // Highlight the placeholders
+                const placeholders = template.match(/\{([^}]+)\}/g);
+                if (placeholders) {
+                    let start = 0;
+                    placeholders.forEach(placeholder => {
+                        const index = template.indexOf(placeholder, start);
+                        promptInput.setSelectionRange(index, index + placeholder.length);
+                        start = index + placeholder.length;
+                    });
+                }
+                
+                promptInput.focus();
             });
-        }
-        
-        promptInput.focus();
-    });
-});
+        });
 
-document.getElementById('magicWandBtn').addEventListener('click', function() {
-    const promptInput = document.getElementById('prompt');
-    const basicPrompt = promptInput.value.trim();
-    
-    if (basicPrompt === '') {
-        alert('Please enter a basic prompt first.');
-        return;
-    }
+        document.getElementById('magicWandBtn').addEventListener('click', function() {
+            const promptInput = document.getElementById('prompt');
+            const basicPrompt = promptInput.value.trim();
+            
+            if (basicPrompt === '') {
+                alert('Please enter a basic prompt first.');
+                return;
+            }
 
-    // Disable the button and show loading state
-    this.disabled = true;
-    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            // Disable the button and show loading state
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-    // Make an API call to enhance the prompt
-    fetch('/enhance_prompt', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt: basicPrompt }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            throw new Error(data.error);
-        }
-        promptInput.value = data.enhanced_prompt;
-        // Re-enable the button and restore icon
-        this.disabled = false;
-        this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to enhance the prompt. Please try again.');
-        // Re-enable the button and restore icon
-        this.disabled = false;
-        this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
-    });
-});
+            // Make an API call to enhance the prompt
+            fetch('/enhance_prompt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt: basicPrompt }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                promptInput.value = data.enhanced_prompt;
+                // Re-enable the button and restore icon
+                this.disabled = false;
+                this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to enhance the prompt. Please try again.');
+                // Re-enable the button and restore icon
+                this.disabled = false;
+                this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
+            });
+        });
     </script>
 </body>
 </html>
