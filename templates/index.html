@@ -480,21 +480,38 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
         document.getElementById('videoGenerationTab').addEventListener('click', loadUserVideos);
 
         // Prompt template functionality
-        document.querySelectorAll('.template-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const template = this.dataset.template;
-                const promptInput = document.getElementById('prompt');
-                promptInput.value = template;
-                
-                // Highlight the first placeholder
-                const placeholders = template.match(/\{([^}]+)\}/g);
-                if (placeholders && placeholders.length > 0) {
-                    const firstPlaceholder = placeholders[0];
-                    const index = template.indexOf(firstPlaceholder);
-                    promptInput.setSelectionRange(index, index + firstPlaceholder.length);
-                }
-                
-                promptInput.focus();
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded and parsed');
+            const templateButtons = document.querySelectorAll('.template-btn');
+            console.log('Number of template buttons found:', templateButtons.length);
+
+            templateButtons.forEach(button => {
+                button.addEventListener('click', function(event) {
+                    console.log('Template button clicked:', this.textContent);
+                    event.preventDefault();
+                    const template = this.getAttribute('data-template');
+                    console.log('Template:', template);
+                    const promptInput = document.getElementById('prompt');
+                    
+                    if (promptInput) {
+                        promptInput.value = template;
+                        console.log('Prompt input value set');
+
+                        // Highlight the first placeholder
+                        const placeholders = template.match(/\{([^}]+)\}/g);
+                        if (placeholders && placeholders.length > 0) {
+                            const firstPlaceholder = placeholders[0];
+                            const index = template.indexOf(firstPlaceholder);
+                            promptInput.setSelectionRange(index, index + firstPlaceholder.length);
+                            console.log('First placeholder highlighted');
+                        }
+
+                        promptInput.focus();
+                        console.log('Prompt input focused');
+                    } else {
+                        console.error('Prompt input element not found');
+                    }
+                });
             });
         });
 
