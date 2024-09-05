@@ -848,67 +848,67 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
         // Call loadUserVideos when the video generation tab is clicked
         document.getElementById('videoGenerationTab').addEventListener('click', loadUserVideos);
 
-        // Prompt template functionality
-        document.querySelectorAll('.template-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const template = this.dataset.template;
-                const promptInput = document.getElementById('prompt');
-                promptInput.value = template;
-                
-                // Highlight the placeholders
-                const placeholders = template.match(/\{([^}]+)\}/g);
-                if (placeholders) {
-                    let start = 0;
-                    placeholders.forEach(placeholder => {
-                        const index = template.indexOf(placeholder, start);
-                        promptInput.setSelectionRange(index, index + placeholder.length);
-                        start = index + placeholder.length;
-                    });
-                }
-                
-                promptInput.focus();
+// Prompt template functionality
+document.querySelectorAll('.template-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const template = this.dataset.template;
+        const promptInput = document.getElementById('prompt');
+        promptInput.value = template;
+        
+        // Highlight the placeholders
+        const placeholders = template.match(/\{([^}]+)\}/g);
+        if (placeholders) {
+            let start = 0;
+            placeholders.forEach(placeholder => {
+                const index = template.indexOf(placeholder, start);
+                promptInput.setSelectionRange(index, index + placeholder.length);
+                start = index + placeholder.length;
             });
-        });
+        }
+        
+        promptInput.focus();
+    });
+});
 
-        document.getElementById('magicWandBtn').addEventListener('click', function() {
-            const promptInput = document.getElementById('prompt');
-            const basicPrompt = promptInput.value.trim();
-            
-            if (basicPrompt === '') {
-                alert('Please enter a basic prompt first.');
-                return;
-            }
+document.getElementById('magicWandBtn').addEventListener('click', function() {
+    const promptInput = document.getElementById('prompt');
+    const basicPrompt = promptInput.value.trim();
+    
+    if (basicPrompt === '') {
+        alert('Please enter a basic prompt first.');
+        return;
+    }
 
-            // Disable the button and show loading state
-            this.disabled = true;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    // Disable the button and show loading state
+    this.disabled = true;
+    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-            // Make an API call to enhance the prompt
-            fetch('/enhance_prompt', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ prompt: basicPrompt }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                promptInput.value = data.enhanced_prompt;
-                // Re-enable the button and restore icon
-                this.disabled = false;
-                this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to enhance the prompt. Please try again.');
-                // Re-enable the button and restore icon
-                this.disabled = false;
-                this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
-            });
-        });
+    // Make an API call to enhance the prompt
+    fetch('/enhance_prompt', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt: basicPrompt }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        promptInput.value = data.enhanced_prompt;
+        // Re-enable the button and restore icon
+        this.disabled = false;
+        this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to enhance the prompt. Please try again.');
+        // Re-enable the button and restore icon
+        this.disabled = false;
+        this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
+    });
+});
     </script>
 </body>
 </html>
