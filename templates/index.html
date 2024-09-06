@@ -43,7 +43,7 @@
         <div class="main-content">
             <div class="prompt-container">
                 <input type="text" id="prompt" placeholder="Enter your prompt here">
-                <button id="magicWandBtn" class="magic-wand-btn"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                <button id="magicWandBtn" class="magic-wand-btn"><i class="fa-solid fa-wand-magic-sparkles"></i></i></button>
                 <button id="generateButton">Generate</button>
             </div>
             <div class="image-grid" id="resultGrid">
@@ -546,6 +546,45 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
             } else {
                 console.error('Magic wand button not found');
             }
+        });
+        document.getElementById('magicWandBtn').addEventListener('click', function() {
+            const promptInput = document.getElementById('prompt');
+            const basicPrompt = promptInput.value.trim();
+            
+            if (basicPrompt === '') {
+                alert('Please enter a basic prompt first.');
+                return;
+            }
+
+            // Disable the button and show loading state
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            // Make an API call to enhance the prompt
+            fetch('/enhance_prompt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt: basicPrompt }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                promptInput.value = data.enhanced_prompt;
+                // Re-enable the button and restore icon
+                this.disabled = false;
+                this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to enhance the prompt. Please try again.');
+                // Re-enable the button and restore icon
+                this.disabled = false;
+                this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
+            });
         });
     </script>
 </body>
