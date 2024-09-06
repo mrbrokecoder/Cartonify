@@ -14,7 +14,7 @@
     {% endwith %}
 
     <div class="header">
-        <img src="https://raw.githubusercontent.com/mrbrokecoder/ChatCat/main/ComfyUI_Generate_1_image%20(2).png" alt="" srcset="" style="height: 40px; width: 40px; border-radius: 5px;">        
+        <img src="https://raw.githubusercontent.com/mrbrokecoder/ChatCat/main/ComfyUI_Generate_1_image%20(2).png" alt="" srcset="" style="height: 40px; width: 40px; border-radius: 5px;">        <div class="header-title">Text to Image</div>
         <div class="header-actions">
             <div class="credits-info">
                 {% if current_user.is_premium %}
@@ -40,39 +40,6 @@
         </div>
     </div>
     <div class="content">
-        <div class="main-content">
-            <div class="prompt-container">
-                <input type="text" id="prompt" placeholder="Enter your prompt here">
-                <button id="magicWandBtn" class="magic-wand-btn" aria-label="Enhance prompt"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
-                <button id="generateButton">Generate</button>
-            </div>
-            <div class="image-grid" id="resultGrid">
-                <div class="image-box"></div>
-                <div class="image-box"></div>
-            </div>
-             <!-- Add the new section for previously generated images -->
-        <div class="previous-images">
-            <h2>Your Previously Generated Images</h2>
-            <div class="previous-images-grid">
-                {% if images %}
-                {% for image in images %}
-                    <div class="previous-image-box">
-                        <img src="{{ image[0] }}" alt="{{ image[1] }}" loading="lazy">
-                        <div class="previous-image-info">
-                            <p>Prompt: {{ image[1] }}</p>
-                            <p>Style: {{ image[2] }}</p>
-                            <p>Color: {{ image[3] }}</p>
-                            <p>Created at: {{ image[4] | custom_datetime }}</p>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No images found.</p>
-            {% endif %}
-            </div>
-        </div>
-        </div>
-        
         <div class="sidebar left-sidebar">
             <div class="section">
                 <h3 class="section-title">Image Settings</h3>
@@ -140,7 +107,46 @@
                 </div>
             </div>
         </div>
-        
+        <div class="main-content">
+            <div class="image-grid" id="resultGrid">
+                <div class="image-box"></div>
+                <div class="image-box"></div>
+            </div>
+             <!-- Add the new section for previously generated images -->
+        <div class="previous-images">
+            <h2>Your Previously Generated Images</h2>
+            <div class="previous-images-grid">
+                {% if images %}
+                {% for image in images %}
+                    <div class="previous-image-box">
+                        <img src="{{ image[0] }}" alt="{{ image[1] }}" loading="lazy">
+                        <div class="previous-image-info">
+                            <p>Prompt: {{ image[1] }}</p>
+                            <p>Style: {{ image[2] }}</p>
+                            <p>Color: {{ image[3] }}</p>
+                            <p>Created at: {{ image[4] | custom_datetime }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No images found.</p>
+            {% endif %}
+            </div>
+        </div>
+            <div class="prompt-container">
+                <input type="text" id="prompt" placeholder="Enter your prompt here">
+                <button id="magicWandBtn" class="magic-wand-btn"><i class="fa-solid fa-wand-magic-sparkles"></i></i></button>
+                <button id="generateButton">Generate</button>
+            </div>
+        </div>
+        <div id="videoGenerationContent" class="tab-content" style="display: none;">
+            <div class="prompt-container">
+                <input type="text" id="videoPrompt" placeholder="Enter your prompt for video generation">
+                <button id="generateVideoButton">Generate Video</button>
+            </div>
+            <div id="videoLoadingIndicator" style="display: none;">Generating video... This may take a few minutes.</div>
+            <div id="videoContainer" class="video-container"></div>
+        </div>
         <div class="sidebar right-sidebar">
             <div class="section">
                 <h3 class="section-title">Recent Images</h3>
