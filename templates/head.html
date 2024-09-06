@@ -401,6 +401,60 @@
 .dark-mode .prompt-template-buttons .template-btn:hover {
     background-color: #3a3a3a;
 }
+    /* Add this to your existing styles */
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
 
+    .dropbtn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+
+    .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
+
+    .dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    .dropdown:hover .dropbtn {
+        background-color: #3e8e41;
+    }
+
+    /* Adjust this if you're using dark mode */
+    body.dark-mode .dropdown-content {
+        background-color: #333;
+    }
+
+    body.dark-mode .dropdown-content a {
+        color: white;
+    }
+
+    body.dark-mode .dropdown-content a:hover {
+        background-color: #444;
+    }
     </style>
 </head>
