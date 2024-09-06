@@ -1,224 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Adobe Firefly Replica</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <style>
-        .header {
-            background-color: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .dashboard-btn {
-            background-color: #007bff;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
-
-        .dashboard-btn:hover {
-            background-color: #0056b3;
-        }
-
-        .content {
-            display: flex;
-            justify-content: space-between;
-            max-width: 100%;
-            padding: 2px;
-            min-height: calc(100vh - 60px);
-        }
-
-        .sidebar {
-            width: 250px;
-            flex-shrink: 0;
-            overflow-y: auto;
-            padding: 0 10px;
-            background-color: #f8f9fa;
-        }
-
-        .left-sidebar {
-            order: -1;
-        }
-
-        .right-sidebar {
-            order: 1;
-        }
-
-        .main-content {
-            flex-grow: 1;
-            max-width: calc(100% - 520px);
-            margin: 0 10px;
-            overflow-y: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .image-box {
-            aspect-ratio: 1 / 1;
-            background-size: cover;
-            background-position: center;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 100%;
-            height: auto;
-        }
-
-        .previous-images-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .previous-image-box img {
-            width: 100%;
-            height: auto;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-
-        .tab-btn {
-            background-color: #007bff;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-            cursor: pointer;
-        }
-
-        .tab-btn:hover {
-            background-color: #0056b3;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .video-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-        .video-item {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .video-item video {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .right-sidebar {
-            display: flex;
-            flex-direction: column;
-            width: 248px;
-        }
-
-        .right-sidebar .section {
-            margin-bottom: 20px;
-        }
-
-        .prompt-templates {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 500px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-
-        .template-btn {
-            text-align: left;
-            padding: 12px 15px;
-            background-color: #f0f0f0;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9em;
-            line-height: 1.4;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .template-btn:hover {
-            background-color: #e0e0e0;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-
-        .dark-mode .template-btn {
-            background-color: #2a2a2a;
-            border-color: #444;
-            color: #fff;
-        }
-
-        .dark-mode .template-btn:hover {
-            background-color: #3a3a3a;
-        }
-
-        .prompt-templates::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .prompt-templates::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .prompt-templates::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-
-        .prompt-templates::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        .prompt-container {
-            display: flex;
-            align-items: center;
-        }
-
-        .magic-wand-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2em;
-            color: #007bff;
-            margin: 0 10px;
-            transition: color 0.3s ease;
-        }
-
-        .magic-wand-btn:hover {
-            color: #0056b3;
-        }
-    </style>
-</head>
+{% include 'head.html' %}
 <body>
     <div class="popup-overlay" id="imagePopup">
         <div class="popup-content">
@@ -234,7 +14,7 @@
     {% endwith %}
 
     <div class="header">
-        <img src="https://raw.githubusercontent.com/mrbrokecoder/ChatCat/main/ComfyUI_Generate_1_image%20(2).png" alt="" srcset="" style="height: 40px; width: 40px; border-radius: 5px;">        <div class="header-title">Text to Image</div>
+        <img src="https://raw.githubusercontent.com/mrbrokecoder/ChatCat/main/ComfyUI_Generate_1_image%20(2).png" alt="" srcset="" style="height: 40px; width: 40px; border-radius: 5px;">        
         <div class="header-actions">
             <div class="credits-info">
                 {% if current_user.is_premium %}
@@ -260,6 +40,39 @@
         </div>
     </div>
     <div class="content">
+        <div class="main-content">
+            <div class="prompt-container">
+                <input type="text" id="prompt" placeholder="Enter your prompt here">
+                <button id="magicWandBtn" class="magic-wand-btn" aria-label="Enhance prompt"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                <button id="generateButton">Generate</button>
+            </div>
+            <div class="image-grid" id="resultGrid">
+                <div class="image-box"></div>
+                <div class="image-box"></div>
+            </div>
+             <!-- Add the new section for previously generated images -->
+        <div class="previous-images">
+            <h2>Your Previously Generated Images</h2>
+            <div class="previous-images-grid">
+                {% if images %}
+                {% for image in images %}
+                    <div class="previous-image-box">
+                        <img src="{{ image[0] }}" alt="{{ image[1] }}" loading="lazy">
+                        <div class="previous-image-info">
+                            <p>Prompt: {{ image[1] }}</p>
+                            <p>Style: {{ image[2] }}</p>
+                            <p>Color: {{ image[3] }}</p>
+                            <p>Created at: {{ image[4] | custom_datetime }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No images found.</p>
+            {% endif %}
+            </div>
+        </div>
+        </div>
+        
         <div class="sidebar left-sidebar">
             <div class="section">
                 <h3 class="section-title">Image Settings</h3>
@@ -327,46 +140,7 @@
                 </div>
             </div>
         </div>
-        <div class="main-content">
-            <div class="image-grid" id="resultGrid">
-                <div class="image-box"></div>
-                <div class="image-box"></div>
-            </div>
-             <!-- Add the new section for previously generated images -->
-        <div class="previous-images">
-            <h2>Your Previously Generated Images</h2>
-            <div class="previous-images-grid">
-                {% if images %}
-                {% for image in images %}
-                    <div class="previous-image-box">
-                        <img src="{{ image[0] }}" alt="{{ image[1] }}" loading="lazy">
-                        <div class="previous-image-info">
-                            <p>Prompt: {{ image[1] }}</p>
-                            <p>Style: {{ image[2] }}</p>
-                            <p>Color: {{ image[3] }}</p>
-                            <p>Created at: {{ image[4] | custom_datetime }}</p>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No images found.</p>
-            {% endif %}
-            </div>
-        </div>
-            <div class="prompt-container">
-                <input type="text" id="prompt" placeholder="Enter your prompt here">
-                <button id="magicWandBtn" class="magic-wand-btn"><i class="fa-solid fa-wand-magic-sparkles"></i></i></button>
-                <button id="generateButton">Generate</button>
-            </div>
-        </div>
-        <div id="videoGenerationContent" class="tab-content" style="display: none;">
-            <div class="prompt-container">
-                <input type="text" id="videoPrompt" placeholder="Enter your prompt for video generation">
-                <button id="generateVideoButton">Generate Video</button>
-            </div>
-            <div id="videoLoadingIndicator" style="display: none;">Generating video... This may take a few minutes.</div>
-            <div id="videoContainer" class="video-container"></div>
-        </div>
+        
         <div class="sidebar right-sidebar">
             <div class="section">
                 <h3 class="section-title">Recent Images</h3>
