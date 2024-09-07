@@ -540,10 +540,20 @@ def send_otp_email(email, otp):
     msg = MIMEMultipart()
     msg['From'] = app.config['SMTP_USERNAME']
     msg['To'] = email
-    msg['Subject'] = 'Your OTP for signup'
+    msg['Subject'] = 'Your OTP for Cartonify Signup'
     
-    body = f'Your OTP for signup is: {otp}'
-    msg.attach(MIMEText(body, 'plain'))
+    html = f"""
+    <html>
+        <body>
+            <h2>Welcome to Cartonify!</h2>
+            <p>Thank you for signing up. To complete your registration, please use the following One-Time Password (OTP):</p>
+            <h1 style="color: #4B0082; font-size: 24px;">{otp}</h1>
+            <p>This OTP is valid for 10 minutes. If you didn't request this, please ignore this email.</p>
+            <p>Best regards,<br>The Image Garden Team</p>
+        </body>
+    </html>
+    """
+    msg.attach(MIMEText(html, 'html'))
     
     with smtplib.SMTP_SSL(app.config['SMTP_SERVER'], app.config['SMTP_PORT']) as server:
         server.login(app.config['SMTP_USERNAME'], app.config['SMTP_PASSWORD'])
