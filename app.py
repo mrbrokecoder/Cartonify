@@ -598,19 +598,26 @@ def signup():
             cur.close()
             conn.close()
             
-            # Generate OTP
-            otp = str(random.randint(100000, 999999))
-            
-            # Store OTP and user details in session
-            session['signup_otp'] = otp
-            session['signup_email'] = email
-            session['signup_password'] = password
-            
-            # Send OTP via email
-            send_otp_email(email, otp)
-            
-            flash('OTP sent to your email. Please enter it to complete signup. check Spam')
-            return render_template('signup.html', email=email, show_otp=True)
+            # Add error handling and logging here
+            try:
+                # Generate OTP
+                otp = str(random.randint(100000, 999999))
+                
+                # Store OTP and user details in session
+                session['signup_otp'] = otp
+                session['signup_email'] = email
+                session['signup_password'] = password
+                
+                # Send OTP via email
+                send_otp_email(email, otp)
+                
+                flash('OTP sent to your email. Please enter it to complete signup. check Spam')
+                return render_template('signup.html', email=email, show_otp=True)
+            except Exception as e:
+                app.logger.error(f"Error sending OTP: {str(e)}")
+                flash("An error occurred while sending OTP. Please try again.")
+                return render_template('signup.html', show_otp=False)
+
     
     return render_template('signup.html', show_otp=False)
 
