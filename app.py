@@ -272,7 +272,18 @@ def custom_datetime(value):
 @app.route('/')
 def home():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        user = get_user_data(current_user.id)
+        user['credits_percentage'] = (user['credits_used'] / user['total_credits']) * 100
+    else:
+        user = {
+            'username': 'Guest',
+            'avatar_url': '/static/default_avatar.png',
+            'points': 0,
+            'credits_used': 0,
+            'total_credits': 0,
+            'credits_percentage': 0,
+            'profile_url': '/login'
+        }
     
     # Fetch the most recent generated images with all necessary information
     conn = get_db_connection()
@@ -295,7 +306,29 @@ def home():
     cur.close()
     conn.close()
     
-    return render_template('home.html', images=images)
+    return render_template('home.html', images=images, user=user)
+
+
+
+def get_user_data(user_id):
+    # Connect to your database and fetch user data
+    # This is a simplified example; adjust according to your database setup
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    
+    cursor.execute("SELECT username, avatar_url, points, credits_used, total_credits FROM users WHERE id = %s", (user_id,))
+    user_data = cursor.fetchone()
+    
+    connection.close()
+    
+    return {
+        'username': user_data[0],
+        'avatar_url': user_data[1],
+        'points': user_data[2],
+        'credits_used': user_data[3],
+        'total_credits': user_data[4],
+        'profile_url': f"/user/{user_data[0]}"
+    }
 
 # Update the login manager to use the new home page
 login_manager.login_view = 'home'
@@ -484,6 +517,24 @@ def api_usage_stats():
 @app.route('/check_login')
 def check_login():
     return jsonify({"logged_in": current_user.is_authenticated})
+
+
+@app.route('/api/user_profile')
+def user_profile_api():
+    if current_user.is_authenticated:
+        user = get_user_data(current_user.id)
+        user['credits_percentage'] = (user['credits_used'] / user['total_credits']) * 100
+    else:
+        user = {
+            'username': 'Guest',
+            'avatar_url': '/static/default_avatar.png',
+            'points': 0,
+            'credits_used': 0,
+            'total_credits': 0,
+            'credits_percentage': 0,
+            'profile_url': '/login'
+        }
+    return jsonify(user)
 
 def send_otp_email(email, otp):
     msg = MIMEMultipart()
