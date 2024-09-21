@@ -10,7 +10,8 @@ from io import BytesIO
 import time
 import psycopg2
 from psycopg2 import sql
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash as werkzeug_generate_password_hash
+from werkzeug.security import check_password_hash as werkzeug_check_password_hash
 from datetime import datetime, timedelta
 import secrets  # Add this import at the top of the file
 import razorpay
@@ -52,7 +53,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
 app.config['SESSION_TYPE'] = 'filesystem'
 
 # Redis Configuration
-app.config['REDIS_URL'] = os.getenv('REDIS_URL', 'redis://127.0.0.1:4000')
+app.config['REDIS_URL'] = os.getenv('REDIS_URL', 'https://167d9fa7-b0b0-4ae1-961b-d0e104077762-00-xst0vfasw3um.picard.replit.dev/')
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
@@ -576,7 +577,7 @@ def signup():
             
             # OTP is valid, create the user
             password = session.get('signup_password')
-            hashed_password = generate_password_hash(password)
+            hashed_password = werkzeug_generate_password_hash(password, method='pbkdf2:sha256')
             
             conn = get_db_connection()
             cur = conn.cursor()
@@ -645,7 +646,7 @@ def login():
         user = cur.fetchone()
         cur.close()
         conn.close()
-        if user and check_password_hash(user[2], password):
+        if user and werkzeug_check_password_hash(user[2], password):
             user_obj = User(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8])
             login_user(user_obj)
             return redirect(url_for('index'))
